@@ -80,9 +80,17 @@ button{font:inherit;color:inherit}
 .chrome-in{flex-wrap:wrap}
 .pvnote{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap;background:none;border:1px solid var(--line);border-radius:6px;padding:5px 9px;cursor:pointer}
 .pvnote:hover{border-color:var(--accent);color:var(--accent)}
+.mockonly{padding-left:14px;border-left:1px solid var(--line)}
+.resetbtn{font-family:var(--disp);font-size:11.5px;font-weight:600;color:var(--ink-3);background:var(--surface);
+  border:1px solid var(--line-2);border-radius:6px;padding:5px 11px;cursor:pointer;white-space:nowrap}
+.resetbtn:hover{border-color:var(--crit);color:var(--crit)}
+.resetbtn.arm{border-color:var(--crit);color:var(--crit);background:var(--crit-wash)}
+.resetbtn.done{border-color:var(--ok);color:var(--ok);background:var(--ok-wash)}
 .thbtn{font-family:var(--disp);font-size:11.5px;font-weight:600;color:var(--ink-3);background:var(--surface);border:1px solid var(--line-2);padding:5px 10px;cursor:pointer;margin-left:-1px}
 .thbtn:first-of-type{border-radius:6px 0 0 6px;margin-left:0} .thbtn:last-of-type{border-radius:0 6px 6px 0}
 .thbtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;position:relative;z-index:1}
+:root[data-theme="dark"] .thbtn[aria-pressed="true"],:root:not([data-theme="light"]) .thbtn[aria-pressed="true"]{color:#101318}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .thbtn[aria-pressed="true"]{color:#fff}}
 .dslot{display:flex;flex-direction:column;gap:8px;min-height:70px}
 .sec.flash{background:var(--wash);box-shadow:0 0 0 12px var(--wash);border-radius:10px}
 .sec{transition:background .35s ease,box-shadow .35s ease}
@@ -317,8 +325,13 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
     </select>
     <button type="button" class="pvnote" id="pvnote"></button>
   </div>
-  <div class="previewas"><label for="revealsel">Detail link</label>
-    <select id="revealsel"><option value="fixed">Link — fixed slot</option><option value="appear">Link — appears</option><option value="inline">Fields inline</option></select></div>
+  <div class="previewas"><label for="revealsel">Reveal</label>
+    <select id="revealsel">
+      <option value="fixed">Link reveal</option>
+      <option value="appear">Link reveal (appears)</option>
+      <option value="inline">Progressive add</option>
+    </select></div>
+  <div class="previewas mockonly"><button type="button" class="resetbtn" id="resetmock">Clear form</button></div>
   <div class="previewas" role="group" aria-label="Theme">
     <button type="button" class="thbtn" data-th="auto" aria-pressed="true">Auto</button>
     <button type="button" class="thbtn" data-th="light" aria-pressed="false">Light</button>
@@ -448,6 +461,7 @@ const S={who:"caic-ret",opt:"b",step:0,
   g_total:"",g_caught:"",g_partial:"",g_full:"",g_breathing:"",g_involved:"",g_tsp:"",g_airbag:"",g_deployed:"",g_desc:"",
   startElev:"",crust:"",weakLayer:"",windExp:"",veg:"",triggerDepth:"",traps:[],
   reveal:"fixed"};
+const INITIAL=JSON.parse(JSON.stringify(S));   // pristine copy, for the Clear control
 
 /* ---------- enums ---------- */
 const AV=[["none","No avalanches"],["saw","Saw avalanche(s)"],["triggered","We triggered one"],["caught","Someone was caught"]];
@@ -652,8 +666,8 @@ const FOOT=extra=>`<div class="foot">${extra||""}<p class="outcome" data-outcome
 function buildB(){
   $("#pane-b").innerHTML=
     LEDE("The field report",
-      "Contact, where, when, photos, notes and red flags. Three of those are required; the rest are one tap each. Use the Detail link control at the top to compare three ways of offering the optional detail \u2014 a link in a fixed slot, a link that appears when it becomes relevant, or the fields themselves added inline.",
-      ["3 required fields","core never changes","3 reveal modes"])+
+      "Contact, where, when, photos, notes and red flags. Three of those are required; the rest are one tap each. Use the Reveal control at the top to switch between <b>link reveal</b> \u2014 one row that opens a separate detail page \u2014 and <b>progressive add</b>, which drops the relevant fields straight into the form underneath the red flags.",
+      ["3 required fields","core never changes","link reveal or progressive add"])+
     `<div class="page"><form class="screen">${INTRO}
       ${B.who()}${B.where()}${B.when()}${B.photos()}${B.notes()}${B.flags()}<div data-inline></div>${B.detail()}
       ${FOOT()}
@@ -1061,6 +1075,36 @@ document.addEventListener("click",e=>{
 document.addEventListener("change",e=>{
   const c=e.target.closest("[data-ppc]"); if(!c) return;
   prst[c.dataset.ppc]=c.checked; renderPriv(c.dataset.ppc==="anon"?"anon":"checks");
+});
+
+/* ---------- clear the mock (prototype control, not part of the form) ---------- */
+let armed=null;
+function resetMock(){
+  const keep={who:S.who,opt:S.opt,reveal:S.reveal};        // demo settings survive; the report does not
+  Object.keys(INITIAL).forEach(k=>{ S[k]=Array.isArray(INITIAL[k])?INITIAL[k].slice():INITIAL[k]; });
+  Object.assign(S,keep);
+  S.observed_at=new Date().toISOString().slice(0,10);
+  S.step=0;
+  $$("[data-need]").forEach(x=>x.classList.remove("err"));
+  $$("[data-msg]").forEach(m=>{ m.className="msg"; m.textContent=""; });
+  if($("#sheet").classList.contains("on")) closeSheet();
+  if(!$(".dbg").hidden) $(".dbg").hidden=true;
+  renderWho();
+  if(S.opt==="c") renderStep();
+  syncAll();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+$("#resetmock").addEventListener("click",()=>{
+  const b=$("#resetmock");
+  if(b.classList.contains("arm")){                          // second click confirms
+    clearTimeout(armed); b.classList.remove("arm");
+    resetMock();
+    b.classList.add("done"); b.textContent="Cleared";
+    armed=setTimeout(()=>{ b.classList.remove("done"); b.textContent="Clear form"; },1600);
+    return;
+  }
+  b.classList.add("arm"); b.textContent="Clear \u2014 sure?";
+  armed=setTimeout(()=>{ b.classList.remove("arm"); b.textContent="Clear form"; },3000);
 });
 
 /* ---------- init ---------- */
