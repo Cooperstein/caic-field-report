@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="description" content="Draft design concept for the CAIC and Avalanche Canada backcountry observation report form.">
+<style>
+  :root{color-scheme:light dark}
+  html,body{margin:0}
+  body{font:14px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fff}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+<style>
+.draftbar{background:#5A3C0A;color:#FBEED6;font:500 13px/1.45 "IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  padding:9px 22px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;justify-content:center;text-align:center}
+.draftbar strong{color:#FFC978;font-weight:700;letter-spacing:.02em;text-transform:uppercase;font-size:11px}
+@media (prefers-color-scheme:dark){.draftbar{background:#33270F}}
+</style>
+<title>CAIC Field Report</title>
+</head>
+<body>
+<div class="draftbar">
+  <strong>Draft concept</strong>
+  <span>Design exploration for the CAIC and Avalanche Canada field report. Not official CAIC guidance, and not a live form &mdash; nothing you enter is submitted anywhere.</span>
+</div>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F6F7F9; --surface:#FFFFFF; --sunk:#F0F2F6;
+  --ink:#16181D; --ink-2:#4A5260; --ink-3:#7A8290;
+  --line:#E2E5EA; --line-2:#C7CDD6;
+  --accent:#1F5FA8; --accent-2:#17497F; --wash:#EAF1FA;
+  --ok:#2C7A52; --ok-wash:#E4F1EA;
+  --flag:#B8730F; --flag-wash:#FBEED6;
+  --crit:#B0301C; --crit-wash:#FAE5E1;
+  --r:9px; --touch:46px;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --disp:"Archivo","IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#101318; --surface:#171B21; --sunk:#1D222A;
+  --ink:#E8EBF0; --ink-2:#A5AEBB; --ink-3:#79828F;
+  --line:#262C34; --line-2:#39414B;
+  --accent:#6FA8E8; --accent-2:#93C0F2; --wash:#152234;
+  --ok:#5EAE81; --ok-wash:#152A1F;
+  --flag:#E0A54E; --flag-wash:#332714;
+  --crit:#DE7460; --crit-wash:#331915;
+}}
+:root[data-theme="dark"]{
+  --ground:#101318; --surface:#171B21; --sunk:#1D222A;
+  --ink:#E8EBF0; --ink-2:#A5AEBB; --ink-3:#79828F;
+  --line:#262C34; --line-2:#39414B;
+  --accent:#6FA8E8; --accent-2:#93C0F2; --wash:#152234;
+  --ok:#5EAE81; --ok-wash:#152A1F;
+  --flag:#E0A54E; --flag-wash:#332714;
+  --crit:#DE7460; --crit-wash:#331915;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--disp);margin:0;letter-spacing:-.02em;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus{outline:none}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;border-radius:4px}
+.vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important}}
+
+/* chrome */
+.chrome{border-bottom:1px solid var(--line);background:var(--surface)}
+.chrome-in{max-width:620px;margin:0 auto;padding:11px 22px;display:flex;align-items:center;gap:14px}
+.mark{font-family:var(--disp);font-weight:700;font-size:13.5px;letter-spacing:.02em;flex:1;color:var(--ink)}
+.mark span{color:var(--ink-3);font-weight:500}
+.previewas{display:flex;align-items:center;gap:7px}
+.previewas label{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.chrome-in{flex-wrap:wrap}
+.pvnote{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap;background:none;border:1px solid var(--line);border-radius:6px;padding:5px 9px;cursor:pointer}
+.pvnote:hover{border-color:var(--accent);color:var(--accent)}
+.thbtn{font-family:var(--disp);font-size:11.5px;font-weight:600;color:var(--ink-3);background:var(--surface);border:1px solid var(--line-2);padding:5px 10px;cursor:pointer;margin-left:-1px}
+.thbtn:first-of-type{border-radius:6px 0 0 6px;margin-left:0} .thbtn:last-of-type{border-radius:0 6px 6px 0}
+.thbtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;position:relative;z-index:1}
+.dslot{display:flex;flex-direction:column;gap:8px;min-height:70px}
+.sec.flash{background:var(--wash);box-shadow:0 0 0 12px var(--wash);border-radius:10px}
+.sec{transition:background .35s ease,box-shadow .35s ease}
+.previewas select{font-family:var(--sans);font-size:12.5px;padding:5px 7px;border:1px solid var(--line-2);border-radius:6px;background:var(--surface);color:var(--ink)}
+
+.page{max-width:620px;margin:0 auto;padding:26px 22px 70px;position:relative}
+.screen{display:flex;flex-direction:column}
+.screen[hidden]{display:none}
+
+/* intro */
+.intro h1{font-size:27px;font-weight:700}
+.intro p{color:var(--ink-2);margin-top:7px;max-width:52ch}
+
+/* section: hairline label, no boxes */
+.sec{margin-top:34px}
+.sec-h{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+.sec-h h2{font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+.sec-h::after{content:"";flex:1;height:1px;background:var(--line)}
+.sec-h .must{font-family:var(--sans);font-size:10.5px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--crit);border:1px solid currentColor;border-radius:4px;padding:0 5px;line-height:16px}
+.sec-h .may{font-family:var(--sans);font-size:10.5px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink-3)}
+.q{font-family:var(--disp);font-size:17px;font-weight:600;line-height:1.35;margin-bottom:4px;display:block}
+.hint{color:var(--ink-3);font-size:13.5px;margin-bottom:11px;line-height:1.5}
+.bad{color:var(--crit);font-size:13px;font-weight:600;margin-top:8px;display:none}
+.sec.err .bad{display:block}
+
+input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],textarea{
+  width:100%;font-family:var(--sans);font-size:16px;color:var(--ink);background:var(--surface);
+  border:1.5px solid var(--line-2);border-radius:var(--r);padding:11px 13px;min-height:var(--touch)}
+textarea{min-height:150px;resize:vertical;line-height:1.6}
+input::placeholder,textarea::placeholder{color:var(--ink-3)}
+.sec.err input,.sec.err textarea{border-color:var(--crit);background:var(--crit-wash)}
+input[type=date]{max-width:220px}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line-2);background:var(--surface);border-radius:999px;padding:9px 15px;font-size:14.5px;font-weight:500;cursor:pointer;min-height:42px;transition:background .12s,border-color .12s,color .12s}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+:root[data-theme="dark"] .chip[aria-pressed="true"],:root:not([data-theme="light"]) .chip[aria-pressed="true"]{color:#101318}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .chip[aria-pressed="true"]{color:#fff}}
+.chip:hover[aria-pressed="true"]{color:#fff}
+:root[data-theme="dark"] .chip:hover[aria-pressed="true"],:root:not([data-theme="light"]) .chip:hover[aria-pressed="true"]{color:#101318}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .chip:hover[aria-pressed="true"]{color:#fff}}
+
+/* red-flag rows */
+.flagrow{display:grid;grid-template-columns:104px 1fr;gap:12px;align-items:start;padding:11px 0;border-top:1px solid var(--line)}
+.flagrow:first-of-type{border-top:0}
+.flagrow>.fl{font-family:var(--disp);font-size:14.5px;font-weight:600;padding-top:10px}
+.fl small{display:block;font-family:var(--sans);font-weight:400;font-size:11.5px;color:var(--ink-3);margin-top:-2px}
+.fl button{background:none;border:0;padding:0;font-family:var(--sans);font-size:11.5px;font-weight:500;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+@media (max-width:520px){.flagrow{grid-template-columns:1fr;gap:7px}.flagrow>.fl{padding-top:0}}
+.quickset{margin-bottom:13px}
+.flagrow.pairrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:16px 18px;align-items:start}
+.pairrow .pair .fl{padding-top:0;margin-bottom:8px}
+
+.deflinewrap{margin:9px 0 0}
+.sec.inlined{border-left:3px solid var(--accent);padding-left:15px;margin-left:-18px}
+.sec.inlined .sec-h h2{color:var(--accent)}
+.privrow{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);border-radius:8px;transition:background .35s,box-shadow .35s}
+.privrow.flash{background:var(--wash);box-shadow:0 0 0 12px var(--wash)}
+.outcome{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:13.5px;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:11px 13px}
+.outcome b{color:var(--ink);font-weight:600}
+.outcome .eye{color:var(--accent);font-size:11px}
+.outcome.locked{background:var(--flag-wash);border-color:var(--flag-line)}
+.outcome.locked .eye{color:var(--flag)}
+.deflink{background:none;border:0;padding:2px 0;font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.deflink:hover{color:var(--accent-2)}
+.chip-none[aria-pressed="true"]{background:var(--ok);border-color:var(--ok)}
+
+/* map */
+.mapwrap{border:1.5px solid var(--line-2);border-radius:var(--r);overflow:hidden;background:var(--sunk)}
+.mapwrap svg{display:block;width:100%;height:auto}
+.zone{fill:var(--surface);stroke:var(--line-2);stroke-width:1.5;cursor:pointer;transition:fill .13s}
+.zone:hover{fill:var(--wash)}
+.zone.on{fill:var(--accent);stroke:var(--accent-2)}
+.zlab{font-family:var(--disp);font-size:10.5px;font-weight:600;fill:var(--ink-2);pointer-events:none;text-anchor:middle}
+.zlab.on{fill:#fff}
+:root[data-theme="dark"] .zlab.on,:root:not([data-theme="light"]) .zlab.on{fill:#101318}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .zlab.on{fill:#fff}}
+.state{fill:var(--sunk);stroke:var(--line);stroke-width:1.5}
+.pinned{min-height:42px;display:flex;align-items:center;gap:9px;margin-top:9px;font-size:14px;color:var(--ink-2)}
+.pinned b{font-family:var(--disp);color:var(--ink)}
+.pinned .co{font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
+.pinned .tk{color:var(--ok);font-weight:700}
+
+/* photos */
+.drop{display:flex;align-items:center;gap:13px;width:100%;text-align:left;border:2px dashed var(--line-2);border-radius:var(--r);background:var(--surface);cursor:pointer;padding:15px 16px;min-height:74px;transition:border-color .13s,background .13s}
+.drop:hover{border-color:var(--accent);background:var(--wash)}
+.drop .plus{width:38px;height:38px;border-radius:10px;background:var(--wash);color:var(--accent);display:grid;place-items:center;font-size:21px;font-family:var(--disp);font-weight:600;flex:none}
+.drop strong{display:block;font-family:var(--disp);font-size:15.5px;font-weight:600}
+.drop small{display:block;color:var(--ink-3);font-size:12.5px}
+.strip{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding-top:10px;min-height:0}
+.strip:empty{display:none}
+.thumb{width:70px;height:70px;flex:none;border-radius:8px;border:1px solid var(--line-2);background:var(--sunk);position:relative;overflow:hidden;display:grid;place-items:center}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.thumb span{font-family:var(--mono);font-size:9px;color:var(--ink-3);padding:4px;text-align:center;word-break:break-all;line-height:1.25}
+.thumb button{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:0;background:rgba(22,24,29,.8);color:#fff;font-size:13px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+
+/* prompts under notes */
+.prompts{margin-top:10px;font-size:13px;color:var(--ink-3);line-height:1.7}
+.prompts b{display:block;font-family:var(--disp);font-size:10.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-bottom:2px}
+.prompts i{font-style:italic}
+
+/* identity */
+.who{display:flex;align-items:center;gap:12px;background:var(--surface);border:1.5px solid var(--line-2);border-radius:var(--r);padding:12px 14px}
+.who .av{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--disp);font-weight:700;font-size:13px;flex:none}
+:root[data-theme="dark"] .who .av,:root:not([data-theme="light"]) .who .av{color:#101318}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .who .av{color:#fff}}
+.who .m{flex:1;min-width:0}
+.who .n{font-family:var(--disp);font-weight:600;font-size:15px}
+.who .s{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lnk{background:none;border:0;padding:5px 3px;color:var(--accent);font-size:13.5px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:440px){.two{grid-template-columns:1fr}}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld span{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+
+/* footer */
+.foot{margin-top:34px;padding-top:22px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:13px}
+.btn{border:1.5px solid transparent;border-radius:var(--r);padding:14px 20px;font-family:var(--disp);font-size:16px;font-weight:700;cursor:pointer;min-height:52px}
+.btn-go{background:var(--accent);color:#fff;border-color:var(--accent);width:100%}
+.btn-go:hover{background:var(--accent-2);border-color:var(--accent-2)}
+:root[data-theme="dark"] .btn-go,:root:not([data-theme="light"]) .btn-go{color:#101318}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .btn-go{color:#fff}}
+.btn-2{background:var(--surface);border-color:var(--line-2);color:var(--ink);font-size:15px}
+.btn-2:hover{border-color:var(--accent);color:var(--accent)}
+.more{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;background:var(--surface);border:1.5px solid var(--line-2);border-radius:var(--r);padding:14px 16px;cursor:pointer;text-align:left;min-height:var(--touch)}
+.more:hover{border-color:var(--accent)}
+.more.has{border-color:var(--ok);background:var(--ok-wash)}
+.more strong{display:block;font-family:var(--disp);font-size:15px;font-weight:600}
+.more small{display:block;color:var(--ink-3);font-size:12.5px;margin-top:1px}
+.more .ar{color:var(--ink-3);font-size:19px;flex:none}
+.msg{font-size:13.5px;text-align:center;color:var(--ink-3);min-height:20px}
+.msg.no{color:var(--crit);font-weight:600}
+.msg.yes{color:var(--ok);font-weight:600}
+</style>
+<style>
+/* tabs */
+.tabs{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.tabs-in{max-width:960px;margin:0 auto;padding:0 22px;display:flex;flex-wrap:wrap;gap:0 2px}
+.tab{border:0;background:none;padding:13px 14px;font-family:var(--disp);font-size:13.5px;font-weight:600;color:var(--ink-3);cursor:pointer;white-space:nowrap;border-bottom:2.5px solid transparent}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-right:6px}
+.tab[aria-selected="true"] em{color:var(--accent)}
+
+.optlede{max-width:620px;margin:0 auto;padding:22px 22px 0}
+.optlede h2{font-size:19px;font-weight:700}
+.optlede p{color:var(--ink-2);font-size:14.5px;margin-top:6px}
+.optlede .meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.tagx{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--ink-2);background:var(--surface)}
+
+/* detail page (screen 2) */
+.dpage{position:fixed;inset:0;background:var(--ground);z-index:55;display:flex;flex-direction:column;
+  transform:translateY(100%);visibility:hidden;transition:transform .28s cubic-bezier(.32,.72,0,1),visibility .28s}
+.dpage.on{transform:none;visibility:visible}
+.dpin{max-width:620px;margin:0 auto;width:100%;padding:0 22px}
+.dpage-h{background:var(--surface);border-bottom:1px solid var(--line);padding:12px 0;flex:none}
+.dpage-h .dpin{display:flex;align-items:center;gap:13px}
+.dpage-h h3{font-size:17px;font-weight:700}
+.dpage-h small{display:block;font-family:var(--sans);font-size:12.5px;font-weight:400;color:var(--ink-3);margin-top:1px}
+.dpage-t{background:var(--surface);border-bottom:1px solid var(--line);flex:none}
+.dpage-t .dpin{display:flex;flex-wrap:wrap;gap:7px;padding-top:0;padding-bottom:11px}
+.dpage-t button{border:1.5px solid var(--line-2);background:var(--surface);border-radius:999px;padding:7px 14px;
+  font-family:var(--disp);font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.dpage-t button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .dpage-t button[aria-selected="true"],:root:not([data-theme="light"]) .dpage-t button[aria-selected="true"]{color:#101318}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .dpage-t button[aria-selected="true"]{color:#fff}}
+.dpage-t button.req{border-color:var(--flag);color:var(--flag)}
+.dpage-b{flex:1;overflow-y:auto;padding:22px 0 30px}
+.dpage-f{background:var(--surface);border-top:1px solid var(--line);padding:13px 0;flex:none}
+.dpage-f .dpin{display:flex;gap:10px}
+.dpage-f .btn{flex:1}
+.dstep{font-family:var(--mono);font-size:11px;color:var(--ink-3);padding:9px 0 0}
+.x{border:1px solid var(--line-2);background:var(--surface);width:40px;height:40px;border-radius:9px;cursor:pointer;
+  font-size:20px;line-height:1;display:grid;place-items:center;flex:none;color:var(--ink-2)}
+.x:hover{border-color:var(--accent);color:var(--accent)}
+
+/* wizard (option C) */
+.wiz{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden;display:flex;flex-direction:column;min-height:530px}
+.wiz-top{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line)}
+.dots{display:flex;gap:6px;flex:1;justify-content:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--line-2)}
+.dot.on{background:var(--accent);transform:scale(1.25)}
+.dot.done{background:var(--accent);opacity:.45}
+.wiz-b{flex:1;padding:26px 22px;display:flex;flex-direction:column;justify-content:center}
+.wiz-b .q{font-size:23px;margin-bottom:6px}
+.wiz-f{padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
+.wiz-f .btn{flex:1}
+.step-skip{background:none;border:0;color:var(--ink-3);font-size:13.5px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:6px}
+.ghost{border:1px solid var(--line-2);background:var(--surface);width:44px;height:44px;border-radius:9px;cursor:pointer;font-size:18px;display:grid;place-items:center;flex:none;color:var(--ink-2)}
+.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.ghost:disabled{opacity:.35;cursor:default}
+
+/* audit */
+.audit{max-width:960px;margin:0 auto;padding:26px 22px 80px}
+.audit h2{font-size:24px;font-weight:700}
+.audit .sub{color:var(--ink-2);margin-top:8px;max-width:70ch}
+.audit h3{font-size:15px;font-weight:700;margin:34px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.tw{overflow-x:auto;overflow-y:hidden;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table.aud{width:100%;border-collapse:collapse;font-size:13.5px;min-width:720px}
+.aud th{font-family:var(--disp);font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);text-align:left;padding:11px 13px;border-bottom:1.5px solid var(--line-2);white-space:nowrap;background:var(--sunk)}
+.aud td{padding:12px 13px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.5}
+.aud tr:last-child td{border-bottom:0}
+.aud td:first-child{font-family:var(--disp);font-weight:600;white-space:nowrap;color:var(--ink)}
+.aud td small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);font-weight:400;margin-top:2px}
+.v{display:inline-block;font-family:var(--disp);font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:5px;white-space:nowrap}
+.v-keep{background:var(--ok-wash);color:var(--ok);border:1px solid currentColor}
+.v-red{background:var(--wash);color:var(--accent);border:1px solid currentColor}
+.v-move{background:var(--flag-wash);color:var(--flag);border:1px solid currentColor}
+.v-cut{background:var(--crit-wash);color:var(--crit);border:1px solid currentColor}
+.cost-hi{color:var(--crit);font-weight:600}
+.cost-lo{color:var(--ok);font-weight:600}
+.cost-md{color:var(--flag);font-weight:600}
+.note{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:9px;padding:15px 17px;margin-top:16px}
+.note p+p{margin-top:9px}
+.note b{font-weight:600}
+.audit ol,.audit ul{margin:0;padding-left:21px;display:flex;flex-direction:column;gap:9px}
+.audit li{color:var(--ink-2);line-height:1.6}
+.audit li b{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px 5px;border-radius:4px}
+.hid{display:none !important}
+</style>
+<div class="chrome"><div class="chrome-in">
+  <div class="mark">CAIC <span>· field report concepts</span></div>
+  <div class="previewas">
+    <label for="whosel">Preview as</label>
+    <select id="whosel">
+      <option value="caic-new">CAIC · first time</option>
+      <option value="caic-ret">CAIC · returning</option>
+      <option value="avcan">AvCan · signed in</option>
+    </select>
+    <button type="button" class="pvnote" id="pvnote"></button>
+  </div>
+  <div class="previewas"><label for="revealsel">Detail link</label>
+    <select id="revealsel"><option value="fixed">Link — fixed slot</option><option value="appear">Link — appears</option><option value="inline">Fields inline</option></select></div>
+  <div class="previewas" role="group" aria-label="Theme">
+    <button type="button" class="thbtn" data-th="auto" aria-pressed="true">Auto</button>
+    <button type="button" class="thbtn" data-th="light" aria-pressed="false">Light</button>
+    <button type="button" class="thbtn" data-th="dark" aria-pressed="false">Dark</button></div>
+</div></div>
+
+<div class="tabs"><div class="tabs-in" role="tablist">
+  <button class="tab" role="tab" id="t-b" aria-selected="true">The form</button>
+  <button class="tab" role="tab" id="t-e" aria-selected="false">Reveal patterns</button>
+  <button class="tab" role="tab" id="t-f" aria-selected="false">Privacy patterns</button>
+  <button class="tab" role="tab" id="t-d" aria-selected="false">Field audit</button>
+</div></div>
+
+<div id="pane-b"></div>
+
+<div id="pane-e" class="audit" hidden></div>
+
+<div id="pane-f" class="audit" hidden></div>
+
+<div id="pane-d" class="audit" hidden>
+  <h2>Is this field earning its place?</h2>
+  <p class="sub">Every field is a toll booth between a person who saw something useful and the forecaster who needs to know it. A field earns its place only if what it returns is worth what it costs to collect. Below is each field in the combined CAIC and Avalanche Canada set, judged on that one test.</p>
+
+  <div class="note">
+    <p><b>Cost</b> is what the field takes from the reporter: typing costs far more than tapping, jargon costs more than plain language, and anything that asks for identity or precision before the person has invested effort costs more than the same question asked later.</p>
+    <p><b>Value</b> is what a forecaster can actually do with it — filter on it, trust it, or act on it. A field that produces confident-looking but frequently wrong data has negative value, because it takes review time and can mislead.</p>
+  </div>
+
+  <h3>Keep on the core form</h3>
+  <div class="tw"><table class="aud">
+    <thead><tr><th>Field</th><th>Cost</th><th>Value</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Location<small>latitude / longitude</small></td><td><span class="cost-md">Medium</span> — a map interaction, the fiddliest thing on the form</td><td><b>Essential.</b> Derives Backcountry Area, places the pin, makes everything else interpretable</td><td><span class="v v-keep">Keep</span><br><small style="margin-top:6px">Default to GPS, let them adjust</small></td></tr>
+      <tr><td>Date<small>observed_at</small></td><td><span class="cost-lo">Very low</span> — defaults to today, most people never touch it</td><td><b>Essential.</b> An observation without a date is noise</td><td><span class="v v-keep">Keep</span></td></tr>
+      <tr><td>What did you observe<small>comments</small></td><td><span class="cost-hi">High</span> — the only typing on the form, and a blank box is where casual reporters quit</td><td><b>Highest.</b> This is what forecasters actually read. No dropdown set will ever cover what a person noticed</td><td><span class="v v-keep">Keep required</span><br><small style="margin-top:6px">Prompts beside it remove the blank page</small></td></tr>
+      <tr><td>Photos and video<small>assets</small></td><td><span class="cost-lo">Low</span> on a phone — they are already in the camera roll</td><td><b>Very high.</b> A photo of a crown or a shooting crack outperforms every structured field you could ask for</td><td><span class="v v-keep">Keep</span><br><small style="margin-top:6px">Promote it; ask early, not last</small></td></tr>
+      <tr><td>Avalanches seen<small>+ degree_involvement</small></td><td><span class="cost-lo">One tap</span> if merged into a single row</td><td><b>High.</b> Drives the Avalanches column and all three table flags</td><td><span class="v v-red">Merge</span><br><small style="margin-top:6px">One row of four, not two questions</small></td></tr>
+      <tr><td>Cracking<small>Yes / No</small></td><td><span class="cost-lo">One tap</span>, and the question is unambiguous — a reporter can answer it honestly without training</td><td><b>High,</b> and higher than a severity scale would be. Recreational reporters cannot reliably tell minor cracking from moderate, so a five-point scale returns confident-looking guesses a forecaster has no way to separate from careful answers</td><td><span class="v v-keep">Keep as yes/no</span><br><small style="margin-top:6px">Severity could live on the detail page for those who want to give it</small></td></tr>
+      <tr><td>Collapsing<small>Yes / No</small></td><td><span class="cost-lo">One tap</span>, same</td><td><b>High.</b> Same</td><td><span class="v v-keep">Keep</span></td></tr>
+      <tr><td>Name<small>firstname / lastname</small></td><td><span class="cost-lo">Low</span> — typed once, then remembered forever</td><td><b>High.</b> Attribution, credibility weighting, repeat-reporter recognition</td><td><span class="v v-keep">Keep</span><br><small style="margin-top:6px">Remember it; never ask twice</small></td></tr>
+      <tr><td>Email<small>email</small></td><td><span class="cost-lo">Low</span> — typed once, then remembered</td><td><b>High.</b> Follow-up, de-duplication, abuse control</td><td><span class="v v-keep">Keep</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Question these</h3>
+  <div class="tw"><table class="aud">
+    <thead><tr><th>Field</th><th>Cost</th><th>Value</th><th>Verdict</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Phone<small>phone</small></td><td><span class="cost-md">Medium.</span> Phone number is among the most-refused fields on a typical form — but that finding comes from marketing forms, where people expect to be sold to</td><td><b>High.</b> Forecasters reach out to reporters directly, so this is a working channel rather than an emergency one. That changes the trade entirely</td><td><span class="v v-keep">Keep required</span><br><small style="margin-top:6px">Say why you are asking, right next to the field</small></td></tr>
+      <tr><td>Activity<small>ski / sled / climb / foot</small></td><td><span class="cost-lo">One tap</span> — but repeated on every single report forever</td><td><span class="cost-md">Medium.</span> Tells you which terrain the observation samples. It rarely changes for a given person</td><td><span class="v v-move">Move to profile</span><br><small style="margin-top:6px">Set once, edit rarely, not per report</small></td></tr>
+      <tr><td>Privacy<small>is_anonymous · is_anonymous_location · is_locked</small></td><td><span class="cost-md">Medium.</span> Three independent checkboxes is three decisions, and most people will not read them carefully</td><td><b>Real</b> for the minority who need it — and that minority matters, because without it they may not report at all</td><td><span class="v v-red">Simplify</span><br><small style="margin-top:6px">One "who can see this" choice covers nearly every real combination</small></td></tr>
+      <tr><td>Avalanche problem type<small>storm / wind / persistent / …</small></td><td><span class="cost-md">Medium.</span> Genuine jargon; a recreational reporter is often guessing</td><td><span class="cost-md">Mixed.</span> Valuable when right, actively misleading when wrong, and you cannot tell which from the record</td><td><span class="v v-move">Detail only</span><br><small style="margin-top:6px">Keep a prominent "Not sure"</small></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Cut from the public form</h3>
+  <div class="tw"><table class="aud">
+    <thead><tr><th>Field</th><th>Cost</th><th>Value</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Trip title<small>title</small></td><td><span class="cost-md">Medium.</span> A naming task with a blank box, before the person has said anything real</td><td><span class="cost-hi">Near zero.</span> Fully derivable from zone plus date, which is how your table already displays reports</td><td><span class="v v-cut">Cut</span></td></tr>
+      <tr><td>Group size · caught · partially buried · fully buried · breathing impaired<small>six numeric fields</small></td><td><span class="cost-hi">Very high.</span> Six numeric inputs, and they are asked at the worst possible moment — right after an accident, often on a phone, often by someone in shock</td><td><b>High</b> in an investigation, but almost never captured accurately through a web form by someone who has just had the worst day of their life</td><td><span class="v v-cut">Cut</span><br><small style="margin-top:6px">A forecaster follows up directly</small></td></tr>
+      <tr><td>Transceiver / shovel / probe · airbags · airbag deployed<small>rescue equipment</small></td><td><span class="cost-md">Medium</span>, and only ever asked in the worst moment</td><td><b>High</b> — but this belongs in the accident interview, not a public submission</td><td><span class="v v-cut">Cut</span></td></tr>
+      <tr><td>Weather<small>sky · precipitation · wind · temperature</small></td><td><span class="cost-md">Medium.</span> Four more questions, asked of someone who was concentrating on the snow rather than the sky</td><td><span class="cost-hi">Low.</span> Your weather stations do all four of these better and more consistently than a person estimating from memory. A recreational reporter's temperature guess is close to worthless</td><td><span class="v v-cut">Cut</span><br><small style="margin-top:6px">Anything worth saying goes in the notes box as prose</small></td></tr>
+      <tr><td>Terrain traps · vegetation cover · wind exposure · ground cover</td><td><span class="cost-md">Medium each</span>, and four of them together read as an interrogation</td><td><span class="cost-hi">Low</span> from recreational reporters; you get this better from terrain data you already hold</td><td><span class="v v-cut">Cut</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>What the evidence actually supports</h3>
+  <p class="sub" style="margin-bottom:14px">These are well-established directional patterns in form research. The magnitudes vary a lot by context, so treat them as reasons to test rather than as numbers to quote in a meeting. Ask me and I will pull real citations for anything here.</p>
+  <ul>
+    <li><b>The count of required fields predicts abandonment better than almost anything else.</b> This is the single most reliable finding in the literature, and it is the reason a "yes" answer should never cost more than a "no".</li>
+    <li><b>Typing costs far more than tapping</b>, especially on a phone with cold hands. Every field you can turn from an input into a chip row is a real reduction in effort.</li>
+    <li><b>Asking for identity before the person has invested anything raises abandonment.</b> This is why checkout flows ask for payment last. Contact fields belong near the end, after the report is written.</li>
+    <li><b>Optional fields sitting among required ones slow everyone down</b>, because each one has to be read and dismissed. Separating them — by screen, by grouping, or by clear marking — is worth more than deleting a couple of them.</li>
+    <li><b>Prompts change what people write.</b> A labelled blank box gets one line. The same box with the six questions beside it gets a usable observation. Your NAC screenshot is doing the heavy lifting here.</li>
+    <li><b>Multi-step can beat one long page — but only when the steps are genuinely short.</b> Splitting a long form into long steps is worse than leaving it alone.</li>
+    <li><b>Never ask a person for something an instrument already measures better.</b> Temperature, wind speed and precipitation totals are measurements, and your weather stations beat a recreational reporter's recollection every time.</li>
+    <li><b>Precision you cannot collect is worse than none.</b> If reporters cannot reliably tell your categories apart, a finer scale does not capture more signal — it manufactures false precision, and a forecaster cannot tell a careful answer from a guess. Two options a person can answer honestly beat five they cannot.</li>
+    <li><b>People satisfice.</b> Whatever is easiest to answer is what you will get. If "no red flags" is one tap and "yes" is twelve, your dataset will drift toward "no" regardless of what the snow did.</li>
+  </ul>
+
+  <h3>How to find out what your people actually want</h3>
+  <p class="sub" style="margin-bottom:14px">None of the above tells you what Colorado backcountry users prefer. This does, and it takes about a week.</p>
+  <ol>
+    <li><b>Recruit eight to ten real observers</b> — a mix of frequent reporters, people who have submitted once and never returned, and a couple who have never submitted at all. That third group is the one you are actually trying to win, and the one most likely to be missing from your feedback so far.</li>
+    <li><b>Give each of them a real observation to report</b> from a photo and a short scenario, so everyone is entering comparable content. Rotate which option they see first, or the first one will always look hardest.</li>
+    <li><b>Watch, and time it.</b> Do not ask which one they like — ask them to think out loud while they do it. Record time to submit, where they hesitate, what they ask you about, and every field they skip.</li>
+    <li><b>Count the drop-offs, not the opinions.</b> The useful signal is where someone stalls or gives up, not which screen they say looks nicer. People are unreliable about preference and very reliable about friction.</li>
+    <li><b>Then check the quality of what came out.</b> Have a forecaster read the submissions blind and rate whether each one is usable. The shortest form that still produces usable reports is the winner — speed alone is not the goal.</li>
+  </ol>
+  <div class="note" style="margin-top:22px">
+    <p><b>One prediction worth testing.</b> If the audit above is right, the biggest single win available is not the layout at all — it is making the free-text box easy to start. It is the highest-value field on the form and the highest-cost one, which means it is where the leverage is. Try one version with the NAC prompt list and one with a bare box, and I would expect that difference to swamp the difference between these three layouts.</p>
+  </div>
+</div>
+
+<div class="dpage" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+  <header class="dpage-h"><div class="dpin">
+    <button type="button" class="x" id="sheet-x" aria-label="Back to the report">&lsaquo;</button>
+    <div style="flex:1"><h3 id="sheet-title">Add more detail</h3><small id="sheet-sub">All optional</small></div>
+  </div></header>
+  <nav class="dpage-t"><div class="dpin" id="sheet-tabs" role="tablist"></div></nav>
+  <div class="dpage-b"><div class="dpin" id="sheet-body"></div></div>
+  <footer class="dpage-f"><div class="dpin">
+    <button type="button" class="btn btn-2" id="sheet-clear">Clear this section</button>
+    <button type="button" class="btn btn-go" id="sheet-done">Save and return</button>
+  </div></footer>
+</div>
+<script>
+(function(){
+"use strict";
+const $=(s,r)=>(r||document).querySelector(s);
+const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+const has=v=>v!==undefined&&v!==null&&String(v).trim()!=="";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const S={who:"caic-new",opt:"b",
+  firstname:"",lastname:"",email:"",phone:"",
+  observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",
+  comments:"",assets:[],av:"",cracking:"",collapsing:"",visibility:"public",
+  av_type:"",dsize:"",trigger:"",aspect:"",elevation:"",problem:"",av_desc:"",
+  depth:"",width:"",runLength:"",incline:"",
+  hs:"",hn24:"",wl_grain:"",test:"",sp_desc:"",
+  sky:"",precip:"",wind:"",temp:"",wx_desc:"",
+  g_total:"",g_caught:"",g_partial:"",g_full:"",g_breathing:"",g_involved:"",g_tsp:"",g_airbag:"",g_deployed:"",g_desc:"",
+  startElev:"",crust:"",weakLayer:"",windExp:"",veg:"",triggerDepth:"",traps:[],
+  reveal:"fixed"};
+
+/* ---------- enums ---------- */
+const AV=[["none","No avalanches"],["saw","Saw avalanche(s)"],["triggered","We triggered one"],["caught","Someone was caught"]];
+const CRACK=[["yes","Yes"],["no","No"]];
+const COLL=[["yes","Yes"],["no","No"]];
+const VIS=[["public","With my name"],["noname","Anonymously"],["noloc","Anonymous, no location"],["staff","CAIC staff only"]];
+const ASPECT=[["N","N"],["NE","NE"],["E","E"],["SE","SE"],["S","S"],["SW","SW"],["W","W"],["NW","NW"],["U","?"]];
+const ZONES=[
+ {n:"Steamboat & Flat Tops",a:"Steamboat",b:"& Flat Tops",p:"120,40 300,32 314,150 200,170 110,140",x:208,y:98,lat:40.45,lng:-106.90},
+ {n:"Front Range",a:"Front",b:"Range",p:"400,55 528,50 536,215 408,215",x:468,y:128,lat:39.75,lng:-105.70},
+ {n:"Vail & Summit County",a:"Vail &",b:"Summit",p:"316,112 398,108 398,212 316,212",x:357,y:155,lat:39.55,lng:-106.20},
+ {n:"Sawatch",a:"Sawatch",b:"",p:"316,215 398,215 398,306 320,306",x:358,y:263,lat:38.95,lng:-106.40},
+ {n:"Aspen",a:"Aspen",b:"",p:"206,174 314,157 314,255 210,255",x:260,y:210,lat:39.15,lng:-106.85},
+ {n:"Grand Mesa",a:"Grand",b:"Mesa",p:"96,180 202,175 206,258 100,258",x:151,y:214,lat:39.05,lng:-108.10},
+ {n:"Gunnison",a:"Gunnison",b:"",p:"210,259 318,259 318,346 216,346",x:265,y:306,lat:38.60,lng:-107.00},
+ {n:"North San Juan",a:"North",b:"San Juan",p:"116,304 250,300 256,384 120,384",x:186,y:337,lat:37.90,lng:-107.80},
+ {n:"South San Juan",a:"South",b:"San Juan",p:"152,388 304,388 304,452 156,452",x:228,y:413,lat:37.40,lng:-107.30},
+ {n:"Sangre de Cristo",a:"Sangre de",b:"Cristo",p:"386,310 460,306 470,452 396,452",x:428,y:374,lat:37.85,lng:-105.50}];
+
+/* ---------- block builders ---------- */
+const head=(t,b)=>`<div class="sec-h"><h2>${t}</h2>${b||""}</div>`;
+const MUST='<span class="must">required</span>', MAY='<span class="may">optional</span>';
+function chips(group,opts,tight){
+  return `<div class="chips${tight?" chips-t":""}" data-group="${group}">`+
+    opts.map(o=>`<button type="button" class="chip" data-value="${esc(o[0])}">${esc(o[1])}</button>`).join("")+`</div>`;
+}
+function chipsM(group,opts,none){
+  return `<div class="chips" data-group="${group}" data-multi="1"${none?' data-none="'+none+'"':""}>`+
+    opts.map(o=>`<button type="button" class="chip${none&&o[0]===none?" chip-none":""}" data-value="${esc(o[0])}">${esc(o[1])}</button>`).join("")+`</div>`;
+}
+function nums(fields){
+  return `<div class="two">`+fields.map(f=>`<label class="fld"><span>${f[1]}</span><input type="number" min="0" data-bind="${f[0]}"></label>`).join("")+`</div>`;
+}
+function mapSVG(){
+  return `<div class="mapwrap"><svg viewBox="0 0 700 480" role="group" aria-label="Colorado forecast zones, schematic">
+    <rect class="state" x="20" y="20" width="660" height="440" rx="4"/>`+
+    ZONES.map((z,i)=>`<polygon class="zone" data-zone="${i}" points="${z.p}"><title>${z.n}</title></polygon>`+
+      (z.b?`<text class="zlab" data-lab="${i}" x="${z.x}" y="${z.y}"><tspan x="${z.x}" dy="0">${z.a}</tspan><tspan x="${z.x}" dy="12">${z.b}</tspan></text>`
+          :`<text class="zlab" data-lab="${i}" x="${z.x}" y="${z.y+5}">${z.a}</text>`)).join("")+
+    `</svg></div><div class="pinned" data-pin></div>`;
+}
+const B={
+ where:()=>`<div class="sec" data-need="location">${head("Where",MUST)}
+   <span class="q">Where were you?</span><p class="hint">Tap the zone you travelled in. We work out the backcountry area from your pin.</p>
+   ${mapSVG()}<p class="bad">Please set a location.</p></div>`,
+ when:()=>`<div class="sec" data-need="date">${head("When",MUST)}
+   <label><span class="q">What day were you out?</span><input type="date" data-bind="observed_at"></label>
+   <p class="bad">Please choose a date.</p></div>`,
+ photos:()=>`<div class="sec">${head("Photos and video",MAY)}
+   <label class="drop"><span class="plus" aria-hidden="true">+</span>
+     <span><strong>Add photos or video</strong><small>The single most useful thing you can send us</small></span>
+     <input type="file" class="vh" accept="image/*,video/*" multiple></label>
+   <div class="strip" data-strip></div></div>`,
+ notes:()=>`<div class="sec" data-need="comments">${head("What you saw",MUST)}
+   <label><span class="q">What did you observe?</span>
+   <textarea data-bind="comments" placeholder="Where you went, what the snow was doing, and what you made of it. A few sentences is plenty."></textarea></label>
+   <div class="prompts"><b>Worth mentioning if you noticed it</b>
+     <i>Signs of instability? &nbsp;·&nbsp; New snow and total snow? &nbsp;·&nbsp; Weather? &nbsp;·&nbsp; Snowpack test results? &nbsp;·&nbsp; How cautiously did you travel? &nbsp;·&nbsp; Overall impression of stability?</i></div>
+   <p class="bad">Please tell us what you observed.</p></div>`,
+ flags:()=>`<div class="sec">${head("Red flags",MAY)}
+   <p class="hint" style="margin-top:-4px">Three taps. This is what forecasters filter the reports table on, so it is the most useful minute you can give us.</p>
+   <div class="quickset"><button type="button" class="chip chip-none" data-quick>I saw none of these today</button></div>
+   <div class="flagrow"><div class="fl">Avalanches</div>${chips("av",AV)}</div>
+   <div class="flagrow pairrow">
+     <div class="pair"><div class="fl">Cracking</div>${chips("cracking",CRACK)}</div>
+     <div class="pair"><div class="fl">Collapsing</div>${chips("collapsing",COLL)}</div>
+   </div>
+   <p class="deflinewrap"><button type="button" class="deflink" data-def="both">What counts as a yes?</button></p></div>`,
+ who:()=>`<div class="sec" data-need="identity">${head("You",MUST)}<div data-whoslot></div>
+   <p class="bad" data-whobad>Please fill in your name and email.</p>
+   ${privacyRow()}</div>`,
+ privacy:()=>`<div class="sec">${head("Who can see this",MAY)}${privacyRow()}</div>`
+};
+const DETAIL={
+ group:{t:"The group",keys:["g_total","g_caught","g_partial","g_full","g_breathing","g_involved","g_tsp","g_airbag","g_deployed","g_desc"],
+  html:()=>`<div>${head("The group",MAY)}
+   <p class="hint" style="margin-top:-6px">A forecaster will follow up with you directly, so none of this is required. Fill in what you know and leave the rest — zero is a real answer.</p>
+   <span class="q" style="font-size:15px;margin:18px 0 8px">How many people</span>
+   ${nums([["g_total","Total in the group"],["g_caught","Caught"],["g_partial","Partially buried"],["g_full","Fully buried"],["g_breathing","Breathing impaired"],["g_involved","Involved nearby"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Transceiver, shovel and probe</span>
+   ${chips("g_tsp",[["all","Yes, everyone"],["some","Some did"],["no","No"],["unknown","Not sure"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Airbags</span>
+   ${chips("g_airbag",[["yes","Yes"],["some","Some did"],["no","No"],["unknown","Not sure"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Was an airbag deployed?</span>
+   ${chips("g_deployed",[["yes","Yes"],["no","No"],["na","Nobody had one"],["unknown","Not sure"]])}
+   <label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">What happened</span>
+   <textarea data-bind="g_desc" style="min-height:120px" placeholder="In your own words. There is no wrong way to write this."></textarea></label></div>`},
+ avalanche:{t:"The avalanche",keys:["av_type","dsize","trigger","aspect","elevation","problem","depth","width","runLength","startElev","incline","crust","weakLayer","windExp","veg","triggerDepth","traps","av_desc"],
+  html:()=>`<div>${head("The avalanche",MAY)}
+   <p class="hint" style="margin-top:-6px">Everything here is optional. "Not sure" is an honest and useful answer — a wrong guess is worse than a blank.</p>
+   <span class="q" style="font-size:15px;margin-top:18px">Trigger</span>
+   ${chips("trigger",[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobile","Snowmobile"],["climber","Ice climber"],["explosive","Explosive"],["unknown","Not sure"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Aspect</span>${chips("aspect",ASPECT,1)}
+   <span class="q" style="font-size:15px;margin-top:18px">Elevation band</span>
+   ${chips("elevation",[[">TL","Alpine"],["TL","Treeline"],["<TL","Below treeline"],["U","Not sure"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Size</span>
+   ${chips("dsize",[["D1","D1"],["D15","D1.5"],["D2","D2"],["D25","D2.5"],["D3","D3"],["D35","D3.5"],["D4","D4"],["D5","D5"],["U","?"]],1)}
+   <p class="hint" style="margin-top:7px">D1 is harmless to people · D2 could bury or injure someone · D3 could bury a car or break trees · D4 and up could destroy a rail car.</p>
+   <span class="q" style="font-size:15px;margin-top:18px">Type</span>
+   ${chips("av_type",[["SS","Soft slab"],["HS","Hard slab"],["L","Loose dry"],["WL","Loose wet"],["WS","Wet slab"],["C","Cornice"],["G","Glide"],["U","Not sure"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Problem type</span>
+   ${chips("problem",[["storm","Storm slab"],["wind","Wind slab"],["persistent","Persistent slab"],["deep_persistent","Deep persistent"],["wet_slab","Wet slab"],["loose_wet","Loose wet"],["loose_dry","Loose dry"],["cornice","Cornice"],["glide","Glide"],["Unknown","Not sure"]])}
+   <span class="q" style="font-size:15px;margin:18px 0 8px">Dimensions</span>
+   ${nums([["depth","Crown depth (cm)"],["width","Width (m)"],["runLength","Run length (m)"],["startElev","Start zone elevation (ft)"],["incline","Start zone incline (\u00b0)"],["triggerDepth","Snow depth at trigger point (cm)"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Crust near the weak layer?</span>
+   ${chips("crust",[["yes","Yes"],["no","No"],["unsure","Did not look"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Weak layer crystal type</span>
+   ${chips("weakLayer",[["surface_hoar","Surface hoar"],["facets","Facets"],["depth_hoar","Depth hoar"],["new_snow","New snow"],["crust","Crust"],["Unknown","Not sure"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Wind exposure</span>
+   ${chips("windExp",[["windward","Windward"],["cross","Cross-loaded"],["lee","Lee"],["sheltered","Sheltered"],["unknown","Not sure"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Vegetation cover</span>
+   ${chips("veg",[["open","Open alpine"],["sparse","Sparse trees"],["dense","Dense forest"],["cutblock","Cutblock"],["glacier","Glacier"],["unknown","Not sure"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Terrain traps <span class="opt">(select all that apply)</span></span>
+   ${chipsM("traps",[["none","None"],["trees","Trees"],["gully","Gully"],["creek","Creek or depression"],["cliff","Cliff"],["unknown","Not sure"]],"none")}
+   <label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">Anything else about the avalanche</span>
+   <textarea data-bind="av_desc" style="min-height:100px"></textarea></label></div>`},
+ snowpack:{t:"Snowpack",keys:["hs","hn24","wl_grain","test","sp_desc"],
+  html:()=>`<div>${head("Snowpack",MAY)}
+   <span class="q" style="font-size:15px;margin:6px 0 8px">Depths</span>${nums([["hs","Total snow depth (cm)"],["hn24","New snow, 24h (cm)"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Weak layer</span>
+   ${chips("wl_grain",[["surface_hoar","Surface hoar"],["facets","Facets"],["depth_hoar","Depth hoar"],["new_snow","New snow"],["crust","Crust"],["Unknown","Not sure"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">Test result</span>
+   ${chips("test",[["ECTP","ECTP \u2014 propagated"],["ECTN","ECTN \u2014 no propagation"],["CT","Compression test"],["hand","Hand shear"],["none","Did not dig"]])}
+   <label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">Pit notes</span><textarea data-bind="sp_desc" style="min-height:100px"></textarea></label></div>`},
+ privacy:{t:"Privacy",keys:[],html:()=>B.privacy()}
+};
+function reporterName(){
+  return S.who==="avcan"?"Alex Trudel":S.who==="caic-ret"?"Sam Ortega":(((S.firstname||"")+" "+(S.lastname||"")).trim()||"you");
+}
+function outcomeHTML(){
+  const z=S.zone||"your area", n=esc(reporterName());
+  let t;
+  if(S.visibility==="noname") t=`Publishes <b>anonymously</b>, in ${esc(z)}.`;
+  else if(S.visibility==="noloc") t=`Publishes <b>anonymously</b>, with your location hidden.`;
+  else if(S.visibility==="staff") t=`<b>Only CAIC staff</b> will see this. Nothing appears publicly.`;
+  else t=`Publishes as <b>${n}</b>, in ${esc(z)}.`;
+  return `<span class="eye" aria-hidden="true">\u25c9</span><span>${t}</span><button type="button" class="deflink" data-privjump>Change</button>`;
+}
+function phoneRequired(){ return true; }
+function whoHTML(){
+  if(S.who==="avcan") return `<div class="who"><div class="av">AT</div><div class="m"><div class="n">Alex Trudel</div><div class="s">Signed in with Auth0 · avalanche.ca</div></div><button type="button" class="lnk">Sign out</button></div>`;
+  if(S.who==="caic-ret") return `<div class="who"><div class="av">SO</div><div class="m"><div class="n">Sam Ortega</div><div class="s">sam.ortega@example.com · 970-555-0148</div></div><button type="button" class="lnk">Edit</button></div>`;
+  return `<p class="hint" style="margin-top:-4px">Saved on this device, so you only type it once. Forecasters use this to follow up on reports.</p>
+   <div class="two"><label class="fld"><span>First name</span><input type="text" data-bind="firstname" autocomplete="given-name"></label>
+   <label class="fld"><span>Last name</span><input type="text" data-bind="lastname" autocomplete="family-name"></label></div>
+   <div class="two" style="margin-top:10px"><label class="fld"><span>Email</span><input type="email" data-bind="email" autocomplete="email"></label>
+   <label class="fld"><span>Phone</span><input type="tel" data-bind="phone" autocomplete="tel" placeholder="3035551234"></label></div>
+`;
+}
+function privacyRow(){
+  return `<div class="privrow">
+    <div class="fl" style="margin-bottom:7px">Who can see this report?</div>
+    ${chips("visibility",VIS)}
+    <p class="hint" style="margin:8px 0 0">Reports normally appear on our public field reports page. Choosing anonymous is completely normal and forecasters read it just the same.</p>
+  </div>`;
+}
+B.detail=()=>`<div class="sec"><div class="dslot" data-dslot></div></div>`;
+function hasAv(){ return ["saw","triggered","caught"].includes(S.av); }
+function filled(k){ const v=S[k]; return Array.isArray(v)?v.length>0:has(v); }
+function detailCount(){ return Object.keys(DETAIL).reduce((t,k)=>t+DETAIL[k].keys.filter(filled).length,0); }
+function drow(cls,to,strong,small){ return `<button type="button" class="more ${cls}" data-more="${to}"><span><strong>${strong}</strong><small>${small}</small></span><span class="ar" aria-hidden="true">\u203a</span></button>`; }
+function inlineKey(){
+  if(S.reveal!=="inline") return "";
+  if(S.av==="caught") return "avalanche+group";
+  return hasAv()?"avalanche":"";
+}
+function inlineHTML(k){
+  if(!k) return "";
+  return (k==="avalanche+group"?["avalanche","group"]:["avalanche"])
+    .map(x=>`<div class="sec inlined">${DETAIL[x].html()}</div>`).join("");
+}
+function detailHTML(){
+  const n=detailCount(), added=n?` \u00b7 ${n} added`:"";
+  const caught=drow("urgent","group","Someone was caught \u2014 add group and avalanche details","Two sections: the group, then the avalanche"+added);
+  const aval=drow(n?"has":"","avalanche","Add avalanche details","Size, type, trigger, aspect \u2014 all optional"+added);
+  const gen=drow(n?"has":"","snowpack","Add more detail","Snowpack depths, weak layers and test results"+added);
+  if(S.reveal==="inline")
+    return drow(n?"has":"","snowpack","Add snowpack detail","Depths, weak layers and test results"+added);
+  if(S.reveal==="appear"){
+    const genQuiet=drow("","snowpack","Add more detail","Snowpack depths, weak layers and test results");
+    if(S.av==="caught") return caught+genQuiet;
+    if(hasAv()) return aval+genQuiet;
+    return genQuiet;
+  }
+  return S.av==="caught"?caught:(hasAv()?aval:gen);
+}
+const LEDE=(t,d,tags)=>`<div class="optlede"><h2>${t}</h2><p>${d}</p><div class="meta">${tags.map(x=>`<span class="tagx">${x}</span>`).join("")}</div></div>`;
+const INTRO=`<div class="intro"><h1>Submit a field report</h1><p>Tell us where you were and what the snow was doing. Photos help more than anything else you can send.</p></div>`;
+const FOOT=extra=>`<div class="foot">${extra||""}<p class="outcome" data-outcome></p><button type="submit" class="btn btn-go">Submit field report</button><p class="msg" data-msg></p></div>`;
+
+function buildB(){
+  $("#pane-b").innerHTML=
+    LEDE("The field report",
+      "Contact, where, when, photos, notes and red flags. Three of those are required; the rest are one tap each. Use the Detail link control at the top to compare three ways of offering the optional detail \u2014 a link in a fixed slot, a link that appears when it becomes relevant, or the fields themselves added inline.",
+      ["3 required fields","core never changes","3 reveal modes"])+
+    `<div class="page"><form class="screen">${INTRO}
+      ${B.who()}${B.where()}${B.when()}${B.photos()}${B.notes()}${B.flags()}<div data-inline></div>${B.detail()}
+      ${FOOT()}
+      </form></div>`;
+}
+/* ---------- wiring ---------- */
+function wire(){
+  $$(".zone:not([data-w])").forEach(p=>{ p.dataset.w=1; p.addEventListener("click",()=>{
+    const z=ZONES[+p.dataset.zone]; S.zone=z.n;
+    S.lat=z.lat+(Math.random()-.5)*.14; S.lng=z.lng+(Math.random()-.5)*.18;
+    clearErr("location"); syncAll(); }); });
+  $$('input[type=file]:not([data-w])').forEach(i=>{ i.dataset.w=1; i.addEventListener("change",()=>{
+    Array.from(i.files||[]).forEach(f=>{ let u=null; try{u=URL.createObjectURL(f);}catch(e){}
+      S.assets.push({name:f.name,url:u,video:/^video/.test(f.type)}); });
+    i.value=""; syncAll(); }); });
+}
+document.addEventListener("click",e=>{
+  const c=e.target.closest(".chip[data-value]");
+  if(c){ const box=c.closest(".chips"), g=box.dataset.group, v=c.dataset.value;
+    if(box.dataset.multi){
+      const cur=new Set(S[g]||[]), none=box.dataset.none;
+      if(none&&v===none){ cur.clear(); cur.add(v); }
+      else { if(none) cur.delete(none); cur.has(v)?cur.delete(v):cur.add(v); }
+      S[g]=[...cur];
+    } else S[g]=(S[g]===v)?"":v;
+    if(g==="av"&&S.who==="caic-new") renderWho();
+    const sec=c.closest("[data-need]"); if(sec) clearErr(sec.dataset.need);
+    syncAll(); return; }
+  if(e.target.closest("[data-quick]")){ S.av="none"; S.cracking="no"; S.collapsing="no";
+    if(S.who==="caic-new") renderWho(); syncAll(); return; }
+  const rm=e.target.closest("[data-rm]");
+  if(rm){ S.assets.splice(+rm.dataset.rm,1); syncAll(); return; }
+  const mo=e.target.closest("[data-more]"); if(mo){ openSheet(mo.dataset.more||"snowpack"); return; }
+});
+document.addEventListener("input",e=>{
+  const el=e.target.closest("[data-bind]"); if(!el) return;
+  S[el.dataset.bind]=el.value;
+  const sec=el.closest("[data-need]"); if(sec) clearErr(sec.dataset.need);
+  syncAll();
+});
+function clearErr(k){ $$('[data-need="'+k+'"]').forEach(s=>s.classList.remove("err")); }
+function renderWho(){ $$("[data-whoslot]").forEach(s=>s.innerHTML=whoHTML()); }
+function syncAll(){
+  $$("[data-inline]").forEach(el=>{ const k=inlineKey();
+    if(el.dataset.sig!==k){ el.dataset.sig=k; el.innerHTML=inlineHTML(k); } });
+  $$(".chips[data-group]").forEach(g=>{ const v=S[g.dataset.group];
+    $$(".chip",g).forEach(c=>c.setAttribute("aria-pressed",
+      (Array.isArray(v)?v.includes(c.dataset.value):v===c.dataset.value)?"true":"false")); });
+  $$("[data-bind]").forEach(el=>{ const v=S[el.dataset.bind];
+    if(document.activeElement!==el&&el.value!==String(v==null?"":v)) el.value=v==null?"":v; });
+  $$("[data-quick]").forEach(b=>b.setAttribute("aria-pressed",
+    (S.av==="none"&&S.cracking==="no"&&S.collapsing==="no")?"true":"false"));
+  $$("[data-pin]").forEach(p=>{ p.innerHTML = S.lat==null
+    ? '<span style="color:var(--ink-3)">No location set yet</span>'
+    : `<span class="tk" aria-hidden="true">✓</span><span>Backcountry area: <b>${esc(S.zone)}</b></span><span class="co">${S.lat.toFixed(4)}, ${S.lng.toFixed(4)}</span>`; });
+  $$("[data-strip]").forEach(st=>{ st.innerHTML=S.assets.map((a,i)=>
+    `<div class="thumb"><span>${a.video?"▶ ":""}${esc(a.name.slice(0,18))}</span>`+
+    (a.url&&!a.video?`<img src="${a.url}" alt="" onerror="this.remove()">`:"")+
+    `<button type="button" data-rm="${i}" aria-label="Remove">×</button></div>`).join(""); });
+  pvNote();
+  $$("[data-outcome]").forEach(el=>{ el.className="outcome"+(S.visibility==="staff"?" locked":""); el.innerHTML=outcomeHTML(); });
+  const dh=detailHTML();
+  $$("[data-dslot]").forEach(el=>{ if(el.dataset.sig!==dh){ el.dataset.sig=dh; el.innerHTML=dh; } });
+}
+/* ---------- extra styles + defs modal ---------- */
+const ex=document.createElement("style");
+ex.textContent=`.more.urgent{border-color:var(--flag);background:var(--flag-wash)}
+.more.urgent strong{color:var(--flag)}
+.more.dim{opacity:.42;pointer-events:none}
+.callout{background:var(--flag-wash);border:1px solid var(--flag);border-radius:9px;padding:13px 15px}
+.callout strong{font-family:var(--disp);font-size:15px;display:block}
+.callout a{color:var(--flag)}
+.callout p{font-size:13px;color:var(--ink-2);margin-top:5px;line-height:1.5}
+.pat{border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden;margin-top:16px}
+.pat-h{padding:14px 17px;border-bottom:1px solid var(--line);background:var(--sunk);display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.pat-h h4{font-family:var(--disp);font-size:15px;font-weight:700;margin:0;flex:1}
+.rec{font-family:var(--disp);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ok);border:1px solid currentColor;border-radius:5px;padding:2px 7px}
+.pat-demo{padding:15px 17px;border-bottom:1px solid var(--line)}
+.pat-sel{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:13px}
+.pat-sel button{border:1.5px solid var(--line-2);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:12.5px;cursor:pointer}
+.pat-sel button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.pat-out{min-height:0}
+.pat-h2{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap}
+.pat-why{padding:14px 17px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.pat-why{grid-template-columns:1fr}}
+.pat-why div span{font-family:var(--disp);font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;display:block;margin-bottom:4px}
+.pat-why .g span{color:var(--ok)} .pat-why .b span{color:var(--crit)}
+.pat-why p{font-size:13px;color:var(--ink-2);line-height:1.5}
+.qline{font-size:13.5px;color:var(--ink-3)}
+.qline a{color:var(--accent);font-weight:600}
+.unfolded{border:1px dashed var(--line-2);border-radius:9px;padding:13px;margin-top:11px;background:var(--sunk)}
+.chips-t .chip{padding:9px 12px;min-width:48px;justify-content:center;text-align:center}
+.dbg{position:fixed;inset:0;background:rgba(22,24,29,.55);z-index:60;display:grid;place-items:center;padding:20px}
+.dbg[hidden]{display:none}
+.dmod{background:var(--surface);border-radius:12px;max-width:430px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.dmod-h{display:flex;align-items:center;gap:10px;padding:14px 17px;border-bottom:1px solid var(--line)}
+.dmod-h h3{flex:1;font-size:16px;font-weight:700}
+.dmod-b{padding:17px;display:flex;flex-direction:column;gap:14px;max-height:70vh;overflow-y:auto}
+.dr{display:flex;gap:13px;align-items:flex-start}
+.dr svg{flex:none;border:1px solid var(--line);border-radius:7px;background:var(--sunk);color:var(--accent)}
+.dr strong{display:block;font-family:var(--mono);font-size:12.5px;margin-bottom:2px}
+.dr p{font-size:13px;color:var(--ink-2);line-height:1.5}`;
+document.head.appendChild(ex);
+const dbg=document.createElement("div");
+dbg.className="dbg"; dbg.hidden=true;
+dbg.innerHTML=`<div class="dmod" role="dialog" aria-modal="true" aria-labelledby="dmt"><div class="dmod-h"><h3 id="dmt"></h3><button type="button" class="x" data-dclose aria-label="Close">×</button></div><div class="dmod-b"></div></div>`;
+document.body.appendChild(dbg);
+const sk=p=>`<svg width="60" height="40" viewBox="0 0 60 40" aria-hidden="true"><path d="M3 28 Q19 22 30 24 T57 27" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".5"/>${p}</svg>`;
+const DEFS={both:{t:"Cracking and collapsing",i:[
+  ["Cracking \u2014 Yes",sk('<path d="M4 27L17 20L27 26L39 19L56 25" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M47 13l8 4-8 4" fill="none" stroke="currentColor" stroke-width="1.5"/>'),"Cracks running out from your skis, sled or feet \u2014 and especially ones that shoot ahead of you across the slope. Short cracks at your tips count too."],
+  ["Collapsing \u2014 Yes",sk('<path d="M15 25q15 8 30 0" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M9 14q6 3 0 6M51 14q-6 3 0 6" fill="none" stroke="currentColor" stroke-width="1.5"/>'),"The snow settling or dropping under your weight, and whumpfs you can hear as well as feel. Any of it counts."],
+  ["No",sk(""),"Neither happened anywhere you travelled. This is a genuinely useful answer \u2014 quiet days tell forecasters as much as loud ones."],
+  ["Not sure",sk('<path d="M27 16a4 4 0 116 3c-2 1-3 2-3 4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="30" cy="27" r="1.2" fill="currentColor"/>'),"Leave it blank. A blank is more useful to a forecaster than a guess."]]}};
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-def]");
+  if(b){ const d=DEFS[b.dataset.def];
+    $("#dmt",dbg).textContent=d.t+" \u2014 what counts";
+    $(".dmod-b",dbg).innerHTML=d.i.map(x=>`<div class="dr"><span>${x[1]}</span><div><strong>${x[0]}</strong><p>${x[2]}</p></div></div>`).join("");
+    dbg.hidden=false; $("[data-dclose]",dbg).focus(); return; }
+  if(e.target.closest("[data-dclose]")||e.target===dbg) dbg.hidden=true;
+});
+
+/* ---------- detail sheet ---------- */
+let sheetTab="avalanche";
+function openSheet(k){ sheetTab=k||sheetTab; renderSheet(); $("#sheet").classList.add("on");
+  document.body.style.overflow="hidden"; $("#sheet-x").focus(); }
+function closeSheet(){ $("#sheet").classList.remove("on"); document.body.style.overflow=""; syncAll();
+  const b=$('#pane-'+S.opt+' [data-more]'); if(b&&b.focus) b.focus(); }
+function sheetKeys(){
+  if(S.reveal==="inline") return ["snowpack"];
+  const k=[]; if(S.av==="caught") k.push("group");
+  if(hasAv()) k.push("avalanche");
+  return k.concat(["snowpack"]);
+}
+function renderSheet(){
+  if(!sheetKeys().includes(sheetTab)) sheetTab=sheetKeys()[0];
+  $("#sheet-tabs").innerHTML=sheetKeys().map(k=>{
+    const n=DETAIL[k].keys.filter(filled).length;
+    const need=S.av==="caught"&&(k==="group"||k==="avalanche");
+    return `<button type="button" role="tab" data-stab="${k}" aria-selected="${k===sheetTab}" class="${need&&!n?"req":""}">${DETAIL[k].t}${n?" ("+n+")":""}</button>`;}).join("");
+  $("#sheet-body").innerHTML=DETAIL[sheetTab].html();
+  const caught=S.av==="caught", ks=sheetKeys();
+  $("#sheet-done").textContent=(caught&&sheetTab==="group")?"Next: the avalanche":"Save and return";
+  $("#sheet-title").textContent=caught?"Someone was caught":(hasAv()?"About the avalanche":"Add more detail");
+  $("#sheet-sub").textContent=caught
+    ? "Two sections to fill in: the group, then the avalanche. Both optional."
+    : "All optional \u2014 add what you have and leave the rest.";
+  const i=ks.indexOf(sheetTab);
+  if(caught&&i<2) $("#sheet-sub").textContent="Section "+(i+1)+" of 2 \u2014 "+DETAIL[sheetTab].t.toLowerCase()+". Both optional.";
+  wire(); syncAll();
+}
+$("#sheet-tabs").addEventListener("click",e=>{ const b=e.target.closest("[data-stab]"); if(!b) return; sheetTab=b.dataset.stab; renderSheet(); });
+$("#sheet-x").addEventListener("click",closeSheet);
+$("#sheet-done").addEventListener("click",()=>{
+  if(S.av==="caught"&&sheetTab==="group"){ sheetTab="avalanche"; renderSheet(); return; }
+  closeSheet();
+});
+
+$("#sheet-clear").addEventListener("click",()=>{ DETAIL[sheetTab].keys.forEach(k=>{ S[k]=Array.isArray(S[k])?[]:""; }); renderSheet(); });
+document.addEventListener("keydown",e=>{ if(e.key!=="Escape") return;
+  if(!dbg.hidden){ dbg.hidden=true; return; }
+  if($("#sheet").classList.contains("on")) closeSheet(); });
+
+/* ---------- validation ---------- */
+function needs(){
+  const L=[{k:"location",ok:S.lat!=null,label:"where you were"},
+           {k:"date",ok:has(S.observed_at),label:"the date"},
+           {k:"comments",ok:has(S.comments),label:"what you observed"}];
+  if(S.who==="caic-new") L.push({k:"identity",
+    ok:has(S.firstname)&&has(S.lastname)&&has(S.email)&&(!phoneRequired()||has(S.phone)),
+    label:phoneRequired()?"your name, email and phone":"your name and email"});
+  return L;
+}
+document.addEventListener("submit",e=>{
+  e.preventDefault();
+  const pane=e.target.closest("[id^=pane-]"); if(!pane) return;
+  const bad=needs().filter(x=>!x.ok);
+  $$("[data-need]",pane).forEach(s=>s.classList.remove("err"));
+  const msg=$("[data-msg]",pane);
+  if(bad.length){
+    bad.forEach(b=>$$('[data-need="'+b.k+'"]',pane).forEach(s=>s.classList.add("err")));
+    const f=$(".sec.err",pane); if(f&&f.scrollIntoView) f.scrollIntoView({block:"center",behavior:"smooth"});
+    msg.className="msg no"; msg.textContent="Still needed: "+bad.map(b=>b.label).join(", ")+".";
+  }else{ msg.className="msg yes"; msg.textContent="Complete — this would submit. Nothing was sent; this is a prototype."; }
+});
+
+/* ---------- panes ---------- */
+function showPane(o){
+  S.opt=o;
+  ["b","d","e","f"].forEach(k=>{ const p=$("#pane-"+k); if(p) p.hidden=(k!==o);
+    const t=$("#t-"+k); if(t) t.setAttribute("aria-selected",k===o?"true":"false"); });
+  window.scrollTo({top:0,behavior:"instant"});
+}
+["b","d","e","f"].forEach(k=>$("#t-"+k).addEventListener("click",()=>showPane(k)));
+const WHOLABEL={"caic-new":"first time","caic-ret":"returning","avcan":"signed in"};
+function pvNote(){ const el=$("#pvnote"); if(!el) return;
+  const cost = S.who==="caic-new" ? (phoneRequired()?4:3)+" fields to type" : "nothing to type";
+  el.textContent = WHOLABEL[S.who]+" \u00b7 "+cost;
+  el.title = "Highlight the contact block"; }
+function flashWho(){
+  const pane=$("#pane-"+S.opt); if(!pane||pane.hidden) return;
+  const sec=$('[data-need="identity"]',pane); if(!sec) return;
+  if(sec.scrollIntoView) sec.scrollIntoView({block:"center",behavior:"smooth"});
+  sec.classList.add("flash"); setTimeout(()=>sec.classList.remove("flash"),1400);
+}
+$("#pvnote").addEventListener("click",flashWho);
+document.addEventListener("click",e=>{ if(!e.target.closest("[data-privjump]")) return;
+  const pane=$("#pane-"+S.opt); const row=$(".privrow",pane); if(!row) return;
+  if(row.scrollIntoView) row.scrollIntoView({block:"center",behavior:"smooth"});
+  row.classList.add("flash"); setTimeout(()=>row.classList.remove("flash"),1400); });
+$("#revealsel").addEventListener("change",e=>{ S.reveal=e.target.value; syncAll(); });
+$$(".thbtn").forEach(b=>b.addEventListener("click",()=>{
+  const t=b.dataset.th;
+  if(t==="auto") delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme=t;
+  $$(".thbtn").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));
+}));
+$("#whosel").addEventListener("change",e=>{
+  S.who=e.target.value;
+  renderWho(); syncAll();
+  flashWho();
+});
+
+/* ---------- reveal patterns (for the AvCan discussion) ---------- */
+const AVOPTS=[["none","No avalanches"],["saw","Saw one"],["triggered","We triggered one"],["caught","Someone was caught"]];
+const PATS=[
+ {id:"fixed",t:"Fixed slot, the label swaps",rec:true,
+  g:"Nothing ever appears or disappears. The row is always present and always the same height, so the page cannot shift under the reporter. Only the words and the colour change.",
+  b:"The row occupies space even when there is nothing extra worth adding, which costs a little height on an otherwise short form."},
+ {id:"appear",t:"Link appears and disappears",
+  g:"Nothing irrelevant is ever on screen. The form is at its absolute shortest for someone who has nothing to report.",
+  b:"The page changes height the moment you answer — the exact effect that makes a form feel like it is growing underneath you."},
+ {id:"dim",t:"All links always visible, dimmed until relevant",
+  g:"No movement at all, and the reporter can see up front the full extent of what the form might ask for. No surprises.",
+  b:"Shows options that do not apply. Greyed-out rows read as clutter, and some people read them as fields they have failed to fill in."},
+ {id:"inline",t:"Quiet sentence link",
+  g:"The least obtrusive of the lot. The helper line under the row simply gains a link — no new element, no new box, almost no new height.",
+  b:"Easy to miss entirely. If you actually want the detail, a link inside a sentence gets far fewer clicks than a button does."},
+ {id:"unfold",t:"Section unfolds in place",
+  g:"Zero clicks to reach the detail. It is simply there the moment it becomes relevant, which suits a reporter who wants to give you everything.",
+  b:"The page grows every time someone answers honestly, and the submit button moves further away each time. This is the behaviour in the current prototype."}
+];
+const pst={};
+function patOut(id,v){
+  const isAv=["saw","triggered","caught"].includes(v), caught=v==="caught";
+  const row=(cls,strong,small,extra)=>`<button type="button" class="more ${cls}"${extra||""}><span><strong>${strong}</strong><small>${small}</small></span><span class="ar" aria-hidden="true">\u203a</span></button>`;
+  if(id==="fixed") return `<div class="dslot">`+(caught
+      ? row("urgent","Someone was caught \u2014 add group and avalanche details","Both sets of detail, in one place")
+      : isAv ? row("","Add avalanche details","Size, type, trigger, aspect \u2014 all optional")
+             : row("","Add more detail","Snowpack depths, weak layers and test results"))+`</div>`;
+  if(id==="appear") return caught? row("urgent","Someone was caught \u2014 add group and avalanche details","Both sets of detail, in one place")
+      : isAv ? row("","Add avalanche details","Size, type, trigger, aspect \u2014 all optional") : "";
+  if(id==="dim") return `<div style="display:flex;flex-direction:column;gap:8px">
+      ${row(caught?"urgent":"dim","Someone was caught \u2014 add what happened","Only relevant if someone was caught")}
+      ${row(isAv?"":"dim","Add avalanche details","Only relevant if you saw an avalanche")}
+      ${row("","Add more detail","Snowpack depths, weak layers, test results")}</div>`;
+  if(id==="inline") return `<p class="qline">`+(caught
+      ? `Someone was caught. <a href="#" onclick="return false">Add what happened</a>. A forecaster will follow up.`
+      : isAv ? `You saw an avalanche. <a href="#" onclick="return false">Add the details</a> if you have them.`
+             : `Seeing none is a useful answer too. <a href="#" onclick="return false">Add snowpack detail</a>.`)+`</p>`;
+  if(id==="unfold"){ if(!isAv) return `<p class="qline">Nothing further to fill in.</p>`;
+    return `<div class="unfolded"><strong style="font-family:var(--disp);font-size:14px">Avalanche details</strong>
+      <div class="chips chips-t" style="margin-top:9px">${["D1","D1.5","D2","D2.5","D3"].map(x=>`<button type="button" class="chip">${x}</button>`).join("")}</div>
+      <div class="chips" style="margin-top:9px">${["Natural","Skier","Snowmobile","Explosive"].map(x=>`<button type="button" class="chip">${x}</button>`).join("")}</div>
+      <div class="chips chips-t" style="margin-top:9px">${["N","NE","E","SE","S","SW","W","NW"].map(x=>`<button type="button" class="chip">${x}</button>`).join("")}</div>`+
+      (caught?`<div class="callout" style="margin-top:11px"><strong>Someone was caught</strong><p>Six more required fields would open here in the original prototype.</p></div>`:"")+`</div>`; }
+  return "";
+}
+function renderPat(id){
+  const box=$('[data-pat="'+id+'"]'); if(!box) return;
+  const v=pst[id]||"";
+  $(".pat-sel",box).innerHTML=AVOPTS.map(o=>`<button type="button" data-pv="${o[0]}" aria-pressed="${v===o[0]}">${o[1]}</button>`).join("");
+  const out=$(".pat-out",box); out.innerHTML=patOut(id,v);
+  const h=$(".pat-h2",box); if(h) h.textContent="block height: "+(out.getBoundingClientRect().height|0)+"px";
+}
+function buildPatterns(){
+  $("#pane-e").innerHTML=`<h2>How should the detail link behave?</h2>
+   <p class="sub">Five ways the form can offer avalanche detail once someone reports an avalanche, and involvement detail once someone reports that a person was caught. Change the answer in each demo and watch what the block does. The height readout is live, so you can see which patterns move the page and which do not.</p>`+
+   PATS.map(p=>`<div class="pat" data-pat="${p.id}">
+     <div class="pat-h"><h4>${p.t}</h4>${p.rec?'<span class="rec">recommended</span>':""}<span class="pat-h2"></span></div>
+     <div class="pat-demo"><div class="pat-sel"></div><div class="pat-out"></div></div>
+     <div class="pat-why"><div class="g"><span>What it gives you</span><p>${p.g}</p></div><div class="b"><span>What it costs you</span><p>${p.b}</p></div></div>
+   </div>`).join("")+
+   `<div class="note" style="margin-top:24px"><p><b>Worth deciding together with AvCan:</b> these are not mutually exclusive. The fixed slot can carry the involvement link while a quiet sentence link handles snowpack and weather, so the loudest pattern is spent on the highest-stakes answer and the quietest on the optional extras.</p>
+   <p>The one thing every pattern here shares, and the current prototype does not, is that <b>reporting an avalanche never adds a required field</b>. The detail is offered, never demanded.</p></div>`;
+  PATS.forEach(p=>renderPat(p.id));
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-pv]"); if(!b) return;
+  const box=b.closest("[data-pat]"); const id=box.dataset.pat;
+  pst[id]=(pst[id]===b.dataset.pv)?"":b.dataset.pv; renderPat(id);
+});
+
+/* ---------- privacy patterns ---------- */
+const prst={pills:"public",oc:"public",ocOpen:false,anon:false,c1:false,c2:false,c3:false};
+function pubLine(anon,noloc,staff){
+  if(staff) return `<span class="eye">\u25c9</span><span><b>Only CAIC staff</b> will see this. Nothing appears publicly.</span>`;
+  if(noloc) return `<span class="eye">\u25c9</span><span>Publishes <b>anonymously</b>, with the location hidden.</span>`;
+  if(anon)  return `<span class="eye">\u25c9</span><span>Publishes <b>anonymously</b>, in the Front Range.</span>`;
+  return `<span class="eye">\u25c9</span><span>Publishes as <b>Sam Ortega</b>, in the Front Range.</span>`;
+}
+function fromPill(v){ return {anon:v!=="public",noloc:v==="noloc"||v==="staff",staff:v==="staff"}; }
+function pillRow(id,v){ return `<div class="chips">`+VIS.map(o=>
+  `<button type="button" class="chip" data-pp="${id}:${o[0]}" aria-pressed="${v===o[0]}">${o[1]}</button>`).join("")+`</div>`; }
+const PRIVP=[
+ {id:"pills",t:"Pill row in the contact block, restated above Submit",rec:true,
+  g:"The reporter sees the choice at the moment they type their name \u2014 the exact moment the worry occurs \u2014 and sees the consequence again just before they commit. Nothing is hidden and nothing needs hunting for.",
+  b:"Costs one row near the top of the form, on every report, for a decision most people will not change.",
+  render:v=>{const f=fromPill(v);return pillRow("pills",v)+`<div class="outcome${f.staff?" locked":""}" style="margin-top:12px">${pubLine(f.anon,f.noloc,f.staff)}</div>`;}},
+ {id:"oc",t:"Outcome line only, control behind Change",
+  g:"The lightest possible footprint. One sentence states what will happen; the pills only appear if the reporter actually wants to change something.",
+  b:"Someone anxious about their name has to trust a link rather than see the options. If the fear is strong, an extra click is where you lose them.",
+  render:v=>{const f=fromPill(v);return `<div class="outcome${f.staff?" locked":""}">${pubLine(f.anon,f.noloc,f.staff)}<button type="button" class="deflink" data-ppo="oc">${prst.ocOpen?"Close":"Change"}</button></div>`+
+    (prst.ocOpen?`<div style="margin-top:11px">${pillRow("oc",v)}</div>`:"");}},
+ {id:"anon",t:"One anonymous switch beside your name",
+  g:"The simplest control on the page and impossible to misread. It answers the only question most people are actually asking.",
+  b:"Collapses three real settings into one. There is no way to say \u2018publish it but hide where I was\u2019, and no way to send a report to staff only.",
+  render:()=>`<label class="check"><input type="checkbox" data-ppc="anon" ${prst.anon?"checked":""}><span>Post this anonymously<small>Your name will not appear anywhere public.</small></span></label>
+    <div class="outcome" style="margin-top:12px">${pubLine(prst.anon,false,false)}</div>`},
+ {id:"checks",t:"Three checkboxes (the current CAIC form)",
+  g:"Every combination of the three underlying settings is reachable, and it maps one-to-one onto what the API already stores.",
+  b:"Three independent decisions to read and reason about, phrased as things you are hiding. Most people will not read them carefully, and \u2018hide\u2019 framing quietly implies you are doing something unusual.",
+  render:()=>`<label class="check"><input type="checkbox" data-ppc="c1" ${prst.c1?"checked":""}><span>Hide my name</span></label>
+    <label class="check"><input type="checkbox" data-ppc="c2" ${prst.c2?"checked":""}><span>Hide my location</span></label>
+    <label class="check"><input type="checkbox" data-ppc="c3" ${prst.c3?"checked":""}><span>Hide my observation</span></label>
+    <div class="outcome${prst.c3?" locked":""}" style="margin-top:12px">${pubLine(prst.c1,prst.c2,prst.c3)}</div>`}
+];
+function renderPriv(id){
+  const box=$('[data-priv="'+id+'"]'); if(!box) return;
+  const P=PRIVP.find(x=>x.id===id);
+  box.querySelector(".pat-out").innerHTML=P.render(prst[id==="pills"?"pills":id==="oc"?"oc":id]);
+}
+function buildPriv(){
+  $("#pane-f").innerHTML=`<h2>Making privacy visible on every report</h2>
+   <p class="sub">If someone believes their name will be published and they do not want it to be, they do not go looking for a setting \u2014 they close the tab. So the job here is not really to provide a control. It is to answer the question before it is asked, on every report, without charging the people who do not care.</p>
+   <div class="note"><p><b>Wording matters more than the control.</b> \u201cHide my name\u201d frames anonymity as concealment, which implies the reporter is doing something irregular. \u201cWith my name / Anonymously\u201d frames it as two equally normal choices. Same data, different submission rate \u2014 and this is worth testing on its own.</p></div>`+
+   PRIVP.map(P=>`<div class="pat" data-priv="${P.id}">
+     <div class="pat-h"><h4>${P.t}</h4>${P.rec?'<span class="rec">recommended</span>':""}</div>
+     <div class="pat-demo"><div class="pat-out"></div></div>
+     <div class="pat-why"><div class="g"><span>What it gives you</span><p>${P.g}</p></div><div class="b"><span>What it costs you</span><p>${P.b}</p></div></div>
+   </div>`).join("")+
+   `<h3>Nothing is lost against the current fields</h3>
+   <p class="sub" style="margin-bottom:14px">The four choices are an ordered ladder over the three booleans the API already stores, so the pill row is a presentation change, not a schema change.</p>
+   <div class="tw"><table class="aud"><thead><tr><th>Choice</th><th>is_anonymous</th><th>is_anonymous_location</th><th>is_locked</th></tr></thead><tbody>
+     <tr><td>With my name</td><td>false</td><td>false</td><td>false</td></tr>
+     <tr><td>Anonymously</td><td><b>true</b></td><td>false</td><td>false</td></tr>
+     <tr><td>Anonymous, no location</td><td><b>true</b></td><td><b>true</b></td><td>false</td></tr>
+     <tr><td>CAIC staff only</td><td><b>true</b></td><td><b>true</b></td><td><b>true</b></td></tr>
+   </tbody></table></div>
+   <div class="note" style="margin-top:20px"><p><b>One more idea worth a sentence.</b> Whatever people pick, remember it as their default for next time. Somebody who reports anonymously once almost certainly wants to do it again, and asking them to re-make that decision on every report is its own small tax.</p></div>`;
+  PRIVP.forEach(P=>renderPriv(P.id));
+}
+document.addEventListener("click",e=>{
+  const pp=e.target.closest("[data-pp]");
+  if(pp){ const [id,v]=pp.dataset.pp.split(":"); prst[id]=v; renderPriv(id); return; }
+  const po=e.target.closest("[data-ppo]");
+  if(po){ prst.ocOpen=!prst.ocOpen; renderPriv("oc"); return; }
+});
+document.addEventListener("change",e=>{
+  const c=e.target.closest("[data-ppc]"); if(!c) return;
+  prst[c.dataset.ppc]=c.checked; renderPriv(c.dataset.ppc==="anon"?"anon":"checks");
+});
+
+/* ---------- init ---------- */
+buildB(); buildPatterns(); buildPriv();
+renderWho(); wire(); syncAll(); showPane("b");
+})();
+</script>
+
+</body>
+</html>
