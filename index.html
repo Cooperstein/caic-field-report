@@ -28,6 +28,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root{
   --ground:#F6F7F9; --surface:#FFFFFF; --sunk:#F0F2F6;
@@ -216,6 +217,25 @@ input[type=date]{max-width:220px}
 .pinned b{font-family:var(--disp);color:var(--ink)}
 .pinned .co{font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
 .pinned .tk{color:var(--ok);font-weight:700}
+.pinmap-wrap{position:relative;width:100%;height:220px;border-radius:var(--r);overflow:hidden;border:1.5px solid var(--line-2);background:var(--sunk)}
+.pinmap-wrap.picking{height:min(58vh,420px)}
+#tr-map{width:100%;height:100%}
+.pinmap-wrap:not(.picking) .leaflet-control-container{display:none}
+.pinmap-cta{position:absolute;inset:0;z-index:1200;background:rgba(22,24,29,.48);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;border:0;width:100%;font:inherit}
+.pinmap-cta .cta-btn{background:var(--accent);color:#fff;padding:12px 18px;border-radius:999px;font-family:var(--disp);font-weight:700;font-size:16px}
+:root[data-theme="dark"] .pinmap-cta .cta-btn,:root:not([data-theme="light"]) .pinmap-cta .cta-btn{color:#101318}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .pinmap-cta .cta-btn{color:#fff}}
+.pinmap-cta small{font-size:13.5px;max-width:16em;line-height:1.35}
+.pinmap-pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);z-index:500;pointer-events:none;display:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
+.pinmap-wrap.picking .pinmap-pin{display:block}
+.pinmap-dot{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;background:var(--accent);border:2px solid #fff;border-radius:50%;z-index:499;pointer-events:none;display:none}
+.pinmap-wrap.picking .pinmap-dot{display:block}
+.pinmap-actions{display:none;gap:8px;margin-top:12px}
+.pinmap-wrap.picking+.pinmap-actions,.pinmap-wrap.confirmed+.pinmap-actions{display:flex}
+.pinmap-actions .btn{flex:1;width:auto}
+.pinmap-coords{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);margin-top:8px;display:none}
+.pinmap-coords.show{display:block}
+.leaflet-control-attribution{font-size:9px}
 
 /* photos */
 .drop{display:flex;align-items:center;gap:13px;width:100%;text-align:left;border:2px dashed var(--line-2);border-radius:var(--r);background:var(--surface);cursor:pointer;padding:15px 16px;min-height:74px;transition:border-color .13s,background .13s}
@@ -387,7 +407,8 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
 
 <div class="tabs"><div class="tabs-in" role="tablist">
   <button class="tab" role="tab" id="t-b" aria-selected="true">The form</button>
-  <button class="tab" role="tab" id="t-g" aria-selected="false">Trip report</button>
+  <button class="tab" role="tab" id="t-g" aria-selected="false">Trip report (CAIC)</button>
+  <button class="tab" role="tab" id="t-h" aria-selected="false">Trip report (AvCan)</button>
   <button class="tab" role="tab" id="t-c" aria-selected="false">One question per screen</button>
   <button class="tab" role="tab" id="t-e" aria-selected="false">Reveal patterns</button>
   <button class="tab" role="tab" id="t-f" aria-selected="false">Privacy patterns</button>
@@ -396,6 +417,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
 
 <div id="pane-b"></div>
 <div id="pane-g" hidden></div>
+<div id="pane-h" hidden></div>
 <div id="pane-c"></div>
 
 <div id="pane-e" class="audit" hidden></div>
@@ -491,6 +513,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
     <button type="button" class="btn btn-go" id="sheet-done">Save and return</button>
   </div></footer>
 </div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function(){
 "use strict";
@@ -501,7 +524,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 
 const S={who:"caic-ret",opt:"b",step:0,
   firstname:"",lastname:"",email:"",phone:"",
-  observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",
+  observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",mapMode:"idle",
   comments:"",assets:[],av:"",cracking:"",collapsing:"",visibility:"public",
   title:"",activity:[],sawAvalanche:"",caught:"",whenOccurred:"",instability:[],incidentStory:"",
   avalanches:[{}],avOpen:0,
@@ -525,6 +548,11 @@ const AV=[["none","No avalanches"],["saw","Saw avalanche(s)"],["triggered","We t
 const CRACK=[["yes","Yes"],["no","No"]];
 const COLL=[["yes","Yes"],["no","No"]];
 const VIS=[["public","With my name"],["noname","Anonymously"],["noloc","Anonymous, no location"],["staff","CAIC staff only"]];
+const VIS_CAIC=[["public","Everyone, with my name"],["noname","Everyone, anonymously"],["staff","CAIC staff only"]];
+const VIS_AVCAN=[["public","Everyone, with my name"],["noname","Everyone, anonymously"]];
+function isTrip(){ return S.opt==="g"||S.opt==="h"; }
+function isAvcanTrip(){ return S.opt==="h"; }
+function visOpts(){ return isAvcanTrip()?VIS_AVCAN:VIS_CAIC; }
 const ASPECT=[["N","N"],["NE","NE"],["E","E"],["SE","SE"],["S","S"],["SW","SW"],["W","W"],["NW","NW"],["U","I don't know"]];
 const TRIG=[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobiler","Snowmobiler"],["snowbiker","Snowbiker"],["climber","Ice climber"],["explosive","Explosive"],["unknown","I don't know"]];
 const CO_ZONES=[
@@ -594,6 +622,28 @@ const B={
  where:()=>`<div class="sec" data-need="location">${head("Where",MUST)}
    <span class="q">Where were you?</span><p class="hint">Tap the zone you travelled in. We work out the backcountry area from your pin.</p>
    <div data-mapslot>${mapSVG()}</div><p class="bad">Please set a location.</p></div>`,
+ trWhere:()=>`<div class="sec" data-need="location">${head("Where",MUST)}
+   <span class="q">Where were you?</span>
+   <p class="hint" id="tr-map-helper">Tap the map to set a location. Then drag and zoom \u2014 the pin stays in the centre.</p>
+   <div class="pinmap-wrap" id="tr-map-wrap" role="application" aria-label="Location map">
+     <div id="tr-map"></div>
+     <button type="button" class="pinmap-cta" id="tr-map-cta">
+       <span class="cta-btn">Set location on map</span>
+       <small>Then drag and zoom \u2014 the pin stays in the centre</small>
+     </button>
+     <div class="pinmap-dot" aria-hidden="true"></div>
+     <svg class="pinmap-pin" width="32" height="44" viewBox="0 0 32 44" aria-hidden="true">
+       <path fill="#1F5FA8" stroke="#fff" stroke-width="2" d="M16 2c7.2 0 13 5.8 13 13 0 9.7-13 27-13 27S3 24.7 3 15C3 7.8 8.8 2 16 2z"/>
+       <circle cx="16" cy="15" r="5" fill="#fff"/>
+     </svg>
+   </div>
+   <div class="pinmap-actions">
+     <button type="button" class="btn btn-2" id="tr-btn-myloc">My location</button>
+     <button type="button" class="btn btn-go" id="tr-btn-confirm">Confirm location</button>
+   </div>
+   <p class="pinmap-coords" id="tr-map-coords" aria-live="polite"></p>
+   <p class="pinned" id="tr-map-zone" hidden></p>
+   <p class="bad">Please set a location on the map.</p></div>`,
  when:()=>`<div class="sec" data-need="date">${head("When",MUST)}
    <label><span class="q">What day were you out?</span><input type="date" data-bind="observed_at"></label>
    <p class="bad">Please choose a date.</p></div>`,
@@ -625,13 +675,21 @@ const AVKEYS=["whenOccurred","dsize","trigger","trigger_mode","aspect","elevatio
 const WHEN=[["whileThere","While there"],["todayFresh","Today"],["yesterday","Yesterday"],["fewDays","A few days"],["unsure","Older / unsure"]];
 const MOREKEYS=["depth","width","runLength","startElev","incline","triggerDepth","crust","weakLayer","windExp","veg","traps"];
 const DSZ={D15:"D1.5",D25:"D2.5",D35:"D3.5"};
+function sizeOpts(){
+  return isAvcanTrip()
+    ?[["D1","1"],["D15","1.5"],["D2","2"],["D25","2.5"],["D3","3"],["D35","3.5"],["D4","4"],["D5","5"],["U","I don't know"]]
+    :[["D1","D1"],["D15","D1.5"],["D2","D2"],["D25","D2.5"],["D3","D3"],["D35","D3.5"],["D4","D4"],["D5","D5"],["U","I don't know"]];
+}
 const ELEV={">TL":"Alpine",TL:"Treeline","<TL":"Below treeline"};
 const PROB={storm:"Storm slab",wind:"Wind slab",persistent:"Persistent slab",deep_persistent:"Deep persistent",
   wet_slab:"Wet slab",loose_wet:"Loose wet",loose_dry:"Loose dry",cornice:"Cornice",glide:"Glide",Unknown:"Not sure"};
 const PROB_OPTS=Object.entries(PROB);
 function avSummary(a){
   const bits=[];
-  if(has(a.dsize)&&a.dsize!=="U") bits.push(DSZ[a.dsize]||a.dsize);
+  if(has(a.dsize)&&a.dsize!=="U"){
+    const lab=DSZ[a.dsize]||a.dsize;
+    bits.push(isAvcanTrip()?lab.replace(/^D/,""):lab);
+  }
   if(has(a.aspect)&&a.aspect!=="U") bits.push(a.aspect);
   if(has(a.elevation)&&a.elevation!=="U") bits.push(ELEV[a.elevation]||a.elevation);
   if(PROB[a.problem]) bits.push(PROB[a.problem]);
@@ -662,7 +720,7 @@ function avCore(){
       </div>
       <div class="incq">
         <span class="q">How big was it?</span>
-        ${chips("dsize",[["D1","D1"],["D15","D1.5"],["D2","D2"],["D25","D2.5"],["D3","D3"],["D35","D3.5"],["D4","D4"],["D5","D5"],["U","I don't know"]],1)}
+        ${chips("dsize",sizeOpts(),1)}
       </div>
       <div class="incq">
         <span class="q">What avalanche problem was it?</span>
@@ -840,11 +898,17 @@ const LEDE=(t,d,tags)=>`<div class="optlede"><h2>${t}</h2><p>${d}</p><div class=
 const INTRO=`<div class="intro"><h1>Submit a field report</h1><p>Tell us where you were and what the snow was doing. Photos help more than anything else you can send.</p></div>`;
 const FOOT=extra=>`<div class="foot">${extra||""}<p class="outcome" data-outcome></p><button type="submit" class="btn btn-go">Submit field report</button><p class="msg" data-msg></p></div>`;
 
-function buildG(){
-  $("#pane-g").innerHTML=
-    LEDE("Trip report",
-      "Avalanche Canada’s branching trip report, in this form’s type. Required questions first. Problem types if you saw an avalanche. Free text last.",
-      ["required branching","problem types","optional more details"])+
+function buildTrip(){
+  const avcan=isAvcanTrip();
+  const pane=$(avcan?"#pane-h":"#pane-g");
+  if(!pane) return;
+  destroyPinMap();
+  pane.innerHTML=
+    LEDE(avcan?"Trip report (AvCan)":"Trip report (CAIC)",
+      avcan?"Avalanche Canada’s branching trip report, in this form’s type. Required questions first. Observation last."
+           :"Avalanche Canada’s branching trip report, in this form’s type. Required questions first. Problem types if you saw an avalanche. Free text last.",
+      avcan?["AvCan","required branching","optional observation"]
+           :["CAIC","required branching","optional more details"])+
     `<div class="page"><form class="screen">
       <div class="intro"><h1>Submit a trip report</h1><p>Where you went, what you saw, and what you would tell the next party.</p></div>
       <div class="sec" data-need="title">${head("Trip",MUST)}
@@ -853,16 +917,18 @@ function buildG(){
       ${B.photos()}
       <div class="sec">${head("Who can see this",MAY)}
         <span class="q">Who can see this report?</span>
-        ${chips("visibility",VIS)}
-        <p class="hint">Anonymous is completely normal. Forecasters read it the same.</p>
+        ${chips("visibility",visOpts())}
+        <p class="hint">${avcan?"The public MIN. Anonymous is completely normal and forecasters read it the same.":"Anonymous is completely normal. Forecasters read it the same."}</p>
       </div>
-      ${B.when()}${B.where()}
+      ${B.when()}${B.trWhere()}
       <div class="sec">${head("Activity",MAY)}
         <span class="q">What activity were you doing?</span>
         ${chipsM("activity",[["skiing","Skiing"],["crossCountrySkiing","Cross-country skiing"],["snowboarding","Snowboarding"],["iceClimbing","Ice climbing"],["mountaineering","Mountaineering"],["snowshoeing","Snowshoeing"],["snowmobiling","Snowmobiling"],["snowbiking","Snowbiking"],["hiking","Hiking"]])}</div>
       <div data-trflow></div>
       <div class="foot"><p class="outcome" data-outcome></p><button type="submit" class="btn btn-go">Submit trip report</button><p class="msg" data-msg></p></div>
       </form></div>`;
+  initPinMap();
+  restorePinMap();
 }
 function instFilled(){ return (S.instability||[]).length>0; }
 function trFlowSig(){
@@ -1002,7 +1068,7 @@ function problemSig(){
 }
 function problemHTML(){
   if(S.opt!=="g" && !hasAv()) return "";
-  if(S.opt==="g" && S.sawAvalanche!=="yes") return "";
+  if(isTrip() && S.sawAvalanche!=="yes") return "";
   const pick=PROB_OPTS.map(([id,lab])=>{
     const on=S.problemTypes.includes(id);
     return `<label class="probcheck${on?" on":""}"><input type="checkbox" data-ptype="${id}"${on?" checked":""}> ${esc(lab)}</label>`;
@@ -1152,6 +1218,119 @@ document.addEventListener("change",onBind);
 function clearErr(k){ $$('[data-need="'+k+'"]').forEach(s=>s.classList.remove("err"));
   if(S.opt==="c") wizMsg(""); }
 function renderMaps(){ $$("[data-mapslot]").forEach(el=>{ el.innerHTML=mapSVG(); }); wire(); }
+let pinMap=null, pinMarker=null;
+function tripZones(){ return isAvcanTrip()?CA_ZONES:CO_ZONES; }
+function defaultCenter(){ return isAvcanTrip()||(!isTrip()&&S.who==="avcan")?[51.3,-118.2]:[39.0,-106.3]; }
+function nearestZone(lat,lng){
+  const Z=isTrip()?tripZones():zoneList();
+  let best=Z[0], d=1e9;
+  Z.forEach(z=>{ const dd=(z.lat-lat)**2+(z.lng-lng)**2; if(dd<d){ d=dd; best=z; } });
+  return best;
+}
+function setPinInteractive(on){
+  if(!pinMap) return;
+  const fn=on?"enable":"disable";
+  ["dragging","scrollWheelZoom","doubleClickZoom","touchZoom","boxZoom","keyboard"].forEach(k=>pinMap[k][fn]());
+}
+function updatePinCoords(ll){
+  const el=$("#tr-map-coords"); if(!el) return;
+  el.textContent=ll.lat.toFixed(5)+", "+ll.lng.toFixed(5);
+  el.classList.add("show");
+}
+function setPinZoneLine(){
+  const el=$("#tr-map-zone"); if(!el) return;
+  if(S.lat==null){ el.hidden=true; el.innerHTML=""; return; }
+  el.hidden=false;
+  el.innerHTML=`<span class="tk" aria-hidden="true">✓</span><span>${isAvcanTrip()||S.who==="avcan"?"Forecast region":"Backcountry area"}: <b>${esc(S.zone)}</b></span><span class="co">${S.lat.toFixed(4)}, ${S.lng.toFixed(4)}</span>`;
+}
+function enterPickMode(){
+  if(!pinMap) return;
+  S.mapMode="picking";
+  const cta=$("#tr-map-cta"); if(cta) cta.style.display="none";
+  $("#tr-map-wrap").classList.add("picking");
+  $("#tr-map-wrap").classList.remove("confirmed");
+  $("#tr-map-helper").textContent="Move the map to position the pin. It does not need to be exact.";
+  $("#tr-btn-confirm").textContent="Confirm location";
+  const my=$("#tr-btn-myloc"); if(my) my.hidden=false;
+  setPinInteractive(true);
+  if(pinMarker){ pinMap.removeLayer(pinMarker); pinMarker=null; }
+  setTimeout(()=>pinMap.invalidateSize(),50);
+  if(S.lat!=null) pinMap.setView([S.lat,S.lng],Math.max(pinMap.getZoom(),12));
+  else pinMap.setView(defaultCenter(),8);
+  updatePinCoords(pinMap.getCenter());
+  setPinZoneLine();
+}
+function confirmPinLocation(){
+  if(!pinMap) return;
+  const c=pinMap.getCenter();
+  S.lat=c.lat; S.lng=c.lng; S.zone=nearestZone(c.lat,c.lng).n; S.mapMode="confirmed";
+  $("#tr-map-wrap").classList.remove("picking");
+  $("#tr-map-wrap").classList.add("confirmed");
+  setPinInteractive(false);
+  if(pinMarker) pinMap.removeLayer(pinMarker);
+  pinMarker=L.marker([c.lat,c.lng]).addTo(pinMap);
+  pinMap.setView([c.lat,c.lng],pinMap.getZoom());
+  $("#tr-map-helper").textContent="Location set. Tap Change to adjust.";
+  $("#tr-btn-confirm").textContent="Change location";
+  const my=$("#tr-btn-myloc"); if(my) my.hidden=true;
+  updatePinCoords(c);
+  setPinZoneLine();
+  clearErr("location");
+  setTimeout(()=>pinMap.invalidateSize(),50);
+  syncAll();
+}
+function resetPinMap(){
+  S.mapMode="idle";
+  if(pinMarker&&pinMap){ pinMap.removeLayer(pinMarker); pinMarker=null; }
+  const wrap=$("#tr-map-wrap"); if(!wrap) return;
+  wrap.classList.remove("picking","confirmed");
+  const cta=$("#tr-map-cta"); if(cta) cta.style.display="";
+  const help=$("#tr-map-helper"); if(help) help.textContent="Tap the map to set a location. Then drag and zoom — the pin stays in the centre.";
+  const conf=$("#tr-btn-confirm"); if(conf) conf.textContent="Confirm location";
+  const my=$("#tr-btn-myloc"); if(my) my.hidden=false;
+  const coords=$("#tr-map-coords"); if(coords){ coords.textContent=""; coords.classList.remove("show"); }
+  setPinZoneLine();
+  if(pinMap){ setPinInteractive(false); pinMap.setView(defaultCenter(),6); }
+}
+function initPinMap(){
+  if(typeof L==="undefined"||pinMap||!$("#tr-map")) return;
+  L.Icon.Default.imagePath="https://unpkg.com/leaflet@1.9.4/dist/images/";
+  pinMap=L.map("tr-map",{
+    zoomControl:true,attributionControl:true,
+    dragging:false,scrollWheelZoom:false,doubleClickZoom:false,
+    touchZoom:false,boxZoom:false,keyboard:false
+  }).setView(defaultCenter(),6);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap",maxZoom:19}).addTo(pinMap);
+  pinMap.on("move",()=>{ if(S.mapMode==="picking") updatePinCoords(pinMap.getCenter()); });
+  $("#tr-map-cta").addEventListener("click",enterPickMode);
+  $("#tr-btn-confirm").addEventListener("click",()=>{
+    if(S.mapMode==="picking") confirmPinLocation();
+    else enterPickMode();
+  });
+  $("#tr-btn-myloc").addEventListener("click",()=>{
+    if(!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(pos=>{
+      pinMap.setView([pos.coords.latitude,pos.coords.longitude],13);
+      updatePinCoords(pinMap.getCenter());
+    },()=>{},{enableHighAccuracy:true,timeout:8000});
+  });
+}
+function destroyPinMap(){
+  if(pinMarker&&pinMap){ pinMap.removeLayer(pinMarker); pinMarker=null; }
+  if(pinMap){ pinMap.remove(); pinMap=null; }
+}
+function restorePinMap(){
+  if(!pinMap||S.lat==null||S.mapMode!=="confirmed") return;
+  const cta=$("#tr-map-cta"); if(cta) cta.style.display="none";
+  $("#tr-map-wrap").classList.add("confirmed");
+  pinMarker=L.marker([S.lat,S.lng]).addTo(pinMap);
+  pinMap.setView([S.lat,S.lng],12);
+  $("#tr-map-helper").textContent="Location set. Tap Change to adjust.";
+  $("#tr-btn-confirm").textContent="Change location";
+  const my=$("#tr-btn-myloc"); if(my) my.hidden=true;
+  updatePinCoords({lat:S.lat,lng:S.lng});
+  setPinZoneLine();
+}
 function renderWho(){ $$("[data-whoslot]").forEach(s=>s.innerHTML=whoHTML()); }
 function syncAll(){
   $$("[data-trflow]").forEach(el=>{ const k=trFlowSig();
@@ -1272,14 +1451,14 @@ function openSheet(k){ sheetTab=k||sheetTab; renderSheet(); $("#sheet").classLis
 function closeSheet(){ $("#sheet").classList.remove("on"); document.body.style.overflow=""; syncAll();
   const b=$('#pane-'+S.opt+' [data-more="'+sheetTab+'"]')||$('#pane-'+S.opt+' [data-more="tech"]')||$('#pane-'+S.opt+' [data-more]'); if(b&&b.focus) b.focus(); }
 function sheetKeys(){
-  if(S.opt==="g") return sheetTab==="incident"?["incident"]:["tech"];
+  if(isTrip()) return sheetTab==="incident"?["incident"]:["tech"];
   if(S.reveal==="inline") return ["snowpack"];
   const k=[]; if(S.av==="caught") k.push("group");
   if(hasAv()) k.push("avalanche");
   return k.concat(["snowpack"]);
 }
 function renderSheet(){
-  if(S.opt==="g"){
+  if(isTrip()){
     if(sheetTab==="incident"){
       $("#sheet-tabs").innerHTML=`<button type="button" role="tab" aria-selected="true">Incident details</button>`;
       $("#sheet-body").innerHTML=incMoreHTML();
@@ -1326,11 +1505,11 @@ $("#sheet-done").addEventListener("click",()=>{
 });
 
 $("#sheet-clear").addEventListener("click",()=>{
-  if(S.opt==="g"&&sheetTab==="incident"){
+  if(isTrip()&&sheetTab==="incident"){
     INCKEYS.forEach(k=>{ S[k]=""; });
     renderSheet(); return;
   }
-  if(S.opt==="g"&&sheetTab==="tech"){
+  if(isTrip()&&sheetTab==="tech"){
     const A=S.avalanches[S.avOpen>=0?S.avOpen:0];
     if(A) MOREKEYS.concat(["av_desc"]).forEach(k=>{ A[k]=Array.isArray(A[k])?[]:""; });
     renderSheet(); return;
@@ -1354,7 +1533,7 @@ function tripNeeds(){
   return L;
 }
 function needs(){
-  if(S.opt==="g") return tripNeeds();
+  if(isTrip()) return tripNeeds();
   const L=[{k:"location",ok:S.lat!=null,label:"where you were"},
            {k:"date",ok:has(S.observed_at),label:"the date"}];
   if(S.who==="caic-new") L.push({k:"identity",
@@ -1391,13 +1570,20 @@ document.addEventListener("submit",e=>{
 
 /* ---------- panes ---------- */
 function showPane(o){
+  const prev=S.opt;
   S.opt=o;
-  ["b","g","c","d","e","f"].forEach(k=>{ const p=$("#pane-"+k); if(p) p.hidden=(k!==o);
+  ["b","g","h","c","d","e","f"].forEach(k=>{ const p=$("#pane-"+k); if(p) p.hidden=(k!==o);
     const t=$("#t-"+k); if(t) t.setAttribute("aria-selected",k===o?"true":"false"); });
+  if((o==="g"||o==="h") && (prev==="g"||prev==="h") && prev!==o){
+    S.zone=""; S.lat=null; S.lng=null; S.mapMode="idle";
+    if(S.visibility==="staff"||S.visibility==="noloc") S.visibility="public";
+  }
+  if(o==="g"||o==="h") buildTrip();
   window.scrollTo({top:0,behavior:"instant"});
   syncAll();
+  if((o==="g"||o==="h")&&pinMap) setTimeout(()=>pinMap.invalidateSize(),80);
 }
-["b","g","c","d","e","f"].forEach(k=>$("#t-"+k).addEventListener("click",()=>showPane(k)));
+["b","g","h","c","d","e","f"].forEach(k=>{ const t=$("#t-"+k); if(t) t.addEventListener("click",()=>showPane(k)); });
 const WHOLABEL={"caic-new":"first time","caic-ret":"returning","avcan":"signed in"};
 function pvNote(){ const el=$("#pvnote"); if(!el) return;
   const cost = S.who==="caic-new" ? (phoneRequired()?4:3)+" fields to type" : "nothing to type";
@@ -1426,7 +1612,7 @@ $("#whosel").addEventListener("change",e=>{
   S.who=e.target.value;
   if(S.who==="avcan") rollAvcan();
   if(wasCA!==(S.who==="avcan")){          // different country, so the pin no longer means anything
-    S.zone=""; S.lat=null; S.lng=null; renderMaps();
+    S.zone=""; S.lat=null; S.lng=null; renderMaps(); resetPinMap();
   }
   if(S.opt==="c"){ S.step=WHOSTEP; renderStep(); } else { renderWho(); syncAll(); }
   flashWho();
@@ -1593,6 +1779,7 @@ function resetMock(){
   if(!$(".dbg").hidden) $(".dbg").hidden=true;
   renderWho();
   if(S.opt==="c") renderStep();
+  resetPinMap();
   syncAll();
   window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -1605,7 +1792,7 @@ $("#resetmock").addEventListener("click",()=>{
 });
 
 /* ---------- init ---------- */
-buildB(); buildG(); buildC(); buildPatterns(); buildPriv();
+buildB(); buildC(); buildPatterns(); buildPriv();
 renderWho(); wire(); syncAll(); showPane("b");
 })();
 </script>
