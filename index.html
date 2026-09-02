@@ -684,7 +684,7 @@ function renderStep(){
   $("[data-wizfoot]").innerHTML=((!st.req&&!last)?'<button type="button" class="step-skip" data-skip>Skip</button>':"")+
     (last?'<button type="submit" class="btn btn-go">Submit field report</button>'
         :'<button type="button" class="btn btn-go" data-next>Next</button>');
-  renderWho(); wire(); syncAll();
+  renderWho(); wire(); syncAll(); wizMsg("");
 }
 
 /* ---------- wiring ---------- */
@@ -725,7 +725,8 @@ document.addEventListener("input",e=>{
   const sec=el.closest("[data-need]"); if(sec) clearErr(sec.dataset.need);
   syncAll();
 });
-function clearErr(k){ $$('[data-need="'+k+'"]').forEach(s=>s.classList.remove("err")); }
+function clearErr(k){ $$('[data-need="'+k+'"]').forEach(s=>s.classList.remove("err"));
+  if(S.opt==="c") wizMsg(""); }
 function renderWho(){ $$("[data-whoslot]").forEach(s=>s.innerHTML=whoHTML()); }
 function syncAll(){
   $$("[data-inline]").forEach(el=>{ const k=inlineKey();
@@ -859,11 +860,18 @@ function needs(){
   return L;
 }
 const STEPKEY={where:"location",when:"date",notes:"comments",who:"identity"};
+function wizMsg(t){ const m=$("#pane-c [data-msg]"); if(!m) return;
+  m.className="msg"+(t?" no":""); m.textContent=t||""; }
 function stepOK(){
-  const st=STEPS[S.step]; if(!st.req) return true;
+  const st=STEPS[S.step]; if(!st.req){ wizMsg(""); return true; }
   const n=needs().find(x=>x.k===STEPKEY[st.k]);
-  if(n&&!n.ok){ const s=$('[data-need="'+n.k+'"]'); if(s) s.classList.add("err"); return false; }
-  return true;
+  if(n&&!n.ok){
+    const sec=$('#pane-c [data-need="'+n.k+'"]');   // scope to the wizard, not the first match on the page
+    if(sec){ sec.classList.add("err"); if(sec.scrollIntoView) sec.scrollIntoView({block:"center",behavior:"smooth"}); }
+    wizMsg("Please add "+n.label+" before moving on.");
+    return false;
+  }
+  wizMsg(""); return true;
 }
 document.addEventListener("submit",e=>{
   e.preventDefault();
