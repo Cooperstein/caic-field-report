@@ -195,6 +195,7 @@ input[type=date]{max-width:220px}
 :root[data-theme="dark"] .zlab.on,:root:not([data-theme="light"]) .zlab.on{fill:#101318}
 @media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .zlab.on{fill:#fff}}
 .state{fill:var(--sunk);stroke:var(--line);stroke-width:1.5}
+.mapnote{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);padding:7px 10px;border-top:1px solid var(--line);background:var(--surface)}
 .pinned{min-height:42px;display:flex;align-items:center;gap:9px;margin-top:9px;font-size:14px;color:var(--ink-2)}
 .pinned b{font-family:var(--disp);color:var(--ink)}
 .pinned .co{font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
@@ -498,7 +499,7 @@ const CRACK=[["yes","Yes"],["no","No"]];
 const COLL=[["yes","Yes"],["no","No"]];
 const VIS=[["public","With my name"],["noname","Anonymously"],["noloc","Anonymous, no location"],["staff","CAIC staff only"]];
 const ASPECT=[["N","N"],["NE","NE"],["E","E"],["SE","SE"],["S","S"],["SW","SW"],["W","W"],["NW","NW"],["U","?"]];
-const ZONES=[
+const CO_ZONES=[
  {n:"Steamboat & Flat Tops",a:"Steamboat",b:"& Flat Tops",p:"120,40 300,32 314,150 200,170 110,140",x:208,y:98,lat:40.45,lng:-106.90},
  {n:"Front Range",a:"Front",b:"Range",p:"400,55 528,50 536,215 408,215",x:468,y:128,lat:39.75,lng:-105.70},
  {n:"Vail & Summit County",a:"Vail &",b:"Summit",p:"316,112 398,108 398,212 316,212",x:357,y:155,lat:39.55,lng:-106.20},
@@ -524,18 +525,34 @@ function chipsM(group,opts,none){
 function nums(fields){
   return `<div class="two">`+fields.map(f=>`<label class="fld"><span>${f[1]}</span><input type="number" min="0" data-bind="${f[0]}"></label>`).join("")+`</div>`;
 }
+const CA_ZONES=[
+ {n:"North Rockies",a:"North",b:"Rockies",p:"468,34 604,30 612,146 476,150",x:540,y:82,lat:54.20,lng:-121.10},
+ {n:"Cariboos",a:"Cariboos",b:"",p:"296,58 424,52 430,164 302,168",x:363,y:112,lat:52.90,lng:-119.60},
+ {n:"Jasper",a:"Jasper",b:"",p:"512,156 624,152 630,236 518,240",x:571,y:200,lat:52.80,lng:-117.90},
+ {n:"North Columbia",a:"North",b:"Columbia",p:"296,176 428,172 432,268 300,272",x:364,y:214,lat:51.80,lng:-118.30},
+ {n:"Glacier",a:"Glacier",b:"",p:"330,280 414,278 416,330 332,332",x:373,y:309,lat:51.30,lng:-117.50},
+ {n:"Banff Yoho Kootenay",a:"Banff Yoho",b:"Kootenay",p:"488,248 618,244 622,340 494,344",x:555,y:288,lat:51.30,lng:-116.20},
+ {n:"South Columbia",a:"South",b:"Columbia",p:"294,342 420,340 422,412 296,414",x:358,y:370,lat:50.60,lng:-117.60},
+ {n:"Purcells",a:"Purcells",b:"",p:"430,352 486,350 488,432 432,434",x:459,y:395,lat:50.30,lng:-116.60},
+ {n:"Kootenay Boundary",a:"Kootenay",b:"Boundary",p:"238,424 418,422 420,462 240,464",x:329,y:436,lat:49.40,lng:-117.80},
+ {n:"South Rockies",a:"South",b:"Rockies",p:"496,352 620,350 624,462 500,464",x:560,y:398,lat:49.70,lng:-114.90},
+ {n:"Sea to Sky",a:"Sea to",b:"Sky",p:"104,262 208,258 212,354 108,358",x:158,y:302,lat:50.10,lng:-123.00},
+ {n:"South Coast",a:"South",b:"Coast",p:"80,152 202,148 206,250 86,254",x:143,y:192,lat:49.60,lng:-122.70}
+];
+function zoneList(){ return S.who==="avcan"?CA_ZONES:CO_ZONES; }
 function mapSVG(){
-  return `<div class="mapwrap"><svg viewBox="0 0 700 480" role="group" aria-label="Colorado forecast zones, schematic">
+  const CA=S.who==="avcan", Z=zoneList();
+  return `<div class="mapwrap"><svg viewBox="0 0 700 480" role="group" aria-label="${CA?"Avalanche Canada forecast regions":"Colorado forecast zones"}, schematic">
     <rect class="state" x="20" y="20" width="660" height="440" rx="4"/>`+
-    ZONES.map((z,i)=>`<polygon class="zone" data-zone="${i}" points="${z.p}"><title>${z.n}</title></polygon>`+
+    Z.map((z,i)=>`<polygon class="zone" data-zone="${i}" points="${z.p}"><title>${z.n}</title></polygon>`+
       (z.b?`<text class="zlab" data-lab="${i}" x="${z.x}" y="${z.y}"><tspan x="${z.x}" dy="0">${z.a}</tspan><tspan x="${z.x}" dy="12">${z.b}</tspan></text>`
           :`<text class="zlab" data-lab="${i}" x="${z.x}" y="${z.y+5}">${z.a}</text>`)).join("")+
-    `</svg></div><div class="pinned" data-pin></div>`;
+    `</svg><div class="mapnote">Schematic \u2014 ${CA?"Avalanche Canada forecast regions":"CAIC backcountry forecast zones"}.</div></div><div class="pinned" data-pin></div>`;
 }
 const B={
  where:()=>`<div class="sec" data-need="location">${head("Where",MUST)}
    <span class="q">Where were you?</span><p class="hint">Tap the zone you travelled in. We work out the backcountry area from your pin.</p>
-   ${mapSVG()}<p class="bad">Please set a location.</p></div>`,
+   <div data-mapslot>${mapSVG()}</div><p class="bad">Please set a location.</p></div>`,
  when:()=>`<div class="sec" data-need="date">${head("When",MUST)}
    <label><span class="q">What day were you out?</span><input type="date" data-bind="observed_at"></label>
    <p class="bad">Please choose a date.</p></div>`,
@@ -564,7 +581,7 @@ const B={
    ${privacyRow()}</div>`,
  privacy:()=>`<div class="sec">${head("Who can see this",MAY)}${privacyRow()}</div>`
 };
-const AVKEYS=["dsize","trigger","aspect","elevation","problem","depth","width","runLength","startElev","incline","crust","weakLayer","windExp","veg","triggerDepth","traps","av_desc"];
+const AVKEYS=["dsize","trigger","trigger_mode","aspect","elevation","problem","depth","width","runLength","startElev","incline","crust","weakLayer","windExp","veg","triggerDepth","traps","av_desc"];
 const MOREKEYS=["depth","width","runLength","startElev","incline","triggerDepth","crust","weakLayer","windExp","veg","traps"];
 const DSZ={D15:"D1.5",D25:"D2.5",D35:"D3.5"};
 const ELEV={">TL":"Alpine",TL:"Treeline","<TL":"Below treeline"};
@@ -582,7 +599,10 @@ function avSummary(a){
 }
 function avCore(){
   return `<span class="q" style="font-size:15px">Trigger</span>
-   ${chips("trigger",[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobile","Snowmobile"],["climber","Ice climber"],["remote","Remote trigger"],["explosive","Explosive"],["unknown","Not sure"]])}
+   ${chips("trigger",[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobiler","Snowmobiler"],["snowbiker","Snowbiker"],["foot","Foot"]])}
+   <span class="q" style="font-size:15px;margin-top:18px">How was it triggered?</span>
+   <p class="hint" style="margin:2px 0 9px">Only if a person triggered it. Leave blank for a natural.</p>
+   ${chips("trigger_mode",[["intentional","Intentional"],["unintentional","Unintentional"],["remote","Remote"]])}
    <span class="q" style="font-size:15px;margin-top:18px">Aspect</span>${chips("aspect",ASPECT,1)}
    <span class="q" style="font-size:15px;margin-top:18px">Elevation band</span>
    ${chips("elevation",[[">TL","Alpine"],["TL","Treeline"],["<TL","Below treeline"],["U","Not sure"]])}
@@ -804,7 +824,7 @@ function renderStep(){
 /* ---------- wiring ---------- */
 function wire(){
   $$(".zone:not([data-w])").forEach(p=>{ p.dataset.w=1; p.addEventListener("click",()=>{
-    const z=ZONES[+p.dataset.zone]; S.zone=z.n;
+    const z=zoneList()[+p.dataset.zone]; S.zone=z.n;
     S.lat=z.lat+(Math.random()-.5)*.14; S.lng=z.lng+(Math.random()-.5)*.18;
     clearErr("location"); syncAll(); }); });
   $$('input[type=file]:not([data-w])').forEach(i=>{ i.dataset.w=1; i.addEventListener("change",()=>{
@@ -853,6 +873,7 @@ document.addEventListener("input",e=>{
 });
 function clearErr(k){ $$('[data-need="'+k+'"]').forEach(s=>s.classList.remove("err"));
   if(S.opt==="c") wizMsg(""); }
+function renderMaps(){ $$("[data-mapslot]").forEach(el=>{ el.innerHTML=mapSVG(); }); wire(); }
 function renderWho(){ $$("[data-whoslot]").forEach(s=>s.innerHTML=whoHTML()); }
 function syncAll(){
   $$("[data-inline]").forEach(el=>{ const k=inlineKey();
@@ -866,7 +887,7 @@ function syncAll(){
     (S.av==="none"&&S.cracking==="no"&&S.collapsing==="no")?"true":"false"));
   $$("[data-pin]").forEach(p=>{ p.innerHTML = S.lat==null
     ? '<span style="color:var(--ink-3)">No location set yet</span>'
-    : `<span class="tk" aria-hidden="true">✓</span><span>Backcountry area: <b>${esc(S.zone)}</b></span><span class="co">${S.lat.toFixed(4)}, ${S.lng.toFixed(4)}</span>`; });
+    : `<span class="tk" aria-hidden="true">✓</span><span>${S.who==="avcan"?"Forecast region":"Backcountry area"}: <b>${esc(S.zone)}</b></span><span class="co">${S.lat.toFixed(4)}, ${S.lng.toFixed(4)}</span>`; });
   $$("[data-strip]").forEach(st=>{ st.innerHTML=S.assets.map((a,i)=>
     `<div class="thumb"><span>${a.video?"▶ ":""}${esc(a.name.slice(0,18))}</span>`+
     (a.url&&!a.video?`<img src="${a.url}" alt="" onerror="this.remove()">`:"")+
@@ -1055,8 +1076,12 @@ $$(".thbtn").forEach(b=>b.addEventListener("click",()=>{
   $$(".thbtn").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));
 }));
 $("#whosel").addEventListener("change",e=>{
+  const wasCA=S.who==="avcan";
   S.who=e.target.value;
   if(S.who==="avcan") rollAvcan();
+  if(wasCA!==(S.who==="avcan")){          // different country, so the pin no longer means anything
+    S.zone=""; S.lat=null; S.lng=null; renderMaps();
+  }
   if(S.opt==="c"){ S.step=WHOSTEP; renderStep(); } else { renderWho(); syncAll(); }
   flashWho();
 });
@@ -1101,7 +1126,7 @@ function patOut(id,v){
   if(id==="unfold"){ if(!isAv) return `<p class="qline">Nothing further to fill in.</p>`;
     return `<div class="unfolded"><strong style="font-family:var(--disp);font-size:14px">Avalanche details</strong>
       <div class="chips chips-t" style="margin-top:9px">${["D1","D1.5","D2","D2.5","D3"].map(x=>`<button type="button" class="chip">${x}</button>`).join("")}</div>
-      <div class="chips" style="margin-top:9px">${["Natural","Skier","Snowmobile","Explosive"].map(x=>`<button type="button" class="chip">${x}</button>`).join("")}</div>
+      <div class="chips" style="margin-top:9px">${["Natural","Skier","Snowmobiler","Snowbiker"].map(x=>`<button type="button" class="chip">${x}</button>`).join("")}</div>
       <div class="chips chips-t" style="margin-top:9px">${["N","NE","E","SE","S","SW","W","NW"].map(x=>`<button type="button" class="chip">${x}</button>`).join("")}</div>`+
       (caught?`<div class="callout" style="margin-top:11px"><strong>Someone was caught</strong><p>Six more required fields would open here in the original prototype.</p></div>`:"")+`</div>`; }
   return "";
