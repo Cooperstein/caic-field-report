@@ -160,6 +160,12 @@ input[type=date]{max-width:220px}
 .avtitle{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);flex:none}
 .avsum{font-family:var(--sans);font-size:13px;font-weight:400;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .avblock.closed:hover{border-color:var(--accent)}
+.avmorewrap{margin-top:18px;border-top:1px solid var(--line);padding-top:4px}
+.avmore{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:13px 2px;cursor:pointer;text-align:left}
+.avmoretitle{font-family:var(--disp);font-size:14px;font-weight:600;color:var(--ink);flex:1}
+.avmoretag{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:none}
+.avmore[aria-expanded="true"] .avmoretag{color:var(--accent)}
+.avmorebody{padding:4px 0 6px}
 .rmav{background:none;border:0;padding:3px 2px;color:var(--ink-3);font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 .rmav:hover{color:var(--crit)}
 .addav{width:100%;margin-top:14px;background:var(--surface);border:1.5px dashed var(--line-2);border-radius:10px;padding:13px;
@@ -341,6 +347,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
         <option value="fixed">Link reveal</option>
         <option value="appear">Link reveal (appears)</option>
         <option value="inline">Progressive add</option>
+      <option value="short">Short inline reveal</option>
       </select>
     </div>
     <div class="previewas">
@@ -557,7 +564,8 @@ const B={
    ${privacyRow()}</div>`,
  privacy:()=>`<div class="sec">${head("Who can see this",MAY)}${privacyRow()}</div>`
 };
-const AVKEYS=["av_type","dsize","trigger","aspect","elevation","problem","depth","width","runLength","startElev","incline","crust","weakLayer","windExp","veg","triggerDepth","traps","av_desc"];
+const AVKEYS=["dsize","trigger","aspect","elevation","problem","depth","width","runLength","startElev","incline","crust","weakLayer","windExp","veg","triggerDepth","traps","av_desc"];
+const MOREKEYS=["depth","width","runLength","startElev","incline","triggerDepth","crust","weakLayer","windExp","veg","traps"];
 const DSZ={D15:"D1.5",D25:"D2.5",D35:"D3.5"};
 const ELEV={">TL":"Alpine",TL:"Treeline","<TL":"Below treeline"};
 const PROB={storm:"Storm slab",wind:"Wind slab",persistent:"Persistent slab",deep_persistent:"Deep persistent",
@@ -572,45 +580,58 @@ function avSummary(a){
   const f=AVKEYS.filter(k=>{const v=a[k];return Array.isArray(v)?v.length>0:has(v);}).length;
   return f?f+(f===1?" field filled in":" fields filled in"):"Nothing entered yet";
 }
-function avBlock(i,n){
-  const open = n===1 || S.avOpen===i;
-  const head_ = n>1 ? `<div class="avhead">
-     <button type="button" class="avtoggle" data-avtoggle="${i}" aria-expanded="${open}">
-       <span class="avcaret" aria-hidden="true">\u203a</span>
-       <span class="avtitle">Avalanche ${i+1}</span>
-       ${open?"":`<span class="avsum">${esc(avSummary(S.avalanches[i]||{}))}</span>`}
-     </button>
-     <button type="button" class="rmav" data-rmav="${i}">Remove</button></div>` : "";
-  if(!open) return `<div class="avblock closed" data-avi="${i}">${head_}</div>`;
-  return `<div class="avblock" data-avi="${i}">
-   ${head_}
-   <span class="q" style="font-size:15px">Trigger</span>
-   ${chips("trigger",[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobile","Snowmobile"],["climber","Ice climber"],["explosive","Explosive"],["unknown","Not sure"]])}
+function avCore(){
+  return `<span class="q" style="font-size:15px">Trigger</span>
+   ${chips("trigger",[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobile","Snowmobile"],["climber","Ice climber"],["remote","Remote trigger"],["explosive","Explosive"],["unknown","Not sure"]])}
    <span class="q" style="font-size:15px;margin-top:18px">Aspect</span>${chips("aspect",ASPECT,1)}
    <span class="q" style="font-size:15px;margin-top:18px">Elevation band</span>
    ${chips("elevation",[[">TL","Alpine"],["TL","Treeline"],["<TL","Below treeline"],["U","Not sure"]])}
    <span class="q" style="font-size:15px;margin-top:18px">Size</span>
    ${chips("dsize",[["D1","D1"],["D15","D1.5"],["D2","D2"],["D25","D2.5"],["D3","D3"],["D35","D3.5"],["D4","D4"],["D5","D5"],["U","?"]],1)}
    <p class="hint" style="margin-top:7px">D1 is harmless to people \u00b7 D2 could bury or injure someone \u00b7 D3 could bury a car or break trees \u00b7 D4 and up could destroy a rail car.</p>
-   <span class="q" style="font-size:15px;margin-top:18px">Type</span>
-   ${chips("av_type",[["SS","Soft slab"],["HS","Hard slab"],["L","Loose dry"],["WL","Loose wet"],["WS","Wet slab"],["C","Cornice"],["G","Glide"],["U","Not sure"]])}
    <span class="q" style="font-size:15px;margin-top:18px">Problem type</span>
-   ${chips("problem",[["storm","Storm slab"],["wind","Wind slab"],["persistent","Persistent slab"],["deep_persistent","Deep persistent"],["wet_slab","Wet slab"],["loose_wet","Loose wet"],["loose_dry","Loose dry"],["cornice","Cornice"],["glide","Glide"],["Unknown","Not sure"]])}
-   <span class="q" style="font-size:15px;margin:18px 0 8px">Dimensions</span>
-   ${nums([["depth","Crown depth (cm)"],["width","Width (m)"],["runLength","Run length (m)"],["startElev","Start zone elevation (ft)"],["incline","Start zone incline (\u00b0)"],["triggerDepth","Snow depth at trigger point (cm)"]])}
-   <span class="q" style="font-size:15px;margin-top:18px">Crust near the weak layer?</span>
-   ${chips("crust",[["yes","Yes"],["no","No"],["unsure","Did not look"]])}
-   <span class="q" style="font-size:15px;margin-top:18px">Weak layer crystal type</span>
-   ${chips("weakLayer",[["surface_hoar","Surface hoar"],["facets","Facets"],["depth_hoar","Depth hoar"],["new_snow","New snow"],["crust","Crust"],["Unknown","Not sure"]])}
-   <span class="q" style="font-size:15px;margin-top:18px">Wind exposure</span>
-   ${chips("windExp",[["windward","Windward"],["cross","Cross-loaded"],["lee","Lee"],["sheltered","Sheltered"],["unknown","Not sure"]])}
-   <span class="q" style="font-size:15px;margin-top:18px">Vegetation cover</span>
-   ${chips("veg",[["open","Open alpine"],["sparse","Sparse trees"],["dense","Dense forest"],["cutblock","Cutblock"],["glacier","Glacier"],["unknown","Not sure"]])}
-   <span class="q" style="font-size:15px;margin-top:18px">Terrain traps <span class="opt">(select all that apply)</span></span>
-   ${chipsM("traps",[["none","None"],["trees","Trees"],["gully","Gully"],["creek","Creek or depression"],["cliff","Cliff"],["unknown","Not sure"]],"none")}
-   <label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">Anything else about this avalanche</span>
-   <textarea data-bind="av_desc" style="min-height:100px"></textarea></label>
-  </div>`;
+   ${chips("problem",[["storm","Storm slab"],["wind","Wind slab"],["persistent","Persistent slab"],["deep_persistent","Deep persistent"],["wet_slab","Wet slab"],["loose_wet","Loose wet"],["loose_dry","Loose dry"],["cornice","Cornice"],["glide","Glide"],["Unknown","Not sure"]])}`;
+}
+function avRest(i,more,mfilled){
+  return `<label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">Anything else about this avalanche</span>
+   <textarea data-bind="av_desc" style="min-height:100px" placeholder="A sentence is plenty. A photo of the crown is worth more than any of the fields below."></textarea></label>
+   <div class="avmorewrap">
+     <button type="button" class="avmore" data-avmore="${i}" aria-expanded="${more}">
+       <span class="avcaret" aria-hidden="true">\u203a</span>
+       <span class="avmoretitle">Snowpack and terrain detail</span>
+       <span class="avmoretag">${mfilled?mfilled+" filled in":"optional"}</span>
+     </button>
+     ${more?`<div class="avmorebody">
+       <p class="hint" style="margin:0 0 12px">Useful if you dug or looked closely. Skip the lot if you did not \u2014 a blank is better than a guess.</p>
+       <span class="q" style="font-size:15px;margin:0 0 8px">Dimensions</span>
+       ${nums([["depth","Crown depth (cm)"],["width","Width (m)"],["runLength","Run length (m)"],["startElev","Start zone elevation (ft)"],["incline","Start zone incline (\u00b0)"],["triggerDepth","Snow depth at trigger point (cm)"]])}
+       <span class="q" style="font-size:15px;margin-top:18px">Crust near the weak layer?</span>
+       ${chips("crust",[["yes","Yes"],["no","No"],["unsure","Did not look"]])}
+       <span class="q" style="font-size:15px;margin-top:18px">Weak layer crystal type</span>
+       ${chips("weakLayer",[["surface_hoar","Surface hoar"],["facets","Facets"],["depth_hoar","Depth hoar"],["new_snow","New snow"],["crust","Crust"],["Unknown","Not sure"]])}
+       <span class="q" style="font-size:15px;margin-top:18px">Wind exposure</span>
+       ${chips("windExp",[["windward","Windward"],["cross","Cross-loaded"],["lee","Lee"],["sheltered","Sheltered"],["unknown","Not sure"]])}
+       <span class="q" style="font-size:15px;margin-top:18px">Vegetation cover</span>
+       ${chips("veg",[["open","Open alpine"],["sparse","Sparse trees"],["dense","Dense forest"],["cutblock","Cutblock"],["glacier","Glacier"],["unknown","Not sure"]])}
+       <span class="q" style="font-size:15px;margin-top:18px">Terrain traps <span class="opt">(select all that apply)</span></span>
+       ${chipsM("traps",[["none","None"],["trees","Trees"],["gully","Gully"],["creek","Creek or depression"],["cliff","Cliff"],["unknown","Not sure"]],"none")}
+     </div>`:""}
+   </div>`;
+}
+function avBlock(i,n,short){
+  const A=S.avalanches[i]||{};
+  const open = n===1 || S.avOpen===i;
+  const more = !!A._more;
+  const mfilled = MOREKEYS.filter(k=>{const v=A[k]; return Array.isArray(v)?v.length>0:has(v);}).length;
+  const head_ = n>1 ? `<div class="avhead">
+     <button type="button" class="avtoggle" data-avtoggle="${i}" aria-expanded="${open}">
+       <span class="avcaret" aria-hidden="true">\u203a</span>
+       <span class="avtitle">Avalanche ${i+1}</span>
+       ${open?"":`<span class="avsum">${esc(avSummary(A))}</span>`}
+     </button>
+     <button type="button" class="rmav" data-rmav="${i}">Remove</button></div>` : "";
+  if(!open) return `<div class="avblock closed" data-avi="${i}">${head_}</div>`;
+  return `<div class="avblock" data-avi="${i}">${head_}${avCore()}${short?"":avRest(i,more,mfilled)}</div>`;
 }
 const DETAIL={
  group:{t:"The group",keys:["g_total","g_caught","g_partial","g_full","g_breathing","g_involved","g_tsp","g_airbag","g_deployed","g_desc"],
@@ -627,10 +648,10 @@ const DETAIL={
    <label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">What happened</span>
    <textarea data-bind="g_desc" style="min-height:120px" placeholder="In your own words. There is no wrong way to write this."></textarea></label></div>`},
  avalanche:{t:"The avalanche",keys:AVKEYS,
-  html:()=>{const n=S.avalanches.length;
+  html:(o)=>{const n=S.avalanches.length, short=!!(o&&o.short);
    return `<div>${head(n>1?"The avalanches":"The avalanche",MAY)}
-   <p class="hint" style="margin-top:-6px">Everything here is optional. "Not sure" is an honest and useful answer \u2014 a wrong guess is worse than a blank.</p>
-   ${S.avalanches.map((_,i)=>avBlock(i,n)).join("")}
+   <p class="hint" style="margin-top:-6px">${short?"The five that matter most. Everything else is one tap away below.":"Everything here is optional. \"Not sure\" is an honest and useful answer \u2014 a wrong guess is worse than a blank."}</p>
+   ${S.avalanches.map((_,i)=>avBlock(i,n,short)).join("")}
    <button type="button" class="addav" data-addav>+ Add another avalanche</button></div>`;}},
  snowpack:{t:"Snowpack",keys:["hs","hn24","wl_grain","test","sp_desc"],
   html:()=>`<div>${head("Snowpack",MAY)}
@@ -692,14 +713,16 @@ function sectionCount(k){ return k==="avalanche"?avFilled():DETAIL[k].keys.filte
 function detailCount(){ return Object.keys(DETAIL).reduce((t,k)=>t+sectionCount(k),0); }
 function drow(cls,to,strong,small){ return `<button type="button" class="more ${cls}" data-more="${to}"><span><strong>${strong}</strong><small>${small}</small></span><span class="ar" aria-hidden="true">\u203a</span></button>`; }
 function inlineKey(){
-  if(S.reveal!=="inline") return "";
-  if(S.av==="caught") return "avalanche+group";
-  return hasAv()?"avalanche":"";
+  if(S.reveal!=="inline"&&S.reveal!=="short") return "";
+  if(!hasAv()) return "";
+  const what = (S.reveal==="inline"&&S.av==="caught") ? "avalanche+group" : "avalanche";
+  return what+":"+S.reveal;
 }
 function inlineHTML(k){
   if(!k) return "";
-  return (k==="avalanche+group"?["avalanche","group"]:["avalanche"])
-    .map(x=>`<div class="sec inlined">${DETAIL[x].html()}</div>`).join("");
+  const [what,mode]=k.split(":"), short=mode==="short";
+  return (what==="avalanche+group"?["avalanche","group"]:["avalanche"])
+    .map(x=>`<div class="sec inlined">${DETAIL[x].html(x==="avalanche"?{short:short}:null)}</div>`).join("");
 }
 function detailHTML(){
   const n=detailCount(), added=n?` \u00b7 ${n} added`:"";
@@ -709,6 +732,11 @@ function detailHTML(){
               : (n ? `${n} fields added` : "Size, type, trigger, aspect \u2014 all optional");
   const aval=drow(n?"has":"","avalanche",avn>1?"Add avalanche details":"Add avalanche details",avSub);
   const gen=drow(n?"has":"","snowpack","Add more detail","Snowpack depths, weak layers and test results"+added);
+  if(S.reveal==="short"){
+    if(S.av==="caught") return drow("urgent","group","Someone was caught \u2014 add group and full avalanche details","Everything not shown above"+added);
+    if(hasAv()) return drow(n?"has":"","avalanche","Add more avalanche details","Dimensions, weak layer, terrain traps, snowpack"+added);
+    return drow(n?"has":"","snowpack","Add more detail","Snowpack depths, weak layers and test results"+added);
+  }
   if(S.reveal==="inline")
     return drow(n?"has":"","snowpack","Add snowpack detail","Depths, weak layers and test results"+added);
   if(S.reveal==="appear"){
@@ -791,7 +819,9 @@ document.addEventListener("click",e=>{
   const nx=e.target.closest("[data-next]"), sk=e.target.closest("[data-skip]");
   if(nx||sk){ if(nx&&!stepOK()) return; S.step=Math.min(S.step+1,STEPS.length-1); renderStep(); return; }
   if(e.target.closest("[data-back]")){ S.step=Math.max(S.step-1,0); renderStep(); return; }
-    const tg=e.target.closest("[data-avtoggle]");
+    const mtg=e.target.closest("[data-avmore]");
+  if(mtg){ const i=+mtg.dataset.avmore; const A=S.avalanches[i]; if(A) A._more=!A._more; redrawAvalanches(); return; }
+  const tg=e.target.closest("[data-avtoggle]");
   if(tg){ const i=+tg.dataset.avtoggle; S.avOpen=(S.avOpen===i)?-1:i; redrawAvalanches(); return; }
   if(e.target.closest("[data-addav]")){ S.avalanches.push({}); S.avOpen=S.avalanches.length-1; redrawAvalanches(); return; }
   const rmv=e.target.closest("[data-rmav]");
@@ -829,6 +859,11 @@ function syncAll(){
     `<div class="thumb"><span>${a.video?"▶ ":""}${esc(a.name.slice(0,18))}</span>`+
     (a.url&&!a.video?`<img src="${a.url}" alt="" onerror="this.remove()">`:"")+
     `<button type="button" data-rm="${i}" aria-label="Remove">×</button></div>`).join(""); });
+  $$("[data-avmore]").forEach(btn=>{
+    const A=S.avalanches[+btn.dataset.avmore]||{};
+    const n=MOREKEYS.filter(k=>{const v=A[k]; return Array.isArray(v)?v.length>0:has(v);}).length;
+    const tag=$(".avmoretag",btn); if(tag) tag.textContent=n?n+" filled in":"optional";
+  });
   pvNote();
   $$("[data-outcome]").forEach(el=>{ el.className="outcome"+(S.visibility==="staff"?" locked":""); el.innerHTML=outcomeHTML(); });
   const dh=detailHTML();
@@ -1178,15 +1213,10 @@ function resetMock(){
 }
 $("#resetmock").addEventListener("click",()=>{
   const b=$("#resetmock");
-  if(b.classList.contains("arm")){                          // second click confirms
-    clearTimeout(armed); b.classList.remove("arm");
-    resetMock();
-    b.classList.add("done"); b.textContent="Cleared";
-    armed=setTimeout(()=>{ b.classList.remove("done"); b.textContent="Clear form"; },1600);
-    return;
-  }
-  b.classList.add("arm"); b.textContent="Clear \u2014 sure?";
-  armed=setTimeout(()=>{ b.classList.remove("arm"); b.textContent="Clear form"; },3000);
+  resetMock();
+  clearTimeout(armed);
+  b.classList.add("done"); b.textContent="Cleared";
+  armed=setTimeout(()=>{ b.classList.remove("done"); b.textContent="Clear form"; },1400);
 });
 
 /* ---------- init ---------- */
