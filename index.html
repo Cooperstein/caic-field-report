@@ -311,8 +311,8 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
   <div class="previewas">
     <label for="whosel">Preview as</label>
     <select id="whosel">
+      <option value="caic-ret" selected>CAIC · returning</option>
       <option value="caic-new">CAIC · first time</option>
-      <option value="caic-ret">CAIC · returning</option>
       <option value="avcan">AvCan · signed in</option>
     </select>
     <button type="button" class="pvnote" id="pvnote"></button>
@@ -437,7 +437,7 @@ const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
 const has=v=>v!==undefined&&v!==null&&String(v).trim()!=="";
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-const S={who:"caic-new",opt:"b",step:0,
+const S={who:"caic-ret",opt:"b",step:0,
   firstname:"",lastname:"",email:"",phone:"",
   observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",
   comments:"",assets:[],av:"",cracking:"",collapsing:"",visibility:"public",
