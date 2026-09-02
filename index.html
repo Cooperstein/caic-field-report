@@ -72,7 +72,8 @@ button{font:inherit;color:inherit}
 
 /* chrome */
 .chrome{border-bottom:1px solid var(--line);background:var(--surface)}
-.chrome-in{max-width:620px;margin:0 auto;padding:11px 22px;display:flex;align-items:center;gap:14px}
+.chrome-in{max-width:960px;margin:0 auto;padding:11px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.ctrls{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-left:auto}
 .mark{font-family:var(--disp);font-weight:700;font-size:13.5px;letter-spacing:.02em;flex:1;color:var(--ink)}
 .mark span{color:var(--ink-3);font-weight:500}
 .previewas{display:flex;align-items:center;gap:7px}
@@ -81,8 +82,8 @@ button{font:inherit;color:inherit}
 .pvnote{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap;background:none;border:1px solid var(--line);border-radius:6px;padding:5px 9px;cursor:pointer}
 .pvnote:hover{border-color:var(--accent);color:var(--accent)}
 .mockonly{padding-left:14px;border-left:1px solid var(--line)}
-.resetbtn{font-family:var(--disp);font-size:11.5px;font-weight:600;color:var(--ink-3);background:var(--surface);
-  border:1px solid var(--line-2);border-radius:6px;padding:5px 11px;cursor:pointer;white-space:nowrap}
+.resetbtn{font-family:var(--disp);font-size:12px;font-weight:600;color:var(--ink-2);background:var(--surface);
+  border:1.5px solid var(--line-2);border-radius:6px;padding:6px 12px;cursor:pointer;white-space:nowrap}
 .resetbtn:hover{border-color:var(--crit);color:var(--crit)}
 .resetbtn.arm{border-color:var(--crit);color:var(--crit);background:var(--crit-wash)}
 .resetbtn.done{border-color:var(--ok);color:var(--ok);background:var(--ok-wash)}
@@ -316,26 +317,31 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
 </style>
 <div class="chrome"><div class="chrome-in">
   <div class="mark">CAIC <span>· field report concepts</span></div>
-  <div class="previewas">
-    <label for="whosel">Preview as</label>
-    <select id="whosel">
-      <option value="caic-ret" selected>CAIC · returning</option>
-      <option value="caic-new">CAIC · first time</option>
-      <option value="avcan">AvCan · signed in</option>
-    </select>
-    <button type="button" class="pvnote" id="pvnote"></button>
+  <div class="ctrls">
+    <div class="previewas">
+      <label for="revealsel">Reveal</label>
+      <select id="revealsel">
+        <option value="fixed">Link reveal</option>
+        <option value="appear">Link reveal (appears)</option>
+        <option value="inline">Progressive add</option>
+      </select>
+    </div>
+    <div class="previewas">
+      <label for="whosel">Preview as</label>
+      <select id="whosel">
+        <option value="caic-ret" selected>CAIC · returning</option>
+        <option value="caic-new">CAIC · first time</option>
+        <option value="avcan">AvCan · signed in</option>
+      </select>
+      <button type="button" class="pvnote" id="pvnote"></button>
+    </div>
+    <div class="previewas" role="group" aria-label="Theme">
+      <button type="button" class="thbtn" data-th="auto" aria-pressed="true">Auto</button>
+      <button type="button" class="thbtn" data-th="light" aria-pressed="false">Light</button>
+      <button type="button" class="thbtn" data-th="dark" aria-pressed="false">Dark</button>
+    </div>
+    <div class="previewas mockonly"><button type="button" class="resetbtn" id="resetmock">Clear form</button></div>
   </div>
-  <div class="previewas"><label for="revealsel">Reveal</label>
-    <select id="revealsel">
-      <option value="fixed">Link reveal</option>
-      <option value="appear">Link reveal (appears)</option>
-      <option value="inline">Progressive add</option>
-    </select></div>
-  <div class="previewas mockonly"><button type="button" class="resetbtn" id="resetmock">Clear form</button></div>
-  <div class="previewas" role="group" aria-label="Theme">
-    <button type="button" class="thbtn" data-th="auto" aria-pressed="true">Auto</button>
-    <button type="button" class="thbtn" data-th="light" aria-pressed="false">Light</button>
-    <button type="button" class="thbtn" data-th="dark" aria-pressed="false">Dark</button></div>
 </div></div>
 
 <div class="tabs"><div class="tabs-in" role="tablist">
