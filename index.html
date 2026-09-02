@@ -82,7 +82,15 @@ button{font:inherit;color:inherit}
 .pvnote:hover{border-color:var(--accent);color:var(--accent)}
 .thbtn{font-family:var(--disp);font-size:11.5px;font-weight:600;color:var(--ink-3);background:var(--surface);border:1px solid var(--line-2);padding:5px 10px;cursor:pointer;margin-left:-1px}
 .thbtn:first-of-type{border-radius:6px 0 0 6px;margin-left:0} .thbtn:last-of-type{border-radius:0 6px 6px 0}
-.thbtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;position:relative;z-index:1}
+.rvseg{display:flex}
+.rvbtn{font-family:var(--disp);font-size:12.5px;font-weight:600;color:var(--ink-2);background:var(--surface);border:1.5px solid var(--line-2);padding:7px 14px;cursor:pointer;margin-left:-1.5px;white-space:nowrap}
+.rvbtn:first-of-type{border-radius:7px 0 0 7px;margin-left:0} .rvbtn:last-of-type{border-radius:0 7px 7px 0}
+.rvbtn:hover{color:var(--accent);border-color:var(--accent)}
+.thbtn[aria-pressed="true"],.rvbtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;position:relative;z-index:1}
+:root[data-theme="dark"] .thbtn[aria-pressed="true"],:root:not([data-theme="light"]) .thbtn[aria-pressed="true"],
+:root[data-theme="dark"] .rvbtn[aria-pressed="true"],:root:not([data-theme="light"]) .rvbtn[aria-pressed="true"]{color:#101318}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .thbtn[aria-pressed="true"],
+  :root:not([data-theme="dark"]) .rvbtn[aria-pressed="true"]{color:#fff}}
 .dslot{display:flex;flex-direction:column;gap:8px;min-height:70px}
 .sec.flash{background:var(--wash);box-shadow:0 0 0 12px var(--wash);border-radius:10px}
 .sec{transition:background .35s ease,box-shadow .35s ease}
@@ -308,6 +316,11 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
 </style>
 <div class="chrome"><div class="chrome-in">
   <div class="mark">CAIC <span>· field report concepts</span></div>
+  <div class="previewas"><label id="rvlab">Reveal</label>
+    <div class="rvseg" role="group" aria-labelledby="rvlab">
+      <button type="button" class="rvbtn" data-rv="fixed" aria-pressed="true">Link reveal</button>
+      <button type="button" class="rvbtn" data-rv="inline" aria-pressed="false">Progressive add</button>
+    </div></div>
   <div class="previewas">
     <label for="whosel">Preview as</label>
     <select id="whosel">
@@ -317,8 +330,6 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
     </select>
     <button type="button" class="pvnote" id="pvnote"></button>
   </div>
-  <div class="previewas"><label for="revealsel">Detail link</label>
-    <select id="revealsel"><option value="fixed">Link — fixed slot</option><option value="appear">Link — appears</option><option value="inline">Fields inline</option></select></div>
   <div class="previewas" role="group" aria-label="Theme">
     <button type="button" class="thbtn" data-th="auto" aria-pressed="true">Auto</button>
     <button type="button" class="thbtn" data-th="light" aria-pressed="false">Light</button>
@@ -652,8 +663,8 @@ const FOOT=extra=>`<div class="foot">${extra||""}<p class="outcome" data-outcome
 function buildB(){
   $("#pane-b").innerHTML=
     LEDE("The field report",
-      "Contact, where, when, photos, notes and red flags. Three of those are required; the rest are one tap each. Use the Detail link control at the top to compare three ways of offering the optional detail \u2014 a link in a fixed slot, a link that appears when it becomes relevant, or the fields themselves added inline.",
-      ["3 required fields","core never changes","3 reveal modes"])+
+      "Contact, where, when, photos, notes and red flags. Three of those are required; the rest are one tap each. Use the Reveal control at the top to switch between <b>link reveal</b> \u2014 one row that opens a separate detail page \u2014 and <b>progressive add</b>, which drops the relevant fields straight into the form underneath the red flags.",
+      ["3 required fields","core never changes","link reveal or progressive add"])+
     `<div class="page"><form class="screen">${INTRO}
       ${B.who()}${B.where()}${B.when()}${B.photos()}${B.notes()}${B.flags()}<div data-inline></div>${B.detail()}
       ${FOOT()}
@@ -910,7 +921,11 @@ document.addEventListener("click",e=>{ if(!e.target.closest("[data-privjump]")) 
   const pane=$("#pane-"+S.opt); const row=$(".privrow",pane); if(!row) return;
   if(row.scrollIntoView) row.scrollIntoView({block:"center",behavior:"smooth"});
   row.classList.add("flash"); setTimeout(()=>row.classList.remove("flash"),1400); });
-$("#revealsel").addEventListener("change",e=>{ S.reveal=e.target.value; syncAll(); });
+$$(".rvbtn").forEach(b=>b.addEventListener("click",()=>{
+  S.reveal=b.dataset.rv;
+  $$(".rvbtn").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));
+  syncAll();
+}));
 $$(".thbtn").forEach(b=>b.addEventListener("click",()=>{
   const t=b.dataset.th;
   if(t==="auto") delete document.documentElement.dataset.theme;
