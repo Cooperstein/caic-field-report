@@ -149,8 +149,17 @@ input[type=date]{max-width:220px}
 
 .deflinewrap{margin:9px 0 0}
 .avblock{border:1px solid var(--line);border-radius:10px;padding:15px;margin-top:14px;background:var(--surface)}
-.avhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-3px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
-.avhead span{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.avblock.closed{padding:0;background:var(--sunk)}
+.avhead{display:flex;align-items:center;gap:10px}
+.avblock:not(.closed) .avhead{margin:-3px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.avblock.closed .avhead{padding:0 15px 0 0}
+.avtoggle{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:none;border:0;padding:13px 0 13px 15px;cursor:pointer;text-align:left}
+.avblock:not(.closed) .avtoggle{padding:0}
+.avcaret{color:var(--accent);font-size:17px;line-height:1;transition:transform .15s;flex:none}
+.avtoggle[aria-expanded="true"] .avcaret{transform:rotate(90deg)}
+.avtitle{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);flex:none}
+.avsum{font-family:var(--sans);font-size:13px;font-weight:400;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.avblock.closed:hover{border-color:var(--accent)}
 .rmav{background:none;border:0;padding:3px 2px;color:var(--ink-3);font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 .rmav:hover{color:var(--crit)}
 .addav{width:100%;margin-top:14px;background:var(--surface);border:1.5px dashed var(--line-2);border-radius:10px;padding:13px;
@@ -468,7 +477,7 @@ const S={who:"caic-ret",opt:"b",step:0,
   firstname:"",lastname:"",email:"",phone:"",
   observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",
   comments:"",assets:[],av:"",cracking:"",collapsing:"",visibility:"public",
-  avalanches:[{}],
+  avalanches:[{}],avOpen:0,
   hs:"",hn24:"",wl_grain:"",test:"",sp_desc:"",
   sky:"",precip:"",wind:"",temp:"",wx_desc:"",
   g_total:"",g_caught:"",g_partial:"",g_full:"",g_breathing:"",g_involved:"",g_tsp:"",g_airbag:"",g_deployed:"",g_desc:"",
@@ -549,9 +558,32 @@ const B={
  privacy:()=>`<div class="sec">${head("Who can see this",MAY)}${privacyRow()}</div>`
 };
 const AVKEYS=["av_type","dsize","trigger","aspect","elevation","problem","depth","width","runLength","startElev","incline","crust","weakLayer","windExp","veg","triggerDepth","traps","av_desc"];
+const DSZ={D15:"D1.5",D25:"D2.5",D35:"D3.5"};
+const ELEV={">TL":"Alpine",TL:"Treeline","<TL":"Below treeline"};
+const PROB={storm:"Storm slab",wind:"Wind slab",persistent:"Persistent slab",deep_persistent:"Deep persistent",
+  wet_slab:"Wet slab",loose_wet:"Loose wet",loose_dry:"Loose dry",cornice:"Cornice",glide:"Glide"};
+function avSummary(a){
+  const bits=[];
+  if(has(a.dsize)&&a.dsize!=="U") bits.push(DSZ[a.dsize]||a.dsize);
+  if(has(a.aspect)&&a.aspect!=="U") bits.push(a.aspect);
+  if(has(a.elevation)&&a.elevation!=="U") bits.push(ELEV[a.elevation]||a.elevation);
+  if(PROB[a.problem]) bits.push(PROB[a.problem]);
+  if(bits.length) return bits.join(" \u00b7 ");
+  const f=AVKEYS.filter(k=>{const v=a[k];return Array.isArray(v)?v.length>0:has(v);}).length;
+  return f?f+(f===1?" field filled in":" fields filled in"):"Nothing entered yet";
+}
 function avBlock(i,n){
+  const open = n===1 || S.avOpen===i;
+  const head_ = n>1 ? `<div class="avhead">
+     <button type="button" class="avtoggle" data-avtoggle="${i}" aria-expanded="${open}">
+       <span class="avcaret" aria-hidden="true">\u203a</span>
+       <span class="avtitle">Avalanche ${i+1}</span>
+       ${open?"":`<span class="avsum">${esc(avSummary(S.avalanches[i]||{}))}</span>`}
+     </button>
+     <button type="button" class="rmav" data-rmav="${i}">Remove</button></div>` : "";
+  if(!open) return `<div class="avblock closed" data-avi="${i}">${head_}</div>`;
   return `<div class="avblock" data-avi="${i}">
-   ${n>1?`<div class="avhead"><span>Avalanche ${i+1} of ${n}</span><button type="button" class="rmav" data-rmav="${i}">Remove</button></div>`:""}
+   ${head_}
    <span class="q" style="font-size:15px">Trigger</span>
    ${chips("trigger",[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobile","Snowmobile"],["climber","Ice climber"],["explosive","Explosive"],["unknown","Not sure"]])}
    <span class="q" style="font-size:15px;margin-top:18px">Aspect</span>${chips("aspect",ASPECT,1)}
@@ -759,10 +791,15 @@ document.addEventListener("click",e=>{
   const nx=e.target.closest("[data-next]"), sk=e.target.closest("[data-skip]");
   if(nx||sk){ if(nx&&!stepOK()) return; S.step=Math.min(S.step+1,STEPS.length-1); renderStep(); return; }
   if(e.target.closest("[data-back]")){ S.step=Math.max(S.step-1,0); renderStep(); return; }
-  if(e.target.closest("[data-addav]")){ S.avalanches.push({}); redrawAvalanches(); return; }
+    const tg=e.target.closest("[data-avtoggle]");
+  if(tg){ const i=+tg.dataset.avtoggle; S.avOpen=(S.avOpen===i)?-1:i; redrawAvalanches(); return; }
+  if(e.target.closest("[data-addav]")){ S.avalanches.push({}); S.avOpen=S.avalanches.length-1; redrawAvalanches(); return; }
   const rmv=e.target.closest("[data-rmav]");
-  if(rmv){ S.avalanches.splice(+rmv.dataset.rmav,1);
+  if(rmv){ const i=+rmv.dataset.rmav;
+    S.avalanches.splice(i,1);
     if(!S.avalanches.length) S.avalanches=[{}];
+    if(S.avOpen>=S.avalanches.length) S.avOpen=S.avalanches.length-1;
+    else if(S.avOpen>i) S.avOpen--;
     redrawAvalanches(); return; }
   const mo=e.target.closest("[data-more]"); if(mo){ openSheet(mo.dataset.more||"snowpack"); return; }
 });
