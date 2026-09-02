@@ -117,9 +117,10 @@ button{font:inherit;color:inherit}
 .bad{color:var(--crit);font-size:13px;font-weight:600;margin-top:8px;display:none}
 .sec.err .bad{display:block}
 
-input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],textarea{
+input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],select,textarea{
   width:100%;font-family:var(--sans);font-size:16px;color:var(--ink);background:var(--surface);
   border:1.5px solid var(--line-2);border-radius:var(--r);padding:11px 13px;min-height:var(--touch)}
+select{max-width:160px;cursor:pointer}
 textarea{min-height:150px;resize:vertical;line-height:1.6}
 input::placeholder,textarea::placeholder{color:var(--ink-3)}
 .sec.err input,.sec.err textarea{border-color:var(--crit);background:var(--crit-wash)}
@@ -160,14 +161,29 @@ input[type=date]{max-width:220px}
 .avtitle{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);flex:none}
 .avsum{font-family:var(--sans);font-size:13px;font-weight:400;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .avblock.closed:hover{border-color:var(--accent)}
-.avmorewrap{margin-top:18px;border-top:1px solid var(--line);padding-top:4px}
+.avblock .qrow{display:grid;grid-template-columns:108px 1fr;gap:6px 12px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
+.avblock .qrow:first-child{border-top:0;padding-top:0}
+.avblock .ql{font-family:var(--disp);font-size:13.5px;font-weight:600;line-height:1.25;color:var(--ink)}
+.avblock .qrow .chips{gap:6px}
+.avblock .nums{margin:2px 0 8px}
+.opt{font-weight:400;color:var(--ink-3);font-size:12.5px}
+.incq{display:flex;flex-direction:column;gap:6px;margin-top:16px}
+.avblock>.incq:first-child{margin-top:0}
+.incq .q{font-size:15px;margin:0}
+.incq input[type=number]{max-width:132px}
+.incq select{max-width:200px}
+.incgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;margin:18px 0 2px}
+@media (max-width:520px){.incgrid{grid-template-columns:1fr}}
+@media (max-width:520px){.avblock .qrow{grid-template-columns:1fr;gap:5px;padding:8px 0}}
+.avmorewrap{margin-top:12px;border-top:1px solid var(--line);padding-top:4px}
 .avmore{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:13px 2px;cursor:pointer;text-align:left}
 .avmoretitle{font-family:var(--disp);font-size:14px;font-weight:600;color:var(--ink);flex:1}
 .avmoretag{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:none}
 .avmore[aria-expanded="true"] .avmoretag{color:var(--accent)}
 .avmorebody{padding:4px 0 6px}
-.rmav{background:none;border:0;padding:3px 2px;color:var(--ink-3);font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.rmav,.avskip{background:none;border:0;padding:3px 10px 3px 2px;color:var(--ink-3);font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;flex:none}
 .rmav:hover{color:var(--crit)}
+.avskip:hover{color:var(--accent)}
 .addav{width:100%;margin-top:14px;background:var(--surface);border:1.5px dashed var(--line-2);border-radius:10px;padding:13px;
   font-family:var(--disp);font-size:14.5px;font-weight:600;color:var(--accent);cursor:pointer;min-height:var(--touch)}
 .addav:hover{border-color:var(--accent);background:var(--wash)}
@@ -371,6 +387,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
 
 <div class="tabs"><div class="tabs-in" role="tablist">
   <button class="tab" role="tab" id="t-b" aria-selected="true">The form</button>
+  <button class="tab" role="tab" id="t-g" aria-selected="false">Trip report</button>
   <button class="tab" role="tab" id="t-c" aria-selected="false">One question per screen</button>
   <button class="tab" role="tab" id="t-e" aria-selected="false">Reveal patterns</button>
   <button class="tab" role="tab" id="t-f" aria-selected="false">Privacy patterns</button>
@@ -378,6 +395,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
 </div></div>
 
 <div id="pane-b"></div>
+<div id="pane-g" hidden></div>
 <div id="pane-c"></div>
 
 <div id="pane-e" class="audit" hidden></div>
@@ -485,12 +503,21 @@ const S={who:"caic-ret",opt:"b",step:0,
   firstname:"",lastname:"",email:"",phone:"",
   observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",
   comments:"",assets:[],av:"",cracking:"",collapsing:"",visibility:"public",
+  title:"",activity:[],sawAvalanche:"",caught:"",whenOccurred:"",instability:[],incidentStory:"",
   avalanches:[{}],avOpen:0,
+  problemTypes:[],problems:{},
   hs:"",hn24:"",wl_grain:"",test:"",sp_desc:"",
   sky:"",precip:"",wind:"",temp:"",wx_desc:"",
   g_total:"",g_caught:"",g_partial:"",g_full:"",g_breathing:"",g_involved:"",g_tsp:"",g_airbag:"",g_deployed:"",g_desc:"",
+  g_rescue:"",g_injury:"",g_helmet:"",g_help:"",
   reveal:"fixed"};
-function avScope(el){ const box=el.closest("[data-avi]"); return box ? (S.avalanches[+box.dataset.avi]||{}) : S; }
+function avScope(el){
+  const box=el.closest("[data-avi]");
+  if(box) return S.avalanches[+box.dataset.avi]||{};
+  const pb=el.closest("[data-prob]");
+  if(pb){ S.problems[pb.dataset.prob]=S.problems[pb.dataset.prob]||{}; return S.problems[pb.dataset.prob]; }
+  return S;
+}
 const INITIAL=JSON.parse(JSON.stringify(S));   // pristine copy, for the Clear control
 
 /* ---------- enums ---------- */
@@ -498,7 +525,8 @@ const AV=[["none","No avalanches"],["saw","Saw avalanche(s)"],["triggered","We t
 const CRACK=[["yes","Yes"],["no","No"]];
 const COLL=[["yes","Yes"],["no","No"]];
 const VIS=[["public","With my name"],["noname","Anonymously"],["noloc","Anonymous, no location"],["staff","CAIC staff only"]];
-const ASPECT=[["N","N"],["NE","NE"],["E","E"],["SE","SE"],["S","S"],["SW","SW"],["W","W"],["NW","NW"],["U","?"]];
+const ASPECT=[["N","N"],["NE","NE"],["E","E"],["SE","SE"],["S","S"],["SW","SW"],["W","W"],["NW","NW"],["U","I don't know"]];
+const TRIG=[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobiler","Snowmobiler"],["snowbiker","Snowbiker"],["climber","Ice climber"],["explosive","Explosive"],["unknown","I don't know"]];
 const CO_ZONES=[
  {n:"Steamboat & Flat Tops",a:"Steamboat",b:"& Flat Tops",p:"120,40 300,32 314,150 200,170 110,140",x:208,y:98,lat:40.45,lng:-106.90},
  {n:"Front Range",a:"Front",b:"Range",p:"400,55 528,50 536,215 408,215",x:468,y:128,lat:39.75,lng:-105.70},
@@ -522,8 +550,21 @@ function chipsM(group,opts,none){
   return `<div class="chips" data-group="${group}" data-multi="1"${none?' data-none="'+none+'"':""}>`+
     opts.map(o=>`<button type="button" class="chip${none&&o[0]===none?" chip-none":""}" data-value="${esc(o[0])}">${esc(o[1])}</button>`).join("")+`</div>`;
 }
+function qrow(label,body){
+  return `<div class="qrow"><div class="ql">${label}</div><div class="qr">${body}</div></div>`;
+}
 function nums(fields){
   return `<div class="two">`+fields.map(f=>`<label class="fld"><span>${f[1]}</span><input type="number" min="0" data-bind="${f[0]}"></label>`).join("")+`</div>`;
+}
+function nselect(bind,max=10){
+  let o=`<option value="">\u2014</option>`;
+  for(let i=0;i<=max;i++) o+=`<option value="${i}">${i}</option>`;
+  o+=`<option value="${max+1}">More than ${max}</option>`;
+  return `<select data-bind="${bind}">${o}</select>`;
+}
+function dselect(bind,opts){
+  return `<select data-bind="${bind}"><option value="">\u2014</option>`+
+    opts.map(o=>`<option value="${esc(o[0])}">${esc(o[1])}</option>`).join("")+`</select>`;
 }
 const CA_ZONES=[
  {n:"North Rockies",a:"North",b:"Rockies",p:"468,34 604,30 612,146 476,150",x:540,y:82,lat:54.20,lng:-121.10},
@@ -580,12 +621,14 @@ const B={
    ${privacyRow()}</div>`,
  privacy:()=>`<div class="sec">${head("Who can see this",MAY)}${privacyRow()}</div>`
 };
-const AVKEYS=["dsize","trigger","trigger_mode","aspect","elevation","problem","depth","width","runLength","startElev","incline","crust","weakLayer","windExp","veg","triggerDepth","traps","av_desc"];
+const AVKEYS=["whenOccurred","dsize","trigger","trigger_mode","aspect","elevation","problem","depth","width","runLength","startElev","incline","crust","weakLayer","windExp","veg","triggerDepth","traps","av_desc"];
+const WHEN=[["whileThere","While there"],["todayFresh","Today"],["yesterday","Yesterday"],["fewDays","A few days"],["unsure","Older / unsure"]];
 const MOREKEYS=["depth","width","runLength","startElev","incline","triggerDepth","crust","weakLayer","windExp","veg","traps"];
 const DSZ={D15:"D1.5",D25:"D2.5",D35:"D3.5"};
 const ELEV={">TL":"Alpine",TL:"Treeline","<TL":"Below treeline"};
 const PROB={storm:"Storm slab",wind:"Wind slab",persistent:"Persistent slab",deep_persistent:"Deep persistent",
-  wet_slab:"Wet slab",loose_wet:"Loose wet",loose_dry:"Loose dry",cornice:"Cornice",glide:"Glide"};
+  wet_slab:"Wet slab",loose_wet:"Loose wet",loose_dry:"Loose dry",cornice:"Cornice",glide:"Glide",Unknown:"Not sure"};
+const PROB_OPTS=Object.entries(PROB);
 function avSummary(a){
   const bits=[];
   if(has(a.dsize)&&a.dsize!=="U") bits.push(DSZ[a.dsize]||a.dsize);
@@ -597,19 +640,34 @@ function avSummary(a){
   return f?f+(f===1?" field filled in":" fields filled in"):"Nothing entered yet";
 }
 function avCore(){
-  return `<span class="q" style="font-size:15px">Trigger</span>
-   ${chips("trigger",[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobiler","Snowmobiler"],["snowbiker","Snowbiker"],["foot","Foot"]])}
-   <span class="q" style="font-size:15px;margin-top:18px">How was it triggered?</span>
-   <p class="hint" style="margin:2px 0 9px">Only if a person triggered it. Leave blank for a natural.</p>
-   ${chips("trigger_mode",[["intentional","Intentional"],["unintentional","Unintentional"],["remote","Remote"]])}
-   <span class="q" style="font-size:15px;margin-top:18px">Aspect</span>${chips("aspect",ASPECT,1)}
-   <span class="q" style="font-size:15px;margin-top:18px">Elevation band</span>
-   ${chips("elevation",[[">TL","Alpine"],["TL","Treeline"],["<TL","Below treeline"],["U","Not sure"]])}
-   <span class="q" style="font-size:15px;margin-top:18px">Size</span>
-   ${chips("dsize",[["D1","D1"],["D15","D1.5"],["D2","D2"],["D25","D2.5"],["D3","D3"],["D35","D3.5"],["D4","D4"],["D5","D5"],["U","?"]],1)}
-   <p class="hint" style="margin-top:7px">D1 is harmless to people \u00b7 D2 could bury or injure someone \u00b7 D3 could bury a car or break trees \u00b7 D4 and up could destroy a rail car.</p>
-   <span class="q" style="font-size:15px;margin-top:18px">Problem type</span>
-   ${chips("problem",[["storm","Storm slab"],["wind","Wind slab"],["persistent","Persistent slab"],["deep_persistent","Deep persistent"],["wet_slab","Wet slab"],["loose_wet","Loose wet"],["loose_dry","Loose dry"],["cornice","Cornice"],["glide","Glide"],["Unknown","Not sure"]])}`;
+  return `<div class="incq">
+        <span class="q">When do you think it happened?</span>
+        ${chips("whenOccurred",WHEN,1)}
+      </div>
+      <div class="incq">
+        <span class="q">What triggered it?</span>
+        ${chips("trigger",TRIG,1)}
+      </div>
+      <div class="incq">
+        <span class="q">How was it triggered?</span>
+        ${dselect("trigger_mode",[["intentional","Intentional"],["unintentional","Unintentional"],["remote","Remote"],["unknown","I don't know"]])}
+      </div>
+      <div class="incq">
+        <span class="q">Which way did the slope face?</span>
+        ${chips("aspect",ASPECT,1)}
+      </div>
+      <div class="incq">
+        <span class="q">What elevation band?</span>
+        ${chips("elevation",[[">TL","Alpine"],["TL","Treeline"],["<TL","Below"],["U","I don't know"]],1)}
+      </div>
+      <div class="incq">
+        <span class="q">How big was it?</span>
+        ${chips("dsize",[["D1","D1"],["D15","D1.5"],["D2","D2"],["D25","D2.5"],["D3","D3"],["D35","D3.5"],["D4","D4"],["D5","D5"],["U","I don't know"]],1)}
+      </div>
+      <div class="incq">
+        <span class="q">What avalanche problem was it?</span>
+        ${chips("problem",[["storm","Storm"],["wind","Wind"],["persistent","Persistent"],["deep_persistent","Deep persistent"],["wet_slab","Wet slab"],["loose_wet","Loose wet"],["loose_dry","Loose dry"],["cornice","Cornice"],["glide","Glide"],["Unknown","I don't know"]],1)}
+      </div>`;
 }
 function avRest(i,more,mfilled){
   return `<label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">Anything else about this avalanche</span>
@@ -782,6 +840,211 @@ const LEDE=(t,d,tags)=>`<div class="optlede"><h2>${t}</h2><p>${d}</p><div class=
 const INTRO=`<div class="intro"><h1>Submit a field report</h1><p>Tell us where you were and what the snow was doing. Photos help more than anything else you can send.</p></div>`;
 const FOOT=extra=>`<div class="foot">${extra||""}<p class="outcome" data-outcome></p><button type="submit" class="btn btn-go">Submit field report</button><p class="msg" data-msg></p></div>`;
 
+function buildG(){
+  $("#pane-g").innerHTML=
+    LEDE("Trip report",
+      "Avalanche Canada’s branching trip report, in this form’s type. Required questions first. Problem types if you saw an avalanche. Free text last.",
+      ["required branching","problem types","optional more details"])+
+    `<div class="page"><form class="screen">
+      <div class="intro"><h1>Submit a trip report</h1><p>Where you went, what you saw, and what you would tell the next party.</p></div>
+      <div class="sec" data-need="title">${head("Trip",MUST)}
+        <label><span class="q">Trip title</span><input type="text" data-bind="title" placeholder="e.g. Spearhead Traverse"></label>
+        <p class="bad">Please enter a trip title.</p></div>
+      ${B.photos()}
+      <div class="sec">${head("Who can see this",MAY)}
+        <span class="q">Who can see this report?</span>
+        ${chips("visibility",VIS)}
+        <p class="hint">Anonymous is completely normal. Forecasters read it the same.</p>
+      </div>
+      ${B.when()}${B.where()}
+      <div class="sec">${head("Activity",MAY)}
+        <span class="q">What activity were you doing?</span>
+        ${chipsM("activity",[["skiing","Skiing"],["crossCountrySkiing","Cross-country skiing"],["snowboarding","Snowboarding"],["iceClimbing","Ice climbing"],["mountaineering","Mountaineering"],["snowshoeing","Snowshoeing"],["snowmobiling","Snowmobiling"],["snowbiking","Snowbiking"],["hiking","Hiking"]])}</div>
+      <div data-trflow></div>
+      <div class="foot"><p class="outcome" data-outcome></p><button type="submit" class="btn btn-go">Submit trip report</button><p class="msg" data-msg></p></div>
+      </form></div>`;
+}
+function instFilled(){ return (S.instability||[]).length>0; }
+function trFlowSig(){
+  return [S.sawAvalanche,S.caught,S.avalanches.length,S.avOpen].join("|");
+}
+const INCKEYS=["g_deployed","g_rescue","g_injury","g_helmet","g_help","g_desc"];
+function incMoreFilled(){ return INCKEYS.filter(k=>has(S[k])).length; }
+function incMoreHTML(){
+  return `<div>
+    <p class="hint" style="margin:0 0 12px">All optional. The fields below the first one are placeholders.</p>
+    <span class="q" style="font-size:15px">Were they deployed?</span>
+    ${chips("g_deployed",[["yes","Yes"],["no","No"],["unknown","Unknown"]])}
+    <span class="q" style="font-size:15px;margin-top:18px">Rescue <span class="opt">(placeholder)</span></span>
+    ${chips("g_rescue",[["self","Self"],["companion","Companion"],["organized","Organized"],["unknown","Unknown"]])}
+    <span class="q" style="font-size:15px;margin-top:18px">Injuries <span class="opt">(placeholder)</span></span>
+    ${chips("g_injury",[["none","None"],["minor","Minor"],["serious","Serious"],["unknown","Unknown"]])}
+    <span class="q" style="font-size:15px;margin-top:18px">Helmets <span class="opt">(placeholder)</span></span>
+    ${chips("g_helmet",[["yes","Yes"],["some","Some"],["no","No"],["unknown","Unknown"]])}
+    <span class="q" style="font-size:15px;margin-top:18px">Help called <span class="opt">(placeholder)</span></span>
+    ${chips("g_help",[["yes","Yes"],["no","No"],["unknown","Unknown"]])}
+    <label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">Anything else</span>
+    <textarea data-bind="g_desc" style="min-height:100px" placeholder="In your own words. There is no wrong way to write this."></textarea></label>
+  </div>`;
+}
+function trIncident(){
+  const n=incMoreFilled();
+  return `<div class="sec">${head("Incident",MAY)}
+    <p class="hint" style="margin-top:-6px">Optional. Zero is a real answer. Skip nearby if that is fuzzy.</p>
+    <div class="avblock">
+      <div class="incq">
+        <span class="q">How many people were in the group?</span>
+        <input type="number" min="1" inputmode="numeric" data-bind="g_total">
+      </div>
+      <div class="incq">
+        <span class="q">How many were caught?</span>
+        <input type="number" min="0" inputmode="numeric" data-bind="g_caught">
+      </div>
+      <div class="incgrid">
+        <label class="incq"><span class="q">How many were partially buried?</span>${nselect("g_partial")}</label>
+        <label class="incq"><span class="q">How many were fully buried?</span>${nselect("g_full")}</label>
+        <label class="incq"><span class="q">How many had breathing impaired?</span>${nselect("g_breathing")}</label>
+        <label class="incq"><span class="q">How many were involved nearby? <span class="opt">(optional)</span></span>${nselect("g_involved")}</label>
+      </div>
+      <div class="incq">
+        <span class="q">Did they have transceiver, shovel and probe?</span>
+        ${chips("g_tsp",[["all","Everyone"],["some","Some"],["no","No"],["unknown","I don't know"]])}
+      </div>
+      <div class="incq">
+        <span class="q">Did they have airbags?</span>
+        ${chips("g_airbag",[["yes","Yes"],["some","Some"],["no","No"],["unknown","I don't know"]])}
+      </div>
+      <div class="avmorewrap">${drow(n?"has":"","incident","Add more details",
+        n?n+" fields filled in":"Deployed, rescue — optional")}</div>
+    </div>
+  </div>`;
+}
+function trNotes(){
+  const inc=S.caught==="yes";
+  return `<div class="sec">${head("Trip summary",MAY)}
+    <label><span class="q">${inc?"What happened?":"Trip summary"}</span>
+    <p class="hint">${inc?"In your own words — how it started, what you did, how it ended. The parts that don’t fit a checkbox. No names, no blame.":"How the day compared to the forecast, what you rode or avoided, and what you’d repeat or change."}</p>
+    <textarea data-bind="comments" ${inc?'style="min-height:120px" ':''}placeholder="${inc?"Where you were, how it started, what you did, and how it ended. Skip names and judgement.":"How did the day compare to the forecast? What did you ride or avoid, and what would you repeat or change next time?"}"></textarea></label>
+    </div>`;
+}
+function avTechFilled(A){
+  return MOREKEYS.concat(["av_desc"]).filter(k=>{const v=A[k]; return Array.isArray(v)?v.length>0:has(v);}).length;
+}
+function avTechHTML(i){
+  return `<div data-avi="${i}">
+    <p class="hint" style="margin:0 0 12px">Useful if you dug or looked closely. Skip the lot if you did not \u2014 a blank is better than a guess.</p>
+    <label style="display:block"><span class="q" style="font-size:15px">Anything else about this avalanche</span>
+    <textarea data-bind="av_desc" style="min-height:100px" placeholder="A sentence is plenty. A photo of the crown is worth more than any of the fields below."></textarea></label>
+    <span class="q" style="font-size:15px;margin:18px 0 8px">Dimensions</span>
+    ${nums([["depth","Crown depth (cm)"],["width","Width (m)"],["runLength","Run length (m)"],["startElev","Start zone elevation (ft)"],["incline","Start zone incline (\u00b0)"],["triggerDepth","Snow depth at trigger point (cm)"]])}
+    <span class="q" style="font-size:15px;margin-top:18px">Crust near the weak layer?</span>
+    ${chips("crust",[["yes","Yes"],["no","No"],["unsure","Did not look"]])}
+    <span class="q" style="font-size:15px;margin-top:18px">Weak layer crystal type</span>
+    ${chips("weakLayer",[["surface_hoar","Surface hoar"],["facets","Facets"],["depth_hoar","Depth hoar"],["new_snow","New snow"],["crust","Crust"],["Unknown","Not sure"]])}
+    <span class="q" style="font-size:15px;margin-top:18px">Wind exposure</span>
+    ${chips("windExp",[["windward","Windward"],["cross","Cross-loaded"],["lee","Lee"],["sheltered","Sheltered"],["unknown","Not sure"]])}
+    <span class="q" style="font-size:15px;margin-top:18px">Vegetation cover</span>
+    ${chips("veg",[["open","Open alpine"],["sparse","Sparse trees"],["dense","Dense forest"],["cutblock","Cutblock"],["glacier","Glacier"],["unknown","Not sure"]])}
+    <span class="q" style="font-size:15px;margin-top:18px">Terrain traps <span class="opt">(select all that apply)</span></span>
+    ${chipsM("traps",[["none","None"],["trees","Trees"],["gully","Gully"],["creek","Creek or depression"],["cliff","Cliff"],["unknown","Not sure"]],"none")}
+  </div>`;
+}
+function trAvBlock(i,n){
+  const A=S.avalanches[i]||{};
+  const open=S.avOpen===i;
+  const filled=avTechFilled(A);
+  const title=n>1?"Observation "+(i+1):"This avalanche";
+  const head_=`<div class="avhead">
+     <button type="button" class="avtoggle" data-avtoggle="${i}" aria-expanded="${open}">
+       <span class="avcaret" aria-hidden="true">\u203a</span>
+       <span class="avtitle">${title}</span>
+       ${open?"":`<span class="avsum">${esc(avSummary(A)==="Nothing entered yet"?"Skipped — tap to add":avSummary(A))}</span>`}
+     </button>
+     ${open&&n===1?`<button type="button" class="avskip" data-avtoggle="${i}">Skip</button>`:""}
+     ${n>1?`<button type="button" class="rmav" data-rmav="${i}">Remove</button>`:""}</div>`;
+  if(!open) return `<div class="avblock closed" data-avi="${i}">${head_}</div>`;
+  return `<div class="avblock" data-avi="${i}">${head_}${avCore()}
+    <div class="avmorewrap">${drow(filled?"has":"","tech","Add more details",
+      filled?filled+" technical fields filled in":"Crown, weak layer, terrain \u2014 optional")}</div>
+  </div>`;
+}
+function trAvObs(){
+  const n=S.avalanches.length;
+  return `<div class="sec">${head("Avalanche observation",MAY)}
+    <p class="hint" style="margin-top:-6px">Optional. Skip or collapse if you have nothing to add.</p>
+    ${S.avalanches.map((_,i)=>trAvBlock(i,n)).join("")}
+    <button type="button" class="addav" data-addav>+ Add another avalanche observation</button>
+  </div>`;
+}
+function trFlowHTML(){
+  const saw=S.sawAvalanche, caught=S.caught;
+  let h=`<div class="sec" data-need="sawAvalanche">${head("Avalanches",MUST)}
+    <span class="q">Did you see any recent avalanches or trigger an avalanche?</span>
+    ${chips("sawAvalanche",[["yes","Yes"],["no","No"]])}
+    <p class="bad">Please answer this question.</p></div>`;
+  if(!has(saw)) return h;
+  if(saw==="yes") h+=`<div class="sec" data-need="caught">
+    <span class="q">Was someone caught or carried by the avalanche?</span>
+    ${chips("caught",[["yes","Yes"],["no","No"]])}
+    <p class="bad">Please answer this question.</p></div>`;
+  if(saw==="yes"&&caught==="yes") h+=trIncident();
+  if(saw==="yes") h+=trAvObs();
+  if(saw!=="yes") h+=`<div class="sec">${head("Instability",MAY)}
+    <span class="q">Did you see any signs of instability?</span>
+    ${chipsM("instability",[["none","None"],["whumpfing","Whumpfing"],["shootingCracks","Shooting cracks"],["collapsing","Collapsing"],["hollowSnow","Hollow snow"]],"none")}
+    </div>`;
+  h+=trNotes();
+  return h;
+}
+function problemSig(){
+  return (hasAv()?S.av:"none")+"|"+S.problemTypes.slice().sort().join(",")+"|"+
+    S.problemTypes.map(id=>(S.problems[id]&&S.problems[id]._more)?"1":"0").join("");
+}
+function problemHTML(){
+  if(S.opt!=="g" && !hasAv()) return "";
+  if(S.opt==="g" && S.sawAvalanche!=="yes") return "";
+  const pick=PROB_OPTS.map(([id,lab])=>{
+    const on=S.problemTypes.includes(id);
+    return `<label class="probcheck${on?" on":""}"><input type="checkbox" data-ptype="${id}"${on?" checked":""}> ${esc(lab)}</label>`;
+  }).join("");
+  const cards=S.problemTypes.map(id=>{
+    const lab=PROB[id]||"Not sure";
+    const A=S.problems[id]||{};
+    const more=!!A._more;
+    return `<div class="avblock" data-prob="${id}">
+      <span class="q" style="font-size:15px;margin-top:18px">${esc(lab)}</span>
+      <span class="q" style="font-size:15px;margin-top:14px">How many</span>
+      <label class="fld" style="max-width:120px"><input type="number" min="1" data-bind="count"></label>
+      <span class="q" style="font-size:15px;margin-top:18px">Size</span>
+      ${chips("dsize",[["D1","D1"],["D15","D1.5"],["D2","D2"],["D25","D2.5"],["D3","D3"],["D35","D3.5"],["D4","D4"],["D5","D5"],["U","?"]],1)}
+      <p class="hint" style="margin-top:7px">D1 is harmless to people · D2 could bury or injure someone · D3 could bury a car or break trees</p>
+      <span class="q" style="font-size:15px;margin-top:18px">Trigger</span>
+      ${chips("trigger",TRIG)}
+      <div class="avmorewrap">
+        <button type="button" class="avmore" data-probmore="${id}" aria-expanded="${more}">
+          <span class="avcaret" aria-hidden="true">›</span>
+          <span class="avmoretitle">More details</span>
+          <span class="avmoretag">${more?"open":"optional"}</span>
+        </button>
+        ${more?`<div class="avmorebody">
+          <span class="q" style="font-size:15px">How was it triggered?</span>
+          <p class="hint" style="margin:2px 0 9px">Only if a person triggered it. Leave blank for a natural.</p>
+          ${chips("trigger_mode",[["intentional","Intentional"],["unintentional","Unintentional"],["remote","Remote"]])}
+          <span class="q" style="font-size:15px;margin-top:18px">Aspect</span>${chips("aspect",ASPECT,1)}
+          <span class="q" style="font-size:15px;margin-top:18px">Elevation band</span>
+          ${chips("elevation",[[">TL","Alpine"],["TL","Treeline"],["<TL","Below treeline"],["U","Not sure"]])}
+          <span class="q" style="font-size:15px;margin:18px 0 8px">Dimensions</span>
+          ${nums([["depth","Crown depth (cm)"],["width","Width (m)"],["runLength","Run length (m)"],["incline","Start zone incline (°)"]])}
+        </div>`:""}
+      </div>
+    </div>`;
+  }).join("");
+  return `<div class="sec">${head("Problem types",MAY)}
+    <span class="q">Which problem types did you observe?</span>
+    <p class="hint">Select each type you saw. Number, size and trigger go on that type. Skip anything you are guessing.</p>
+    <div class="prob-pick">${pick}</div>
+    ${cards}</div>`;
+}
 function buildB(){
   $("#pane-b").innerHTML=
     LEDE("The field report",
@@ -854,6 +1117,8 @@ document.addEventListener("click",e=>{
   if(mtg){ const i=+mtg.dataset.avmore; const A=S.avalanches[i]; if(A) A._more=!A._more; redrawAvalanches(); return; }
   const tg=e.target.closest("[data-avtoggle]");
   if(tg){ const i=+tg.dataset.avtoggle; S.avOpen=(S.avOpen===i)?-1:i; redrawAvalanches(); return; }
+  const pmore=e.target.closest("[data-probmore]");
+  if(pmore){ const id=pmore.dataset.probmore; S.problems[id]=S.problems[id]||{}; S.problems[id]._more=!S.problems[id]._more; syncAll(); return; }
   if(e.target.closest("[data-addav]")){ S.avalanches.push({}); S.avOpen=S.avalanches.length-1; redrawAvalanches(); return; }
   const rmv=e.target.closest("[data-rmav]");
   if(rmv){ const i=+rmv.dataset.rmav;
@@ -862,19 +1127,42 @@ document.addEventListener("click",e=>{
     if(S.avOpen>=S.avalanches.length) S.avOpen=S.avalanches.length-1;
     else if(S.avOpen>i) S.avOpen--;
     redrawAvalanches(); return; }
-  const mo=e.target.closest("[data-more]"); if(mo){ openSheet(mo.dataset.more||"snowpack"); return; }
+  const mo=e.target.closest("[data-more]"); if(mo){
+    const box=mo.closest("[data-avi]"); if(box) S.avOpen=+box.dataset.avi;
+    openSheet(mo.dataset.more||"snowpack"); return; }
 });
-document.addEventListener("input",e=>{
+document.addEventListener("change",e=>{
+  const ptype=e.target.closest("[data-ptype]");
+  if(ptype){
+    const id=ptype.dataset.ptype, on=ptype.checked;
+    S.problemTypes=S.problemTypes.filter(x=>x!==id);
+    if(on) S.problemTypes.push(id);
+    else delete S.problems[id];
+    syncAll();
+  }
+});
+function onBind(e){
   const el=e.target.closest("[data-bind]"); if(!el) return;
   avScope(el)[el.dataset.bind]=el.value;
   const sec=el.closest("[data-need]"); if(sec) clearErr(sec.dataset.need);
   syncAll();
-});
+}
+document.addEventListener("input",onBind);
+document.addEventListener("change",onBind);
 function clearErr(k){ $$('[data-need="'+k+'"]').forEach(s=>s.classList.remove("err"));
   if(S.opt==="c") wizMsg(""); }
 function renderMaps(){ $$("[data-mapslot]").forEach(el=>{ el.innerHTML=mapSVG(); }); wire(); }
 function renderWho(){ $$("[data-whoslot]").forEach(s=>s.innerHTML=whoHTML()); }
 function syncAll(){
+  $$("[data-trflow]").forEach(el=>{ const k=trFlowSig();
+    if(el.dataset.sig!==k){
+      const ae=document.activeElement;
+      const bind=ae&&ae.getAttribute&&ae.getAttribute("data-bind");
+      const start=ae&&ae.selectionStart;
+      el.dataset.sig=k; el.innerHTML=trFlowHTML();
+      if(bind){ const n=el.querySelector('[data-bind="'+bind+'"]');
+        if(n){ n.focus(); if(typeof start==="number") try{ n.setSelectionRange(start,start); }catch(err){} } }
+    } });
   $$("[data-inline]").forEach(el=>{ const k=inlineKey();
     if(el.dataset.sig!==k){ el.dataset.sig=k; el.innerHTML=inlineHTML(k); } });
   $$(".chips[data-group]").forEach(g=>{ const v=avScope(g)[g.dataset.group];
@@ -896,10 +1184,24 @@ function syncAll(){
     const n=MOREKEYS.filter(k=>{const v=A[k]; return Array.isArray(v)?v.length>0:has(v);}).length;
     const tag=$(".avmoretag",btn); if(tag) tag.textContent=n?n+" filled in":"optional";
   });
+  $$('[data-more="tech"]').forEach(btn=>{
+    const box=btn.closest("[data-avi]");
+    const A=box?S.avalanches[+box.dataset.avi]||{}:{};
+    const n=avTechFilled(A);
+    const sm=$("small",btn); if(sm) sm.textContent=n?n+" technical fields filled in":"Crown, weak layer, terrain \u2014 optional";
+    btn.classList.toggle("has",!!n);
+  });
+  $$('[data-more="incident"]').forEach(btn=>{
+    const n=incMoreFilled();
+    const sm=$("small",btn); if(sm) sm.textContent=n?n+" fields filled in":"Deployed, rescue — optional";
+    btn.classList.toggle("has",!!n);
+  });
   pvNote();
   $$("[data-outcome]").forEach(el=>{ el.className="outcome"+(S.visibility==="staff"?" locked":""); el.innerHTML=outcomeHTML(); });
   const dh=detailHTML();
   $$("[data-dslot]").forEach(el=>{ if(el.dataset.sig!==dh){ el.dataset.sig=dh; el.innerHTML=dh; } });
+  $$("[data-probs]").forEach(el=>{ const k=problemSig();
+    if(el.dataset.sig!==k){ el.dataset.sig=k; el.innerHTML=problemHTML(); } });
 }
 /* ---------- extra styles + defs modal ---------- */
 const ex=document.createElement("style");
@@ -925,6 +1227,10 @@ ex.textContent=`.more.urgent{border-color:var(--flag);background:var(--flag-wash
 .pat-why div span{font-family:var(--disp);font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;display:block;margin-bottom:4px}
 .pat-why .g span{color:var(--ok)} .pat-why .b span{color:var(--crit)}
 .pat-why p{font-size:13px;color:var(--ink-2);line-height:1.5}
+.prob-pick{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:4px 0 8px}
+.probcheck{display:flex;align-items:center;gap:8px;min-height:42px;padding:8px 10px;border:1.5px solid var(--line-2);border-radius:var(--r);background:var(--surface);font-weight:600;font-size:14px;cursor:pointer}
+.probcheck.on{background:var(--wash);border-color:var(--accent)}
+.probcheck input{width:16px;height:16px;accent-color:var(--accent);flex:none}
 .qline{font-size:13.5px;color:var(--ink-3)}
 .qline a{color:var(--accent);font-weight:600}
 .unfolded{border:1px dashed var(--line-2);border-radius:9px;padding:13px;margin-top:11px;background:var(--sunk)}
@@ -964,14 +1270,35 @@ let sheetTab="avalanche";
 function openSheet(k){ sheetTab=k||sheetTab; renderSheet(); $("#sheet").classList.add("on");
   document.body.style.overflow="hidden"; $("#sheet-x").focus(); }
 function closeSheet(){ $("#sheet").classList.remove("on"); document.body.style.overflow=""; syncAll();
-  const b=$('#pane-'+S.opt+' [data-more]'); if(b&&b.focus) b.focus(); }
+  const b=$('#pane-'+S.opt+' [data-more="'+sheetTab+'"]')||$('#pane-'+S.opt+' [data-more="tech"]')||$('#pane-'+S.opt+' [data-more]'); if(b&&b.focus) b.focus(); }
 function sheetKeys(){
+  if(S.opt==="g") return sheetTab==="incident"?["incident"]:["tech"];
   if(S.reveal==="inline") return ["snowpack"];
   const k=[]; if(S.av==="caught") k.push("group");
   if(hasAv()) k.push("avalanche");
   return k.concat(["snowpack"]);
 }
 function renderSheet(){
+  if(S.opt==="g"){
+    if(sheetTab==="incident"){
+      $("#sheet-tabs").innerHTML=`<button type="button" role="tab" aria-selected="true">Incident details</button>`;
+      $("#sheet-body").innerHTML=incMoreHTML();
+      $("#sheet-title").textContent="Incident details";
+      $("#sheet-sub").textContent="All optional — add what you have and leave the rest.";
+      $("#sheet-done").textContent="Back";
+      wire(); syncAll();
+      return;
+    }
+    sheetTab="tech";
+    const i=S.avOpen>=0?S.avOpen:0;
+    $("#sheet-tabs").innerHTML=`<button type="button" role="tab" aria-selected="true">Technical details</button>`;
+    $("#sheet-body").innerHTML=avTechHTML(i);
+    $("#sheet-title").textContent="Technical details";
+    $("#sheet-sub").textContent="All optional — add what you have and leave the rest.";
+    $("#sheet-done").textContent="Back";
+    wire(); syncAll();
+    return;
+  }
   if(!sheetKeys().includes(sheetTab)) sheetTab=sheetKeys()[0];
   $("#sheet-tabs").innerHTML=sheetKeys().map(k=>{
     const n=sectionCount(k);
@@ -999,6 +1326,15 @@ $("#sheet-done").addEventListener("click",()=>{
 });
 
 $("#sheet-clear").addEventListener("click",()=>{
+  if(S.opt==="g"&&sheetTab==="incident"){
+    INCKEYS.forEach(k=>{ S[k]=""; });
+    renderSheet(); return;
+  }
+  if(S.opt==="g"&&sheetTab==="tech"){
+    const A=S.avalanches[S.avOpen>=0?S.avOpen:0];
+    if(A) MOREKEYS.concat(["av_desc"]).forEach(k=>{ A[k]=Array.isArray(A[k])?[]:""; });
+    renderSheet(); return;
+  }
   if(sheetTab==="avalanche") S.avalanches=[{}];
   else DETAIL[sheetTab].keys.forEach(k=>{ S[k]=Array.isArray(S[k])?[]:""; });
   renderSheet(); });
@@ -1007,7 +1343,18 @@ document.addEventListener("keydown",e=>{ if(e.key!=="Escape") return;
   if($("#sheet").classList.contains("on")) closeSheet(); });
 
 /* ---------- validation ---------- */
+function tripNeeds(){
+  const L=[{k:"title",ok:has(S.title),label:"a trip title"},
+           {k:"location",ok:S.lat!=null,label:"where you were"},
+           {k:"date",ok:has(S.observed_at),label:"the date"},
+           {k:"sawAvalanche",ok:has(S.sawAvalanche),label:"whether you saw avalanches"}];
+  if(S.sawAvalanche==="yes"){
+    L.push({k:"caught",ok:has(S.caught),label:"whether someone was caught"});
+  }
+  return L;
+}
 function needs(){
+  if(S.opt==="g") return tripNeeds();
   const L=[{k:"location",ok:S.lat!=null,label:"where you were"},
            {k:"date",ok:has(S.observed_at),label:"the date"}];
   if(S.who==="caic-new") L.push({k:"identity",
@@ -1045,11 +1392,12 @@ document.addEventListener("submit",e=>{
 /* ---------- panes ---------- */
 function showPane(o){
   S.opt=o;
-  ["b","c","d","e","f"].forEach(k=>{ const p=$("#pane-"+k); if(p) p.hidden=(k!==o);
+  ["b","g","c","d","e","f"].forEach(k=>{ const p=$("#pane-"+k); if(p) p.hidden=(k!==o);
     const t=$("#t-"+k); if(t) t.setAttribute("aria-selected",k===o?"true":"false"); });
   window.scrollTo({top:0,behavior:"instant"});
+  syncAll();
 }
-["b","c","d","e","f"].forEach(k=>$("#t-"+k).addEventListener("click",()=>showPane(k)));
+["b","g","c","d","e","f"].forEach(k=>$("#t-"+k).addEventListener("click",()=>showPane(k)));
 const WHOLABEL={"caic-new":"first time","caic-ret":"returning","avcan":"signed in"};
 function pvNote(){ const el=$("#pvnote"); if(!el) return;
   const cost = S.who==="caic-new" ? (phoneRequired()?4:3)+" fields to type" : "nothing to type";
@@ -1226,7 +1574,8 @@ document.addEventListener("change",e=>{
 
 function redrawAvalanches(){
   $$("[data-inline]").forEach(el=>{ el.dataset.sig=""; });      // force the inline block to rebuild
-  if($("#sheet").classList.contains("on")&&sheetTab==="avalanche") renderSheet();
+  $$("[data-trflow]").forEach(el=>{ el.dataset.sig=""; });
+  if($("#sheet").classList.contains("on")&&(sheetTab==="avalanche"||sheetTab==="tech")) renderSheet();
   syncAll();
 }
 
@@ -1256,7 +1605,7 @@ $("#resetmock").addEventListener("click",()=>{
 });
 
 /* ---------- init ---------- */
-buildB(); buildC(); buildPatterns(); buildPriv();
+buildB(); buildG(); buildC(); buildPatterns(); buildPriv();
 renderWho(); wire(); syncAll(); showPane("b");
 })();
 </script>
