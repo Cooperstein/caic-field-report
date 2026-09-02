@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
-<meta name="description" content="Draft design concept for the CAIC and Avalanche Canada backcountry observation report form.">
+<meta name="description" content="Draft Avalanche Canada trip report form. Design exploration — nothing is submitted.">
 <style>
   :root{color-scheme:light dark}
   html,body{margin:0}
@@ -18,12 +18,12 @@
 .draftbar strong{color:#FFC978;font-weight:700;letter-spacing:.02em;text-transform:uppercase;font-size:11px}
 @media (prefers-color-scheme:dark){.draftbar{background:#33270F}}
 </style>
-<title>CAIC Field Report</title>
+<title>Trip report — Avalanche Canada</title>
 </head>
 <body>
 <div class="draftbar">
   <strong>Draft concept</strong>
-  <span>Design exploration for the CAIC and Avalanche Canada field report. Not official CAIC guidance, and not a live form &mdash; nothing you enter is submitted anywhere.</span>
+  <span>Avalanche Canada trip report. Design exploration, not a live form &mdash; nothing you enter is submitted anywhere.</span>
 </div>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -375,131 +375,7 @@ table.aud{width:100%;border-collapse:collapse;font-size:13.5px;min-width:720px}
 code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px 5px;border-radius:4px}
 .hid{display:none !important}
 </style>
-<div class="chrome"><div class="chrome-in">
-  <div class="mark">CAIC <span>· field report concepts</span></div>
-  <div class="ctrls">
-    <div class="previewas">
-      <label for="revealsel">Reveal</label>
-      <select id="revealsel">
-        <option value="fixed">Link reveal</option>
-        <option value="appear">Link reveal (appears)</option>
-        <option value="inline">Progressive add</option>
-      <option value="short">Short inline reveal</option>
-      </select>
-    </div>
-    <div class="previewas">
-      <label for="whosel">Preview as</label>
-      <select id="whosel">
-        <option value="caic-ret" selected>CAIC · returning</option>
-        <option value="caic-new">CAIC · first time</option>
-        <option value="avcan">AvCan · signed in</option>
-      </select>
-      <button type="button" class="pvnote" id="pvnote"></button>
-    </div>
-    <div class="previewas" role="group" aria-label="Theme">
-      <button type="button" class="thbtn" data-th="auto" aria-pressed="true">Auto</button>
-      <button type="button" class="thbtn" data-th="light" aria-pressed="false">Light</button>
-      <button type="button" class="thbtn" data-th="dark" aria-pressed="false">Dark</button>
-    </div>
-    <div class="previewas mockonly"><button type="button" class="resetbtn" id="resetmock">Clear form</button></div>
-  </div>
-</div></div>
-
-<div class="tabs"><div class="tabs-in" role="tablist">
-  <button class="tab" role="tab" id="t-b" aria-selected="true">The form</button>
-  <button class="tab" role="tab" id="t-g" aria-selected="false">Trip report (CAIC)</button>
-  <button class="tab" role="tab" id="t-h" aria-selected="false">Trip report (AvCan)</button>
-  <button class="tab" role="tab" id="t-c" aria-selected="false">One question per screen</button>
-  <button class="tab" role="tab" id="t-e" aria-selected="false">Reveal patterns</button>
-  <button class="tab" role="tab" id="t-f" aria-selected="false">Privacy patterns</button>
-  <button class="tab" role="tab" id="t-d" aria-selected="false">Field audit</button>
-</div></div>
-
-<div id="pane-b"></div>
-<div id="pane-g" hidden></div>
-<div id="pane-h" hidden></div>
-<div id="pane-c"></div>
-
-<div id="pane-e" class="audit" hidden></div>
-
-<div id="pane-f" class="audit" hidden></div>
-
-<div id="pane-d" class="audit" hidden>
-  <h2>Is this field earning its place?</h2>
-  <p class="sub">Every field is a toll booth between a person who saw something useful and the forecaster who needs to know it. A field earns its place only if what it returns is worth what it costs to collect. Below is each field in the combined CAIC and Avalanche Canada set, judged on that one test.</p>
-
-  <div class="note">
-    <p><b>Cost</b> is what the field takes from the reporter: typing costs far more than tapping, jargon costs more than plain language, and anything that asks for identity or precision before the person has invested effort costs more than the same question asked later.</p>
-    <p><b>Value</b> is what a forecaster can actually do with it — filter on it, trust it, or act on it. A field that produces confident-looking but frequently wrong data has negative value, because it takes review time and can mislead.</p>
-  </div>
-
-  <h3>Keep on the core form</h3>
-  <div class="tw"><table class="aud">
-    <thead><tr><th>Field</th><th>Cost</th><th>Value</th><th>Verdict</th></tr></thead>
-    <tbody>
-      <tr><td>Location<small>latitude / longitude</small></td><td><span class="cost-md">Medium</span> — a map interaction, the fiddliest thing on the form</td><td><b>Essential.</b> Derives Backcountry Area, places the pin, makes everything else interpretable</td><td><span class="v v-keep">Keep</span><br><small style="margin-top:6px">Default to GPS, let them adjust</small></td></tr>
-      <tr><td>Date<small>observed_at</small></td><td><span class="cost-lo">Very low</span> — defaults to today, most people never touch it</td><td><b>Essential.</b> An observation without a date is noise</td><td><span class="v v-keep">Keep</span></td></tr>
-      <tr><td>What did you observe<small>comments</small></td><td><span class="cost-hi">High</span> — the only typing on the form, and a blank box is where casual reporters quit</td><td><b>Highest.</b> This is what forecasters actually read. No dropdown set will ever cover what a person noticed</td><td><span class="v v-keep">Keep, not required</span><br><small style="margin-top:6px">Prompts beside it remove the blank page; a report with photos and red flags still stands on its own</small></td></tr>
-      <tr><td>Photos and video<small>assets</small></td><td><span class="cost-lo">Low</span> on a phone — they are already in the camera roll</td><td><b>Very high.</b> A photo of a crown or a shooting crack outperforms every structured field you could ask for</td><td><span class="v v-keep">Keep</span><br><small style="margin-top:6px">Promote it; ask early, not last</small></td></tr>
-      <tr><td>Avalanches seen<small>+ degree_involvement</small></td><td><span class="cost-lo">One tap</span> if merged into a single row</td><td><b>High.</b> Drives the Avalanches column and all three table flags</td><td><span class="v v-red">Merge</span><br><small style="margin-top:6px">One row of four, not two questions</small></td></tr>
-      <tr><td>Cracking<small>Yes / No</small></td><td><span class="cost-lo">One tap</span>, and the question is unambiguous — a reporter can answer it honestly without training</td><td><b>High,</b> and higher than a severity scale would be. Recreational reporters cannot reliably tell minor cracking from moderate, so a five-point scale returns confident-looking guesses a forecaster has no way to separate from careful answers</td><td><span class="v v-keep">Keep as yes/no</span><br><small style="margin-top:6px">Severity could live on the detail page for those who want to give it</small></td></tr>
-      <tr><td>Collapsing<small>Yes / No</small></td><td><span class="cost-lo">One tap</span>, same</td><td><b>High.</b> Same</td><td><span class="v v-keep">Keep</span></td></tr>
-      <tr><td>Name<small>firstname / lastname</small></td><td><span class="cost-lo">Low</span> — typed once, then remembered forever</td><td><b>High.</b> Attribution, credibility weighting, repeat-reporter recognition</td><td><span class="v v-keep">Keep</span><br><small style="margin-top:6px">Remember it; never ask twice</small></td></tr>
-      <tr><td>Email<small>email</small></td><td><span class="cost-lo">Low</span> — typed once, then remembered</td><td><b>High.</b> Follow-up, de-duplication, abuse control</td><td><span class="v v-keep">Keep</span></td></tr>
-    </tbody>
-  </table></div>
-
-  <h3>Question these</h3>
-  <div class="tw"><table class="aud">
-    <thead><tr><th>Field</th><th>Cost</th><th>Value</th><th>Verdict</th></tr></thead>
-    <tbody>
-      
-      <tr><td>Phone<small>phone</small></td><td><span class="cost-md">Medium.</span> Phone number is among the most-refused fields on a typical form — but that finding comes from marketing forms, where people expect to be sold to</td><td><b>High.</b> Forecasters reach out to reporters directly, so this is a working channel rather than an emergency one. That changes the trade entirely</td><td><span class="v v-keep">Keep required</span><br><small style="margin-top:6px">Say why you are asking, right next to the field</small></td></tr>
-      <tr><td>Activity<small>ski / sled / climb / foot</small></td><td><span class="cost-lo">One tap</span> — but repeated on every single report forever</td><td><span class="cost-md">Medium.</span> Tells you which terrain the observation samples. It rarely changes for a given person</td><td><span class="v v-move">Move to profile</span><br><small style="margin-top:6px">Set once, edit rarely, not per report</small></td></tr>
-      <tr><td>Privacy<small>is_anonymous · is_anonymous_location · is_locked</small></td><td><span class="cost-md">Medium.</span> Three independent checkboxes is three decisions, and most people will not read them carefully</td><td><b>Real</b> for the minority who need it — and that minority matters, because without it they may not report at all</td><td><span class="v v-red">Simplify</span><br><small style="margin-top:6px">One "who can see this" choice covers nearly every real combination</small></td></tr>
-      <tr><td>Avalanche problem type<small>storm / wind / persistent / …</small></td><td><span class="cost-md">Medium.</span> Genuine jargon; a recreational reporter is often guessing</td><td><span class="cost-md">Mixed.</span> Valuable when right, actively misleading when wrong, and you cannot tell which from the record</td><td><span class="v v-move">Detail only</span><br><small style="margin-top:6px">Keep a prominent "Not sure"</small></td></tr>
-    </tbody>
-  </table></div>
-
-  <h3>Cut from the public form</h3>
-  <div class="tw"><table class="aud">
-    <thead><tr><th>Field</th><th>Cost</th><th>Value</th><th>Verdict</th></tr></thead>
-    <tbody>
-      <tr><td>Trip title<small>title</small></td><td><span class="cost-md">Medium.</span> A naming task with a blank box, before the person has said anything real</td><td><span class="cost-hi">Near zero.</span> Fully derivable from zone plus date, which is how your table already displays reports</td><td><span class="v v-cut">Cut</span></td></tr>
-      <tr><td>Group size · caught · partially buried · fully buried · breathing impaired<small>six numeric fields</small></td><td><span class="cost-hi">Very high.</span> Six numeric inputs, and they are asked at the worst possible moment — right after an accident, often on a phone, often by someone in shock</td><td><b>High</b> in an investigation, but almost never captured accurately through a web form by someone who has just had the worst day of their life</td><td><span class="v v-cut">Cut</span><br><small style="margin-top:6px">A forecaster follows up directly</small></td></tr>
-      <tr><td>Transceiver / shovel / probe · airbags · airbag deployed<small>rescue equipment</small></td><td><span class="cost-md">Medium</span>, and only ever asked in the worst moment</td><td><b>High</b> — but this belongs in the accident interview, not a public submission</td><td><span class="v v-cut">Cut</span></td></tr>
-      <tr><td>Weather<small>sky · precipitation · wind · temperature</small></td><td><span class="cost-md">Medium.</span> Four more questions, asked of someone who was concentrating on the snow rather than the sky</td><td><span class="cost-hi">Low.</span> Your weather stations do all four of these better and more consistently than a person estimating from memory. A recreational reporter's temperature guess is close to worthless</td><td><span class="v v-cut">Cut</span><br><small style="margin-top:6px">Anything worth saying goes in the notes box as prose</small></td></tr>
-      <tr><td>Terrain traps · vegetation cover · wind exposure · ground cover</td><td><span class="cost-md">Medium each</span>, and four of them together read as an interrogation</td><td><span class="cost-hi">Low</span> from recreational reporters; you get this better from terrain data you already hold</td><td><span class="v v-cut">Cut</span></td></tr>
-    </tbody>
-  </table></div>
-
-  <h3>What the evidence actually supports</h3>
-  <p class="sub" style="margin-bottom:14px">These are well-established directional patterns in form research. The magnitudes vary a lot by context, so treat them as reasons to test rather than as numbers to quote in a meeting. Ask me and I will pull real citations for anything here.</p>
-  <ul>
-    <li><b>The count of required fields predicts abandonment better than almost anything else.</b> This is the single most reliable finding in the literature, and it is the reason a "yes" answer should never cost more than a "no".</li>
-    <li><b>Typing costs far more than tapping</b>, especially on a phone with cold hands. Every field you can turn from an input into a chip row is a real reduction in effort.</li>
-    <li><b>Asking for identity before the person has invested anything raises abandonment.</b> This is why checkout flows ask for payment last. Contact fields belong near the end, after the report is written.</li>
-    <li><b>Optional fields sitting among required ones slow everyone down</b>, because each one has to be read and dismissed. Separating them — by screen, by grouping, or by clear marking — is worth more than deleting a couple of them.</li>
-    <li><b>Prompts change what people write.</b> A labelled blank box gets one line. The same box with the six questions beside it gets a usable observation. Your NAC screenshot is doing the heavy lifting here.</li>
-    <li><b>Multi-step can beat one long page — but only when the steps are genuinely short.</b> Splitting a long form into long steps is worse than leaving it alone.</li>
-    <li><b>Never ask a person for something an instrument already measures better.</b> Temperature, wind speed and precipitation totals are measurements, and your weather stations beat a recreational reporter's recollection every time.</li>
-    <li><b>Precision you cannot collect is worse than none.</b> If reporters cannot reliably tell your categories apart, a finer scale does not capture more signal — it manufactures false precision, and a forecaster cannot tell a careful answer from a guess. Two options a person can answer honestly beat five they cannot.</li>
-    <li><b>People satisfice.</b> Whatever is easiest to answer is what you will get. If "no red flags" is one tap and "yes" is twelve, your dataset will drift toward "no" regardless of what the snow did.</li>
-  </ul>
-
-  <h3>How to find out what your people actually want</h3>
-  <p class="sub" style="margin-bottom:14px">None of the above tells you what Colorado backcountry users prefer. This does, and it takes about a week.</p>
-  <ol>
-    <li><b>Recruit eight to ten real observers</b> — a mix of frequent reporters, people who have submitted once and never returned, and a couple who have never submitted at all. That third group is the one you are actually trying to win, and the one most likely to be missing from your feedback so far.</li>
-    <li><b>Give each of them a real observation to report</b> from a photo and a short scenario, so everyone is entering comparable content. Rotate which option they see first, or the first one will always look hardest.</li>
-    <li><b>Watch, and time it.</b> Do not ask which one they like — ask them to think out loud while they do it. Record time to submit, where they hesitate, what they ask you about, and every field they skip.</li>
-    <li><b>Count the drop-offs, not the opinions.</b> The useful signal is where someone stalls or gives up, not which screen they say looks nicer. People are unreliable about preference and very reliable about friction.</li>
-    <li><b>Then check the quality of what came out.</b> Have a forecaster read the submissions blind and rate whether each one is usable. The shortest form that still produces usable reports is the winner — speed alone is not the goal.</li>
-  </ol>
-  <div class="note" style="margin-top:22px">
-    <p><b>One prediction worth testing.</b> If the audit above is right, the biggest single win available is not the layout at all — it is making the free-text box easy to start. It is the highest-value field on the form and the highest-cost one, which means it is where the leverage is. Try one version with the NAC prompt list and one with a bare box, and I would expect that difference to swamp the difference between these three layouts.</p>
-  </div>
-</div>
+<div id="pane-h"></div>
 
 <div class="dpage" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
   <header class="dpage-h"><div class="dpin">
@@ -522,7 +398,7 @@ const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
 const has=v=>v!==undefined&&v!==null&&String(v).trim()!=="";
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-const S={who:"caic-ret",opt:"b",step:0,
+const S={who:"avcan",opt:"h",step:0,
   firstname:"",lastname:"",email:"",phone:"",
   observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",mapMode:"idle",
   comments:"",assets:[],av:"",cracking:"",collapsing:"",visibility:"public",
@@ -550,8 +426,8 @@ const COLL=[["yes","Yes"],["no","No"]];
 const VIS=[["public","With my name"],["noname","Anonymously"],["noloc","Anonymous, no location"],["staff","CAIC staff only"]];
 const VIS_CAIC=[["public","Everyone, with my name"],["noname","Everyone, anonymously"],["staff","CAIC staff only"]];
 const VIS_AVCAN=[["public","Everyone, with my name"],["noname","Everyone, anonymously"]];
-function isTrip(){ return S.opt==="g"||S.opt==="h"; }
-function isAvcanTrip(){ return S.opt==="h"; }
+function isTrip(){ return true; }
+function isAvcanTrip(){ return true; }
 function visOpts(){ return isAvcanTrip()?VIS_AVCAN:VIS_CAIC; }
 const ASPECT=[["N","N"],["NE","NE"],["E","E"],["SE","SE"],["S","S"],["SW","SW"],["W","W"],["NW","NW"],["U","I don't know"]];
 const TRIG=[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobiler","Snowmobiler"],["snowbiker","Snowbiker"],["climber","Ice climber"],["explosive","Explosive"],["unknown","I don't know"]];
@@ -904,11 +780,9 @@ function buildTrip(){
   if(!pane) return;
   destroyPinMap();
   pane.innerHTML=
-    LEDE(avcan?"Trip report (AvCan)":"Trip report (CAIC)",
-      avcan?"Avalanche Canada’s branching trip report, in this form’s type. Required questions first. Observation last."
-           :"Avalanche Canada’s branching trip report, in this form’s type. Required questions first. Problem types if you saw an avalanche. Free text last.",
-      avcan?["AvCan","required branching","optional observation"]
-           :["CAIC","required branching","optional more details"])+
+    LEDE("Trip report",
+      "Avalanche Canada’s branching trip report. Required questions first. Observation last.",
+      ["AvCan","required branching","optional observation"])+
     `<div class="page"><form class="screen">
       <div class="intro"><h1>Submit a trip report</h1><p>Where you went, what you saw, and what you would tell the next party.</p></div>
       <div class="sec" data-need="title">${head("Trip",MUST)}
@@ -1597,19 +1471,20 @@ function flashWho(){
   if(sec.scrollIntoView) sec.scrollIntoView({block:"center",behavior:"smooth"});
   sec.classList.add("flash"); setTimeout(()=>sec.classList.remove("flash"),1400);
 }
-$("#pvnote").addEventListener("click",flashWho);
+const _pv=$("#pvnote"); if(_pv) _pv.addEventListener("click",flashWho);
 document.addEventListener("click",e=>{ if(!e.target.closest("[data-privjump]")) return;
-  const pane=$("#pane-"+S.opt); const row=$(".privrow",pane); if(!row) return;
+  const row=$("#pane-h [data-group=\"visibility\"]")?.closest(".sec")||$(".privrow");
+  if(!row) return;
   if(row.scrollIntoView) row.scrollIntoView({block:"center",behavior:"smooth"});
   row.classList.add("flash"); setTimeout(()=>row.classList.remove("flash"),1400); });
-$("#revealsel").addEventListener("change",e=>{ S.reveal=e.target.value; syncAll(); });
+const _rev=$("#revealsel"); if(_rev) _rev.addEventListener("change",e=>{ S.reveal=e.target.value; syncAll(); });
 $$(".thbtn").forEach(b=>b.addEventListener("click",()=>{
   const t=b.dataset.th;
   if(t==="auto") delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme=t;
   $$(".thbtn").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));
 }));
-$("#whosel").addEventListener("change",e=>{
+const _who=$("#whosel"); if(_who) _who.addEventListener("change",e=>{
   const wasCA=S.who==="avcan";
   S.who=e.target.value;
   if(S.who==="avcan") rollAvcan();
@@ -1785,7 +1660,7 @@ function resetMock(){
   syncAll();
   window.scrollTo({top:0,behavior:"smooth"});
 }
-$("#resetmock").addEventListener("click",()=>{
+const _reset=$("#resetmock"); if(_reset) _reset.addEventListener("click",()=>{
   const b=$("#resetmock");
   resetMock();
   clearTimeout(armed);
@@ -1794,8 +1669,9 @@ $("#resetmock").addEventListener("click",()=>{
 });
 
 /* ---------- init ---------- */
-buildB(); buildC(); buildPatterns(); buildPriv();
-renderWho(); wire(); syncAll(); showPane("b");
+S.opt="h"; S.who="avcan"; rollAvcan();
+buildTrip(); wire(); syncAll();
+if(pinMap) setTimeout(()=>pinMap.invalidateSize(),80);
 })();
 </script>
 
