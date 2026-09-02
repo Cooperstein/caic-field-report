@@ -347,6 +347,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
         <option value="fixed">Link reveal</option>
         <option value="appear">Link reveal (appears)</option>
         <option value="inline">Progressive add</option>
+      <option value="short">Short inline reveal</option>
       </select>
     </div>
     <div class="previewas">
@@ -563,7 +564,7 @@ const B={
    ${privacyRow()}</div>`,
  privacy:()=>`<div class="sec">${head("Who can see this",MAY)}${privacyRow()}</div>`
 };
-const AVKEYS=["av_type","dsize","trigger","aspect","elevation","problem","depth","width","runLength","startElev","incline","crust","weakLayer","windExp","veg","triggerDepth","traps","av_desc"];
+const AVKEYS=["dsize","trigger","aspect","elevation","problem","depth","width","runLength","startElev","incline","crust","weakLayer","windExp","veg","triggerDepth","traps","av_desc"];
 const MOREKEYS=["depth","width","runLength","startElev","incline","triggerDepth","crust","weakLayer","windExp","veg","traps"];
 const DSZ={D15:"D1.5",D25:"D2.5",D35:"D3.5"};
 const ELEV={">TL":"Alpine",TL:"Treeline","<TL":"Below treeline"};
@@ -579,22 +580,8 @@ function avSummary(a){
   const f=AVKEYS.filter(k=>{const v=a[k];return Array.isArray(v)?v.length>0:has(v);}).length;
   return f?f+(f===1?" field filled in":" fields filled in"):"Nothing entered yet";
 }
-function avBlock(i,n){
-  const A=S.avalanches[i]||{};
-  const open = n===1 || S.avOpen===i;
-  const more = !!A._more;
-  const mfilled = MOREKEYS.filter(k=>{const v=A[k]; return Array.isArray(v)?v.length>0:has(v);}).length;
-  const head_ = n>1 ? `<div class="avhead">
-     <button type="button" class="avtoggle" data-avtoggle="${i}" aria-expanded="${open}">
-       <span class="avcaret" aria-hidden="true">\u203a</span>
-       <span class="avtitle">Avalanche ${i+1}</span>
-       ${open?"":`<span class="avsum">${esc(avSummary(S.avalanches[i]||{}))}</span>`}
-     </button>
-     <button type="button" class="rmav" data-rmav="${i}">Remove</button></div>` : "";
-  if(!open) return `<div class="avblock closed" data-avi="${i}">${head_}</div>`;
-  return `<div class="avblock" data-avi="${i}">
-   ${head_}
-   <span class="q" style="font-size:15px">Trigger</span>
+function avCore(){
+  return `<span class="q" style="font-size:15px">Trigger</span>
    ${chips("trigger",[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobile","Snowmobile"],["climber","Ice climber"],["remote","Remote trigger"],["explosive","Explosive"],["unknown","Not sure"]])}
    <span class="q" style="font-size:15px;margin-top:18px">Aspect</span>${chips("aspect",ASPECT,1)}
    <span class="q" style="font-size:15px;margin-top:18px">Elevation band</span>
@@ -602,11 +589,11 @@ function avBlock(i,n){
    <span class="q" style="font-size:15px;margin-top:18px">Size</span>
    ${chips("dsize",[["D1","D1"],["D15","D1.5"],["D2","D2"],["D25","D2.5"],["D3","D3"],["D35","D3.5"],["D4","D4"],["D5","D5"],["U","?"]],1)}
    <p class="hint" style="margin-top:7px">D1 is harmless to people \u00b7 D2 could bury or injure someone \u00b7 D3 could bury a car or break trees \u00b7 D4 and up could destroy a rail car.</p>
-   <span class="q" style="font-size:15px;margin-top:18px">Type</span>
-   ${chips("av_type",[["SS","Soft slab"],["HS","Hard slab"],["L","Loose dry"],["WL","Loose wet"],["WS","Wet slab"],["C","Cornice"],["G","Glide"],["U","Not sure"]])}
    <span class="q" style="font-size:15px;margin-top:18px">Problem type</span>
-   ${chips("problem",[["storm","Storm slab"],["wind","Wind slab"],["persistent","Persistent slab"],["deep_persistent","Deep persistent"],["wet_slab","Wet slab"],["loose_wet","Loose wet"],["loose_dry","Loose dry"],["cornice","Cornice"],["glide","Glide"],["Unknown","Not sure"]])}
-   <label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">Anything else about this avalanche</span>
+   ${chips("problem",[["storm","Storm slab"],["wind","Wind slab"],["persistent","Persistent slab"],["deep_persistent","Deep persistent"],["wet_slab","Wet slab"],["loose_wet","Loose wet"],["loose_dry","Loose dry"],["cornice","Cornice"],["glide","Glide"],["Unknown","Not sure"]])}`;
+}
+function avRest(i,more,mfilled){
+  return `<label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">Anything else about this avalanche</span>
    <textarea data-bind="av_desc" style="min-height:100px" placeholder="A sentence is plenty. A photo of the crown is worth more than any of the fields below."></textarea></label>
    <div class="avmorewrap">
      <button type="button" class="avmore" data-avmore="${i}" aria-expanded="${more}">
@@ -629,8 +616,22 @@ function avBlock(i,n){
        <span class="q" style="font-size:15px;margin-top:18px">Terrain traps <span class="opt">(select all that apply)</span></span>
        ${chipsM("traps",[["none","None"],["trees","Trees"],["gully","Gully"],["creek","Creek or depression"],["cliff","Cliff"],["unknown","Not sure"]],"none")}
      </div>`:""}
-   </div>
-  </div>`;
+   </div>`;
+}
+function avBlock(i,n,short){
+  const A=S.avalanches[i]||{};
+  const open = n===1 || S.avOpen===i;
+  const more = !!A._more;
+  const mfilled = MOREKEYS.filter(k=>{const v=A[k]; return Array.isArray(v)?v.length>0:has(v);}).length;
+  const head_ = n>1 ? `<div class="avhead">
+     <button type="button" class="avtoggle" data-avtoggle="${i}" aria-expanded="${open}">
+       <span class="avcaret" aria-hidden="true">\u203a</span>
+       <span class="avtitle">Avalanche ${i+1}</span>
+       ${open?"":`<span class="avsum">${esc(avSummary(A))}</span>`}
+     </button>
+     <button type="button" class="rmav" data-rmav="${i}">Remove</button></div>` : "";
+  if(!open) return `<div class="avblock closed" data-avi="${i}">${head_}</div>`;
+  return `<div class="avblock" data-avi="${i}">${head_}${avCore()}${short?"":avRest(i,more,mfilled)}</div>`;
 }
 const DETAIL={
  group:{t:"The group",keys:["g_total","g_caught","g_partial","g_full","g_breathing","g_involved","g_tsp","g_airbag","g_deployed","g_desc"],
@@ -647,10 +648,10 @@ const DETAIL={
    <label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">What happened</span>
    <textarea data-bind="g_desc" style="min-height:120px" placeholder="In your own words. There is no wrong way to write this."></textarea></label></div>`},
  avalanche:{t:"The avalanche",keys:AVKEYS,
-  html:()=>{const n=S.avalanches.length;
+  html:(o)=>{const n=S.avalanches.length, short=!!(o&&o.short);
    return `<div>${head(n>1?"The avalanches":"The avalanche",MAY)}
-   <p class="hint" style="margin-top:-6px">Everything here is optional. "Not sure" is an honest and useful answer \u2014 a wrong guess is worse than a blank.</p>
-   ${S.avalanches.map((_,i)=>avBlock(i,n)).join("")}
+   <p class="hint" style="margin-top:-6px">${short?"The five that matter most. Everything else is one tap away below.":"Everything here is optional. \"Not sure\" is an honest and useful answer \u2014 a wrong guess is worse than a blank."}</p>
+   ${S.avalanches.map((_,i)=>avBlock(i,n,short)).join("")}
    <button type="button" class="addav" data-addav>+ Add another avalanche</button></div>`;}},
  snowpack:{t:"Snowpack",keys:["hs","hn24","wl_grain","test","sp_desc"],
   html:()=>`<div>${head("Snowpack",MAY)}
@@ -712,14 +713,16 @@ function sectionCount(k){ return k==="avalanche"?avFilled():DETAIL[k].keys.filte
 function detailCount(){ return Object.keys(DETAIL).reduce((t,k)=>t+sectionCount(k),0); }
 function drow(cls,to,strong,small){ return `<button type="button" class="more ${cls}" data-more="${to}"><span><strong>${strong}</strong><small>${small}</small></span><span class="ar" aria-hidden="true">\u203a</span></button>`; }
 function inlineKey(){
-  if(S.reveal!=="inline") return "";
-  if(S.av==="caught") return "avalanche+group";
-  return hasAv()?"avalanche":"";
+  if(S.reveal!=="inline"&&S.reveal!=="short") return "";
+  if(!hasAv()) return "";
+  const what = (S.reveal==="inline"&&S.av==="caught") ? "avalanche+group" : "avalanche";
+  return what+":"+S.reveal;
 }
 function inlineHTML(k){
   if(!k) return "";
-  return (k==="avalanche+group"?["avalanche","group"]:["avalanche"])
-    .map(x=>`<div class="sec inlined">${DETAIL[x].html()}</div>`).join("");
+  const [what,mode]=k.split(":"), short=mode==="short";
+  return (what==="avalanche+group"?["avalanche","group"]:["avalanche"])
+    .map(x=>`<div class="sec inlined">${DETAIL[x].html(x==="avalanche"?{short:short}:null)}</div>`).join("");
 }
 function detailHTML(){
   const n=detailCount(), added=n?` \u00b7 ${n} added`:"";
@@ -729,6 +732,11 @@ function detailHTML(){
               : (n ? `${n} fields added` : "Size, type, trigger, aspect \u2014 all optional");
   const aval=drow(n?"has":"","avalanche",avn>1?"Add avalanche details":"Add avalanche details",avSub);
   const gen=drow(n?"has":"","snowpack","Add more detail","Snowpack depths, weak layers and test results"+added);
+  if(S.reveal==="short"){
+    if(S.av==="caught") return drow("urgent","group","Someone was caught \u2014 add group and full avalanche details","Everything not shown above"+added);
+    if(hasAv()) return drow(n?"has":"","avalanche","Add more avalanche details","Dimensions, weak layer, terrain traps, snowpack"+added);
+    return drow(n?"has":"","snowpack","Add more detail","Snowpack depths, weak layers and test results"+added);
+  }
   if(S.reveal==="inline")
     return drow(n?"has":"","snowpack","Add snowpack detail","Depths, weak layers and test results"+added);
   if(S.reveal==="appear"){
@@ -1205,15 +1213,10 @@ function resetMock(){
 }
 $("#resetmock").addEventListener("click",()=>{
   const b=$("#resetmock");
-  if(b.classList.contains("arm")){                          // second click confirms
-    clearTimeout(armed); b.classList.remove("arm");
-    resetMock();
-    b.classList.add("done"); b.textContent="Cleared";
-    armed=setTimeout(()=>{ b.classList.remove("done"); b.textContent="Clear form"; },1600);
-    return;
-  }
-  b.classList.add("arm"); b.textContent="Clear \u2014 sure?";
-  armed=setTimeout(()=>{ b.classList.remove("arm"); b.textContent="Clear form"; },3000);
+  resetMock();
+  clearTimeout(armed);
+  b.classList.add("done"); b.textContent="Cleared";
+  armed=setTimeout(()=>{ b.classList.remove("done"); b.textContent="Clear form"; },1400);
 });
 
 /* ---------- init ---------- */
