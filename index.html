@@ -663,8 +663,21 @@ const DETAIL={
    <label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">Pit notes</span><textarea data-bind="sp_desc" style="min-height:100px"></textarea></label></div>`},
  privacy:{t:"Privacy",keys:[],html:()=>B.privacy()}
 };
+const AVCAN_NAMES=["Alex Trudel","Maeve Gauthier","Owen Lachance","Sylvie Bouchard","Devon Kilburn",
+  "Camille Fortin","Reid Macpherson","Noémie Charest","Wes Thibodeau","Anouk Vandermeer","Étienne Ouellet","Bryn Hollingsworth"];
+const AVCAN_TOWNS=["Revelstoke, BC","Golden, BC","Nelson, BC","Fernie, BC","Rossland, BC","Canmore, AB",
+  "Whistler, BC","Squamish, BC","Smithers, BC","Jasper, AB","Kaslo, BC","Pemberton, BC"];
+const pickOne=a=>a[Math.floor(Math.random()*a.length)];
+let AVCAN={name:AVCAN_NAMES[0],town:AVCAN_TOWNS[0]};
+function rollAvcan(){
+  let n=AVCAN.name, t=AVCAN.town;
+  while(n===AVCAN.name&&AVCAN_NAMES.length>1) n=pickOne(AVCAN_NAMES);   // never re-roll the same one
+  while(t===AVCAN.town&&AVCAN_TOWNS.length>1) t=pickOne(AVCAN_TOWNS);
+  AVCAN={name:n,town:t};
+}
+function initials(n){ return n.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join(""); }
 function reporterName(){
-  return S.who==="avcan"?"Alex Trudel":S.who==="caic-ret"?"Sam Ortega":(((S.firstname||"")+" "+(S.lastname||"")).trim()||"you");
+  return S.who==="avcan"?AVCAN.name:S.who==="caic-ret"?"Sam Ortega":(((S.firstname||"")+" "+(S.lastname||"")).trim()||"you");
 }
 function outcomeHTML(){
   const z=S.zone||"your area", n=esc(reporterName());
@@ -677,7 +690,7 @@ function outcomeHTML(){
 }
 function phoneRequired(){ return true; }
 function whoHTML(){
-  if(S.who==="avcan") return `<div class="who"><div class="av">AT</div><div class="m"><div class="n">Alex Trudel</div><div class="s">Signed in with Auth0 · avalanche.ca</div></div><button type="button" class="lnk">Sign out</button></div>`;
+  if(S.who==="avcan") return `<div class="who"><div class="av">${esc(initials(AVCAN.name))}</div><div class="m"><div class="n">${esc(AVCAN.name)}</div><div class="s">Signed in with Auth0 · ${esc(AVCAN.town)}</div></div><button type="button" class="lnk">Sign out</button></div>`;
   if(S.who==="caic-ret") return `<div class="who"><div class="av">SO</div><div class="m"><div class="n">Sam Ortega</div><div class="s">sam.ortega@example.com · 970-555-0148</div></div><button type="button" class="lnk">Edit</button></div>`;
   return `<p class="hint" style="margin-top:-4px">Saved on this device, so you only type it once. Forecasters use this to follow up on reports.</p>
    <div class="two"><label class="fld"><span>First name</span><input type="text" data-bind="firstname" autocomplete="given-name"></label>
@@ -1043,6 +1056,7 @@ $$(".thbtn").forEach(b=>b.addEventListener("click",()=>{
 }));
 $("#whosel").addEventListener("change",e=>{
   S.who=e.target.value;
+  if(S.who==="avcan") rollAvcan();
   if(S.opt==="c"){ S.step=WHOSTEP; renderStep(); } else { renderWho(); syncAll(); }
   flashWho();
 });
