@@ -715,7 +715,7 @@ function drow(cls,to,strong,small){ return `<button type="button" class="more ${
 function inlineKey(){
   if(S.reveal!=="inline"&&S.reveal!=="short") return "";
   if(!hasAv()) return "";
-  const what = (S.reveal==="inline"&&S.av==="caught") ? "avalanche+group" : "avalanche";
+  const what = (S.av==="caught") ? "avalanche+group" : "avalanche";
   return what+":"+S.reveal;
 }
 function inlineHTML(k){
@@ -733,7 +733,6 @@ function detailHTML(){
   const aval=drow(n?"has":"","avalanche",avn>1?"Add avalanche details":"Add avalanche details",avSub);
   const gen=drow(n?"has":"","snowpack","Add more detail","Snowpack depths, weak layers and test results"+added);
   if(S.reveal==="short"){
-    if(S.av==="caught") return drow("urgent","group","Someone was caught \u2014 add group and full avalanche details","Everything not shown above"+added);
     if(hasAv()) return drow(n?"has":"","avalanche","Add more avalanche details","Dimensions, weak layer, terrain traps, snowpack"+added);
     return drow(n?"has":"","snowpack","Add more detail","Snowpack depths, weak layers and test results"+added);
   }
