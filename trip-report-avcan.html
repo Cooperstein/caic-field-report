@@ -412,7 +412,7 @@ const S={who:"avcan",opt:"h",step:0,
   firstname:"",lastname:"",email:"",phone:"",
   observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",mapMode:"idle",
   comments:"",assets:[],av:"",cracking:"",collapsing:"",visibility:"public",
-  title:"",activity:[],sawAvalanche:"",caught:"",whenOccurred:"",instability:[],incidentStory:"",
+  title:"",activity:[],activityOther:"",sawAvalanche:"",caught:"",whenOccurred:"",instability:[],incidentStory:"",
   avalanches:[{}],avOpen:0,
   problemTypes:[],problems:{},
   hs:"",hn24:"",wl_grain:"",test:"",sp_desc:"",
@@ -457,12 +457,12 @@ const INSTAB=[
   ["none","None of these",""]
 ];
 const WEAK_INFO=[
-  ["crust","A crust or hard layer"],
-  ["sugary","Loose, sugary snow"],
-  ["feathery","Feathery or sparkly crystals"],
-  ["new","Soft new snow"],
-  ["unsure","Not sure what I was looking at"],
-  ["nolook","I didn't look closely"]
+  ["surface_hoar","Surface hoar"],
+  ["facets","Facets"],
+  ["depth_hoar","Depth hoar"],
+  ["new_snow","New snow"],
+  ["crust","Crust"],
+  ["Unknown","Not sure"]
 ];
 const CO_ZONES=[
  {n:"Steamboat & Flat Tops",a:"Steamboat",b:"& Flat Tops",p:"120,40 300,32 314,150 200,170 110,140",x:208,y:98,lat:40.45,lng:-106.90},
@@ -502,6 +502,13 @@ function nselect(bind,max=10){
 function checks(group,opts,none){
   return `<div class="checks" data-group="${group}" data-multi="1"${none?' data-none="'+none+'"':""}>`+
     opts.map(o=>`<button type="button" class="check${none&&o[0]===none?" chip-none":""}" data-value="${esc(o[0])}">
+      <span class="check-box" aria-hidden="true"></span>
+      <span class="check-txt">${esc(o[1])}${o[2]?`<small>${esc(o[2])}</small>`:""}</span>
+    </button>`).join("")+`</div>`;
+}
+function checksOne(group,opts){
+  return `<div class="checks" data-group="${group}">`+
+    opts.map(o=>`<button type="button" class="check" data-value="${esc(o[0])}">
       <span class="check-box" aria-hidden="true"></span>
       <span class="check-txt">${esc(o[1])}${o[2]?`<small>${esc(o[2])}</small>`:""}</span>
     </button>`).join("")+`</div>`;
@@ -620,8 +627,8 @@ function avCore(){
       </div>
       <div class="incq">
         <span class="q">How did this avalanche start?</span>
-        <p class="hint" style="margin:0">Tick all that apply. “On its own” means weather or the slope, not a person or machine.</p>
-        ${checks("trigger_how",TRIG_HOW,"unknown")}
+        <p class="hint" style="margin:0">“On its own” means weather or the slope, not a person or machine.</p>
+        ${checksOne("trigger_how",TRIG_HOW)}
       </div>
       <div class="incq" data-triggerby hidden>
         <span class="q">Who or what set it off?</span>
@@ -657,9 +664,9 @@ function avRest(i,more,mfilled){
        <p class="hint" style="margin:0 0 12px">Useful if you dug or looked closely. Skip the lot if you did not \u2014 a blank is better than a guess.</p>
        <span class="q" style="font-size:15px;margin:0 0 8px">Dimensions</span>
        ${nums([["depth","Crown depth (cm)"],["width","Width (m)"],["runLength","Run length (m)"],["startElev","Start zone elevation (ft)"],["incline","Start zone incline (\u00b0)"]])}
-       <span class="q" style="font-size:15px;margin-top:18px">What did you notice about the snow where it broke?</span>
-       <p class="hint" style="margin:4px 0 8px">Whatever stood out. Skip the jargon if you are not sure.</p>
-       ${checks("weakInfo",WEAK_INFO,"nolook")}
+       <span class="q" style="font-size:15px;margin-top:18px">Weak layer information</span>
+       <p class="hint" style="margin:4px 0 8px">If you looked at the snow where it broke. Skip if you are not sure.</p>
+       ${checks("weakInfo",WEAK_INFO,"Unknown")}
      </div>`:""}
    </div>`;
 }
@@ -831,7 +838,11 @@ function buildTrip(){
       ${B.when()}${B.trWhere()}
       <div class="sec">${head("Activity",MAY)}
         <span class="q">What activity were you doing?</span>
-        ${chipsM("activity",[["skiing","Skiing"],["crossCountrySkiing","Cross-country skiing"],["snowboarding","Snowboarding"],["iceClimbing","Ice climbing"],["mountaineering","Mountaineering"],["snowshoeing","Snowshoeing"],["snowmobiling","Snowmobiling"],["snowbiking","Snowbiking"],["hiking","Hiking"],["other","Other"]])}</div>
+        ${chipsM("activity",[["skiing","Skiing"],["crossCountrySkiing","Cross-country skiing"],["snowboarding","Snowboarding"],["iceClimbing","Ice climbing"],["mountaineering","Mountaineering"],["snowshoeing","Snowshoeing"],["snowmobiling","Snowmobiling"],["snowbiking","Snowbiking"],["hiking","Hiking"],["other","Other"]])}
+        <label class="fld" data-actother hidden style="margin-top:12px">
+          <span>What activity?</span>
+          <input type="text" data-bind="activityOther" placeholder="e.g. fat biking">
+        </label></div>
       <div data-trflow></div>
       <div data-trnotes></div>
       <div class="foot"><p class="outcome" data-outcome></p><button type="submit" class="btn btn-go">Submit trip report</button><p class="msg" data-msg></p></div>
@@ -842,25 +853,6 @@ function buildTrip(){
 function instFilled(){ return (S.instability||[]).length>0; }
 function trFlowSig(){
   return [S.sawAvalanche,S.caught,S.avalanches.length,S.avOpen].join("|");
-}
-const INCKEYS=["g_deployed","g_rescue","g_injury","g_helmet","g_help","g_desc"];
-function incMoreFilled(){ return INCKEYS.filter(k=>has(S[k])).length; }
-function incMoreHTML(){
-  return `<div>
-    <p class="hint" style="margin:0 0 12px">All optional. The fields below the first one are placeholders.</p>
-    <span class="q" style="font-size:15px">Were they deployed?</span>
-    ${chips("g_deployed",[["yes","Yes"],["no","No"],["unknown","Unknown"]])}
-    <span class="q" style="font-size:15px;margin-top:18px">Rescue <span class="opt">(placeholder)</span></span>
-    ${chips("g_rescue",[["self","Self"],["companion","Companion"],["organized","Organized"],["unknown","Unknown"]])}
-    <span class="q" style="font-size:15px;margin-top:18px">Injuries <span class="opt">(placeholder)</span></span>
-    ${chips("g_injury",[["none","None"],["minor","Minor"],["serious","Serious"],["unknown","Unknown"]])}
-    <span class="q" style="font-size:15px;margin-top:18px">Helmets <span class="opt">(placeholder)</span></span>
-    ${chips("g_helmet",[["yes","Yes"],["some","Some"],["no","No"],["unknown","Unknown"]])}
-    <span class="q" style="font-size:15px;margin-top:18px">Help called <span class="opt">(placeholder)</span></span>
-    ${chips("g_help",[["yes","Yes"],["no","No"],["unknown","Unknown"]])}
-    <label style="display:block;margin-top:18px"><span class="q" style="font-size:15px">Anything else</span>
-    <textarea data-bind="g_desc" style="min-height:100px" placeholder="In your own words. There is no wrong way to write this."></textarea></label>
-  </div>`;
 }
 function trIncident(){
   return `<div class="sec">${head("Incident",MAY)}
@@ -874,9 +866,13 @@ function trIncident(){
         <span class="q">How many were caught?</span>
         <input type="number" min="1" inputmode="numeric" data-bind="g_caught">
       </div>
-      <div class="incgrid">
-        <label class="incq"><span class="q">How many were partially buried?</span>${nselect("g_partial")}</label>
-        <label class="incq"><span class="q">How many were fully buried?</span>${nselect("g_full")}</label>
+      <div class="incq">
+        <span class="q">How many were partially buried?</span>
+        <input type="number" min="1" inputmode="numeric" data-bind="g_partial">
+      </div>
+      <div class="incq">
+        <span class="q">How many were fully buried?</span>
+        <input type="number" min="1" inputmode="numeric" data-bind="g_full">
       </div>
       <div class="incq">
         <span class="q">Did those caught have a transceiver, shovel and probe?</span>
@@ -909,9 +905,9 @@ function avTechHTML(i){
     <p class="hint" style="margin:0 0 12px">Useful if you dug or looked closely. Skip the lot if you did not \u2014 a blank is better than a guess.</p>
     <span class="q" style="font-size:15px;margin:0 0 8px">Dimensions</span>
     ${nums([["depth","Crown depth (cm)"],["width","Width (m)"],["runLength","Run length (m)"],["startElev","Start zone elevation (ft)"],["incline","Start zone incline (\u00b0)"]])}
-    <span class="q" style="font-size:15px;margin-top:18px">What did you notice about the snow where it broke?</span>
-    <p class="hint" style="margin:4px 0 8px">Whatever stood out. Skip the jargon if you are not sure.</p>
-    ${checks("weakInfo",WEAK_INFO,"nolook")}
+    <span class="q" style="font-size:15px;margin-top:18px">Weak layer information</span>
+    <p class="hint" style="margin:4px 0 8px">If you looked at the snow where it broke. Skip if you are not sure.</p>
+    ${checks("weakInfo",WEAK_INFO,"Unknown")}
   </div>`;
 }
 function trAvBlock(i,n){
@@ -1245,9 +1241,13 @@ function syncAll(){
   $$(".chips[data-group], .checks[data-group]").forEach(g=>{ const v=avScope(g)[g.dataset.group];
     $$("[data-value]",g).forEach(c=>c.setAttribute("aria-pressed",
       (Array.isArray(v)?v.includes(c.dataset.value):v===c.dataset.value)?"true":"false")); });
+  $$("[data-actother]").forEach(el=>{
+    const on=(S.activity||[]).includes("other");
+    el.hidden=!on; if(!on) S.activityOther="";
+  });
   $$("[data-triggerby]").forEach(el=>{
-    const A=avScope(el), how=A.trigger_how||[];
-    const show=how.some(v=>v!=="natural"&&v!=="unknown");
+    const A=avScope(el), how=A.trigger_how;
+    const show=!!how && how!=="natural" && how!=="unknown";
     el.hidden=!show; if(!show) A.trigger_by="";
   });
   $$("[data-deployed]").forEach(el=>{
@@ -1275,11 +1275,6 @@ function syncAll(){
     const A=box?S.avalanches[+box.dataset.avi]||{}:{};
     const n=avTechFilled(A);
     const sm=$("small",btn); if(sm) sm.textContent=n?n+" technical fields filled in":"Crown, weak layer — optional";
-    btn.classList.toggle("has",!!n);
-  });
-  $$('[data-more="incident"]').forEach(btn=>{
-    const n=incMoreFilled();
-    const sm=$("small",btn); if(sm) sm.textContent=n?n+" fields filled in":"Deployed, rescue — optional";
     btn.classList.toggle("has",!!n);
   });
   pvNote();
@@ -1358,7 +1353,7 @@ function openSheet(k){ sheetTab=k||sheetTab; renderSheet(); $("#sheet").classLis
 function closeSheet(){ $("#sheet").classList.remove("on"); document.body.style.overflow=""; syncAll();
   const b=$('#pane-'+S.opt+' [data-more="'+sheetTab+'"]')||$('#pane-'+S.opt+' [data-more="tech"]')||$('#pane-'+S.opt+' [data-more]'); if(b&&b.focus) b.focus(); }
 function sheetKeys(){
-  if(isTrip()) return sheetTab==="incident"?["incident"]:["tech"];
+  if(isTrip()) return ["tech"];
   if(S.reveal==="inline") return ["snowpack"];
   const k=[]; if(S.av==="caught") k.push("group");
   if(hasAv()) k.push("avalanche");
@@ -1366,15 +1361,6 @@ function sheetKeys(){
 }
 function renderSheet(){
   if(isTrip()){
-    if(sheetTab==="incident"){
-      $("#sheet-tabs").innerHTML=`<button type="button" role="tab" aria-selected="true">Incident details</button>`;
-      $("#sheet-body").innerHTML=incMoreHTML();
-      $("#sheet-title").textContent="Incident details";
-      $("#sheet-sub").textContent="All optional — add what you have and leave the rest.";
-      $("#sheet-done").textContent="Back";
-      wire(); syncAll();
-      return;
-    }
     sheetTab="tech";
     const i=S.avOpen>=0?S.avOpen:0;
     $("#sheet-tabs").innerHTML=`<button type="button" role="tab" aria-selected="true">Technical details</button>`;
@@ -1412,10 +1398,6 @@ $("#sheet-done").addEventListener("click",()=>{
 });
 
 $("#sheet-clear").addEventListener("click",()=>{
-  if(isTrip()&&sheetTab==="incident"){
-    INCKEYS.forEach(k=>{ S[k]=""; });
-    renderSheet(); return;
-  }
   if(isTrip()&&sheetTab==="tech"){
     const A=S.avalanches[S.avOpen>=0?S.avOpen:0];
     if(A) MOREKEYS.forEach(k=>{ A[k]=Array.isArray(A[k])?[]:""; });
