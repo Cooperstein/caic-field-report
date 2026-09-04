@@ -418,9 +418,9 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
 </div></div>
 
 <div class="tabs"><div class="tabs-in" role="tablist">
-  <button class="tab" role="tab" id="t-b" aria-selected="true">The form</button>
+  <button class="tab" role="tab" id="t-h" aria-selected="true">Trip report (AvCan)</button>
   <button class="tab" role="tab" id="t-g" aria-selected="false">Trip report (CAIC)</button>
-  <button class="tab" role="tab" id="t-h" aria-selected="false">Trip report (AvCan)</button>
+  <button class="tab" role="tab" id="t-b" aria-selected="false">The form</button>
   <button class="tab" role="tab" id="t-c" aria-selected="false">One question per screen</button>
   <button class="tab" role="tab" id="t-e" aria-selected="false">Reveal patterns</button>
   <button class="tab" role="tab" id="t-f" aria-selected="false">Privacy patterns</button>
@@ -534,7 +534,7 @@ const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
 const has=v=>v!==undefined&&v!==null&&String(v).trim()!=="";
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-const S={who:"caic-ret",opt:"b",step:0,
+const S={who:"caic-ret",opt:"h",step:0,
   firstname:"",lastname:"",email:"",phone:"",
   observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",mapMode:"idle",
   comments:"",assets:[],av:"",cracking:"",collapsing:"",visibility:"public",
@@ -1829,7 +1829,7 @@ $("#resetmock").addEventListener("click",()=>{
 
 /* ---------- init ---------- */
 buildB(); buildC(); buildPatterns(); buildPriv();
-renderWho(); wire(); syncAll(); showPane("b");
+renderWho(); wire(); syncAll(); showPane("h");
 })();
 </script>
 
