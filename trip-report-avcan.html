@@ -178,7 +178,9 @@ input[type=date]{max-width:220px}
 .check:hover{border-color:var(--accent)}
 .check[aria-pressed="true"]{background:var(--wash);border-color:var(--accent)}
 .check-box{flex:none;width:20px;height:20px;margin-top:2px;border:1.5px solid var(--line-2);border-radius:5px;background:var(--surface)}
+.checks[data-one] .check-box{border-radius:50%}
 .check[aria-pressed="true"] .check-box{background:var(--accent);border-color:var(--accent);box-shadow:inset 0 0 0 3px var(--surface)}
+.checks[data-one] .check[aria-pressed="true"] .check-box{box-shadow:inset 0 0 0 5px var(--surface)}
 .check-txt{flex:1}
 .check-txt small{display:block;font-size:13px;font-weight:400;color:var(--ink-2);margin-top:3px}
 .incgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;margin:18px 0 2px}
@@ -507,7 +509,7 @@ function checks(group,opts,none){
     </button>`).join("")+`</div>`;
 }
 function checksOne(group,opts){
-  return `<div class="checks" data-group="${group}">`+
+  return `<div class="checks" data-group="${group}" data-one="1">`+
     opts.map(o=>`<button type="button" class="check" data-value="${esc(o[0])}">
       <span class="check-box" aria-hidden="true"></span>
       <span class="check-txt">${esc(o[1])}${o[2]?`<small>${esc(o[2])}</small>`:""}</span>
@@ -594,7 +596,7 @@ const B={
    ${privacyRow()}</div>`,
  privacy:()=>`<div class="sec">${head("Who can see this",MAY)}${privacyRow()}</div>`
 };
-const AVKEYS=["whenOccurred","dsize","trigger","trigger_how","trigger_by","trigger_mode","aspect","elevation","problem","depth","width","runLength","startElev","incline","weakInfo","av_desc"];
+const AVKEYS=["whenOccurred","dsize","trigger","trigger_how","trigger_by","trigger_by_other","trigger_mode","aspect","elevation","problem","depth","width","runLength","startElev","incline","weakInfo","av_desc"];
 const WHEN=[["whileThere","While there"],["todayFresh","Today"],["yesterday","Yesterday"],["fewDays","A few days"],["older","Older"],["unsure","Unsure"]];
 const MOREKEYS=["depth","width","runLength","startElev","incline","weakInfo"];
 const DSZ={D15:"D1.5",D25:"D2.5",D35:"D3.5",D45:"D4.5"};
@@ -623,31 +625,41 @@ function avSummary(a){
 function avCore(){
   return `<div class="incq">
         <span class="q">When do you think it happened?</span>
+        <p class="hint" style="margin:0">Choose one.</p>
         ${chips("whenOccurred",WHEN,1)}
       </div>
       <div class="incq">
         <span class="q">How did this avalanche start?</span>
-        <p class="hint" style="margin:0">“On its own” means weather or the slope, not a person or machine.</p>
+        <p class="hint" style="margin:0">Choose one. “On its own” means weather or the slope, not a person or machine.</p>
         ${checksOne("trigger_how",TRIG_HOW)}
       </div>
       <div class="incq" data-triggerby hidden>
         <span class="q">Who or what set it off?</span>
+        <p class="hint" style="margin:0">Choose one.</p>
         ${chips("trigger_by",TRIG_BY,1)}
+        <label class="fld" data-triggerother hidden style="margin-top:12px">
+          <span>What set it off?</span>
+          <input type="text" data-bind="trigger_by_other" placeholder="e.g. a cornice, an animal">
+        </label>
       </div>
       <div class="incq">
         <span class="q">Which way did the slope face?</span>
+        <p class="hint" style="margin:0">Choose one.</p>
         ${chips("aspect",ASPECT,1)}
       </div>
       <div class="incq">
         <span class="q">What elevation band?</span>
+        <p class="hint" style="margin:0">Choose one.</p>
         ${chips("elevation",[[">TL","Alpine"],["TL","Treeline"],["<TL","Below"],["U","I don't know"]],1)}
       </div>
       <div class="incq">
         <span class="q">How big was it?</span>
+        <p class="hint" style="margin:0">Choose one.</p>
         ${chips("dsize",sizeOpts(),1)}
       </div>
       <div class="incq">
         <span class="q">What avalanche problem was it?</span>
+        <p class="hint" style="margin:0">Choose one.</p>
         ${chips("problem",[["storm","Storm"],["wind","Wind"],["persistent","Persistent"],["deep_persistent","Deep persistent"],["wet_slab","Wet slab"],["loose_wet","Loose wet"],["loose_dry","Loose dry"],["cornice","Cornice"],["glide","Glide"],["Unknown","I don't know"]],1)}
       </div>`;
 }
@@ -665,7 +677,7 @@ function avRest(i,more,mfilled){
        <span class="q" style="font-size:15px;margin:0 0 8px">Dimensions</span>
        ${nums([["depth","Crown depth (cm)"],["width","Width (m)"],["runLength","Run length (m)"],["startElev","Start zone elevation (ft)"],["incline","Start zone incline (\u00b0)"]])}
        <span class="q" style="font-size:15px;margin-top:18px">Weak layer information</span>
-       <p class="hint" style="margin:4px 0 8px">If you looked at the snow where it broke. Skip if you are not sure.</p>
+       <p class="hint" style="margin:4px 0 8px">Select all that apply. If you looked at the snow where it broke. Skip if you are not sure.</p>
        ${checks("weakInfo",WEAK_INFO,"Unknown")}
      </div>`:""}
    </div>`;
@@ -832,12 +844,13 @@ function buildTrip(){
       ${B.photos()}
       <div class="sec">${head("Who can see this",MAY)}
         <span class="q">Who can see this report?</span>
+        <p class="hint">Choose one. ${avcan?"The public MIN. Anonymous is completely normal and forecasters read it the same.":"Anonymous is completely normal. Forecasters read it the same."}</p>
         ${chips("visibility",visOpts())}
-        <p class="hint">${avcan?"The public MIN. Anonymous is completely normal and forecasters read it the same.":"Anonymous is completely normal. Forecasters read it the same."}</p>
       </div>
       ${B.when()}${B.trWhere()}
       <div class="sec">${head("Activity",MAY)}
         <span class="q">What activity were you doing?</span>
+        <p class="hint">Select all that apply.</p>
         ${chipsM("activity",[["skiing","Skiing"],["crossCountrySkiing","Cross-country skiing"],["snowboarding","Snowboarding"],["iceClimbing","Ice climbing"],["mountaineering","Mountaineering"],["snowshoeing","Snowshoeing"],["snowmobiling","Snowmobiling"],["snowbiking","Snowbiking"],["hiking","Hiking"],["other","Other"]])}
         <label class="fld" data-actother hidden style="margin-top:12px">
           <span>What activity?</span>
@@ -876,14 +889,17 @@ function trIncident(){
       </div>
       <div class="incq">
         <span class="q">Did those caught have a transceiver, shovel and probe?</span>
+        <p class="hint" style="margin:0">Choose one.</p>
         ${chips("g_tsp",[["all","Everyone"],["some","Some"],["no","No"],["unknown","I don't know"]])}
       </div>
       <div class="incq">
         <span class="q">Did those caught have airbags?</span>
+        <p class="hint" style="margin:0">Choose one.</p>
         ${chips("g_airbag",[["yes","Yes"],["some","Some"],["no","No"],["unknown","I don't know"]])}
       </div>
       <div class="incq" data-deployed hidden>
         <span class="q">Were they deployed?</span>
+        <p class="hint" style="margin:0">Choose one.</p>
         ${chips("g_deployed",[["yes","Yes"],["no","No"],["unknown","I don't know"]])}
       </div>
     </div>
@@ -906,7 +922,7 @@ function avTechHTML(i){
     <span class="q" style="font-size:15px;margin:0 0 8px">Dimensions</span>
     ${nums([["depth","Crown depth (cm)"],["width","Width (m)"],["runLength","Run length (m)"],["startElev","Start zone elevation (ft)"],["incline","Start zone incline (\u00b0)"]])}
     <span class="q" style="font-size:15px;margin-top:18px">Weak layer information</span>
-    <p class="hint" style="margin:4px 0 8px">If you looked at the snow where it broke. Skip if you are not sure.</p>
+    <p class="hint" style="margin:4px 0 8px">Select all that apply. If you looked at the snow where it broke. Skip if you are not sure.</p>
     ${checks("weakInfo",WEAK_INFO,"Unknown")}
   </div>`;
 }
@@ -941,18 +957,19 @@ function trFlowHTML(){
   const saw=S.sawAvalanche, caught=S.caught;
   let h=`<div class="sec" data-need="sawAvalanche">${head("Avalanches",MUST)}
     <span class="q">Did you see any recent avalanches or trigger an avalanche?</span>
+    <p class="hint">Choose one.</p>
     ${chips("sawAvalanche",[["yes","Yes"],["no","No"]])}
     <p class="bad">Please answer this question.</p></div>`;
-  if(!has(saw)) return h;
   if(saw==="yes") h+=`<div class="sec" data-need="caught">
     <span class="q">Was someone caught by the avalanche?</span>
+    <p class="hint">Choose one.</p>
     ${chips("caught",[["yes","Yes"],["no","No"]])}
     <p class="bad">Please answer this question.</p></div>`;
   if(saw==="yes"&&caught==="yes") h+=trIncident();
   if(saw==="yes") h+=trAvObs();
-  if(saw!=="yes") h+=`<div class="sec">${head("Instability",MAY)}
+  h+=`<div class="sec">${head("Instability",MAY)}
     <span class="q">Did you notice any of these?</span>
-    <p class="hint" style="margin-top:-2px">Signs the snowpack is waking up. Tick all that apply.</p>
+    <p class="hint" style="margin-top:-2px">Select all that apply. Signs the snowpack is waking up.</p>
     ${checks("instability",INSTAB,"none")}
     </div>`;
   return h;
@@ -1248,7 +1265,11 @@ function syncAll(){
   $$("[data-triggerby]").forEach(el=>{
     const A=avScope(el), how=A.trigger_how;
     const show=!!how && how!=="natural" && how!=="unknown";
-    el.hidden=!show; if(!show) A.trigger_by="";
+    el.hidden=!show; if(!show){ A.trigger_by=""; A.trigger_by_other=""; }
+  });
+  $$("[data-triggerother]").forEach(el=>{
+    const A=avScope(el), on=A.trigger_by==="other";
+    el.hidden=!on; if(!on) A.trigger_by_other="";
   });
   $$("[data-deployed]").forEach(el=>{
     const show=S.g_airbag==="yes"||S.g_airbag==="some";
