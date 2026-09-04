@@ -869,7 +869,7 @@ function trFlowSig(){
 }
 function trIncident(){
   return `<div class="sec">${head("Incident",MAY)}
-    <p class="hint" style="margin-top:-6px">Optional. Skip what you don’t know. These questions are about the people who were caught, not the whole group.</p>
+    <p class="hint" style="margin-top:-6px">Optional. Skip what you don’t know.</p>
     <div class="avblock">
       <div class="incq">
         <span class="q">How many people were in the group?</span>
@@ -888,7 +888,7 @@ function trIncident(){
         <input type="number" min="1" inputmode="numeric" data-bind="g_full">
       </div>
       <div class="incq">
-        <span class="q">Did those caught have a transceiver, shovel and probe?</span>
+        <span class="q">Did the group have a transceiver, shovel and probe?</span>
         <p class="hint" style="margin:0">Choose one.</p>
         ${chips("g_tsp",[["all","Everyone"],["some","Some"],["no","No"],["unknown","I don't know"]])}
       </div>
