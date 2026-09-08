@@ -795,10 +795,12 @@ function reporterName(){
 function outcomeHTML(){
   const z=S.zone||"your area", n=esc(reporterName());
   let t;
-  if(S.visibility==="noname") t=`Publishes <b>without your name</b>, in ${esc(z)}.`;
+  const hidden = isTrip() && !isAvcanTrip() && S.locshare==="fuzz";
+  const loc = hidden ? ` <b>Location hidden</b>.` : "";
+  if(S.visibility==="noname") t=`Publishes <b>anonymously</b>, in ${esc(z)}.`+loc;
   else if(S.visibility==="noloc") t=`Publishes <b>anonymously</b>, with your location hidden.`;
   else if(S.visibility==="staff") t=`<b>Only CAIC staff</b> will see this. Nothing appears publicly.`;
-  else t=`Publishes as <b>${n}</b>, in ${esc(z)}.`;
+  else t=`Publishes as <b>${n}</b>, in ${esc(z)}.`+loc;
   return `<span class="eye" aria-hidden="true">\u25c9</span><span>${t}</span><button type="button" class="deflink" data-privjump>Change</button>`;
 }
 function phoneRequired(){ return true; }
@@ -958,11 +960,10 @@ function trIncident(){
   </div>`;
 }
 function trNotes(){
-  const inc=S.caught==="yes";
   return `<div class="sec">${head("Trip summary",MAY)}
-    <label><span class="q">${inc?"What happened?":"Trip summary"}</span>
-    <p class="hint">${inc?"In your own words — how it started, what you did, how it ended. The parts that don’t fit a checkbox. No names, no blame.":"How the day compared to the forecast, what you rode or avoided, and what you’d repeat or change."}</p>
-    <textarea data-bind="comments" ${inc?'style="min-height:120px" ':''}placeholder="${inc?"Where you were, how it started, what you did, and how it ended. Skip names and judgement.":"How did the day compare to the forecast? What did you ride or avoid, and what would you repeat or change next time?"}"></textarea></label>
+    <label>
+    <p class="hint">Tell us anything. What’s the snow like, what you saw, what surprised you, what you talked about at the trailhead. If someone was caught, tell us what happened. Forecasters read every one of these.</p>
+    <textarea data-bind="comments" style="min-height:120px" placeholder="Deep and stable. Punchy and weird. Cracking everywhere. Fresh avalanches on the north side. Crazy wind loading up high on northeast slopes. Bullet points and half sentences are perfect — no need to write it up nicely."></textarea></label>
     </div>`;
 }
 function avTechFilled(A){
