@@ -294,21 +294,6 @@ input[type=date]{max-width:220px}
   font-size:20px;line-height:1;display:grid;place-items:center;flex:none;color:var(--ink-2)}
 .x:hover{border-color:var(--accent);color:var(--accent)}
 
-/* wizard (option C) */
-.wiz{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden;display:flex;flex-direction:column;min-height:530px}
-.wiz-top{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line)}
-.dots{display:flex;gap:6px;flex:1;justify-content:center}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--line-2)}
-.dot.on{background:var(--accent);transform:scale(1.25)}
-.dot.done{background:var(--accent);opacity:.45}
-.wiz-b{flex:1;padding:26px 22px;display:flex;flex-direction:column;justify-content:center}
-.wiz-b .q{font-size:23px;margin-bottom:6px}
-.wiz-f{padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
-.wiz-f .btn{flex:1}
-.step-skip{background:none;border:0;color:var(--ink-3);font-size:13.5px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:6px}
-.ghost{border:1px solid var(--line-2);background:var(--surface);width:44px;height:44px;border-radius:9px;cursor:pointer;font-size:18px;display:grid;place-items:center;flex:none;color:var(--ink-2)}
-.ghost:hover{border-color:var(--accent);color:var(--accent)}
-.ghost:disabled{opacity:.35;cursor:default}
 
 /* audit */
 .audit{max-width:960px;margin:0 auto;padding:26px 22px 80px}
@@ -362,14 +347,12 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
 
 <div class="tabs"><div class="tabs-in" role="tablist">
   <button class="tab" role="tab" id="t-b" aria-selected="true">The form</button>
-  <button class="tab" role="tab" id="t-c" aria-selected="false">One question per screen</button>
   <button class="tab" role="tab" id="t-e" aria-selected="false">Reveal patterns</button>
   <button class="tab" role="tab" id="t-f" aria-selected="false">Privacy patterns</button>
   <button class="tab" role="tab" id="t-d" aria-selected="false">Field audit</button>
 </div></div>
 
 <div id="pane-b"></div>
-<div id="pane-c"></div>
 
 <div id="pane-e" class="audit" hidden></div>
 
@@ -448,7 +431,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
     <li><b>Then check the quality of what came out.</b> Have a forecaster read the submissions blind and rate whether each one is usable. The shortest form that still produces usable reports is the winner — speed alone is not the goal.</li>
   </ol>
   <div class="note" style="margin-top:22px">
-    <p><b>One prediction worth testing.</b> If the audit above is right, the biggest single win available is not the layout at all — it is making the free-text box easy to start. It is the highest-value field on the form and the highest-cost one, which means it is where the leverage is. Try one version with the NAC prompt list and one with a bare box, and I would expect that difference to swamp the difference between these three layouts.</p>
+    <p><b>One prediction worth testing.</b> If the audit above is right, the biggest single win available is not the layout at all — it is making the free-text box easy to start. It is the highest-value field on the form and the highest-cost one, which means it is where the leverage is. Try one version with the NAC prompt list and one with a bare box, and I would expect that difference to swamp any layout question on this page.</p>
   </div>
 </div>
 
@@ -472,7 +455,7 @@ const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
 const has=v=>v!==undefined&&v!==null&&String(v).trim()!=="";
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-const S={who:"caic-ret",opt:"b",step:0,
+const S={who:"caic-ret",opt:"b",
   firstname:"",lastname:"",email:"",phone:"",
   observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",
   comments:"",assets:[],av:"",cracking:"",collapsing:"",visibility:"public",
@@ -709,16 +692,6 @@ function whoHTML(){
    <label class="fld"><span>Phone</span><input type="tel" data-bind="phone" autocomplete="tel" placeholder="3035551234"></label></div>
 `;
 }
-B.avOnly=()=>`<div class="sec">${head("Red flags",MAY)}<span class="q">Did you see any avalanches?</span>
-  <p class="hint">Including old debris. Seeing none is a real and useful answer.</p>${chips("av",AV)}</div>`;
-B.instabOnly=()=>`<div class="sec">${head("Red flags",MAY)}<span class="q">Cracking or collapsing?</span>
-  <p class="hint">Whumpfs, shooting cracks, the snow settling under you.</p>
-  <div class="quickset"><button type="button" class="chip chip-none" data-quick>Neither, and no avalanches</button></div>
-  <div class="flagrow pairrow">
-    <div class="pair"><div class="fl">Cracking</div>${chips("cracking",CRACK)}</div>
-    <div class="pair"><div class="fl">Collapsing</div>${chips("collapsing",COLL)}</div>
-  </div>
-  <p class="deflinewrap"><button type="button" class="deflink" data-def="both">What counts as a yes?</button></p></div>`;
 
 function privacyRow(){
   return `<div class="privrow">
@@ -783,34 +756,6 @@ function buildB(){
       ${FOOT()}
       </form></div>`;
 }
-const STEPS=[{k:"who",req:true},{k:"where",req:true},{k:"when",req:true},{k:"photos",req:false},
-             {k:"notes",req:false},{k:"avOnly",req:false},{k:"instabOnly",req:false}];
-const WHOSTEP=STEPS.findIndex(x=>x.k==="who");
-function buildC(){
-  $("#pane-c").innerHTML=
-    LEDE("One question per screen",
-      "Guided and phone-first, with big targets that work with gloves on. Nothing is ever long, but a complete report takes seven screens instead of one, and a desktop user filling this in at a keyboard will find it slow.",
-      ["7 screens","biggest targets","most guidance","most taps"])+
-    `<div class="page"><form class="screen"><div class="wiz">
-      <div class="wiz-top"><button type="button" class="ghost" data-back aria-label="Back">‹</button>
-        <div class="dots" data-dots></div><span class="tagx" data-count></span></div>
-      <div class="wiz-b" data-wizbody></div>
-      <div class="wiz-f" data-wizfoot></div></div>
-      <p class="msg" data-msg style="margin-top:14px"></p></form></div>`;
-  renderStep();
-}
-function renderStep(){
-  const st=STEPS[S.step], last=S.step===STEPS.length-1;
-  $("[data-wizbody]").innerHTML=B[st.k]()+(last?'<div data-inline></div>'+B.detail():"");
-  $("[data-dots]").innerHTML=STEPS.map((_,i)=>`<span class="dot${i===S.step?" on":(i<S.step?" done":"")}"></span>`).join("");
-  $("[data-count]").textContent=(S.step+1)+" of "+STEPS.length;
-  $("[data-back]").disabled=S.step===0;
-  $("[data-wizfoot]").innerHTML=((!st.req&&!last)?'<button type="button" class="step-skip" data-skip>Skip</button>':"")+
-    (last?'<button type="submit" class="btn btn-go">Submit field report</button>'
-        :'<button type="button" class="btn btn-go" data-next>Next</button>');
-  renderWho(); wire(); syncAll(); wizMsg("");
-}
-
 /* ---------- wiring ---------- */
 function wire(){
   $$(".zone:not([data-w])").forEach(p=>{ p.dataset.w=1; p.addEventListener("click",()=>{
@@ -838,9 +783,6 @@ document.addEventListener("click",e=>{
     if(S.who==="caic-new") renderWho(); syncAll(); return; }
   const rm=e.target.closest("[data-rm]");
   if(rm){ S.assets.splice(+rm.dataset.rm,1); syncAll(); return; }
-  const nx=e.target.closest("[data-next]"), sk=e.target.closest("[data-skip]");
-  if(nx||sk){ if(nx&&!stepOK()) return; S.step=Math.min(S.step+1,STEPS.length-1); renderStep(); return; }
-  if(e.target.closest("[data-back]")){ S.step=Math.max(S.step-1,0); renderStep(); return; }
     const mtg=e.target.closest("[data-avmore]");
   if(mtg){ const i=+mtg.dataset.avmore; const A=S.avalanches[i]; if(A) A._more=!A._more; redrawAvalanches(); return; }
   const tg=e.target.closest("[data-avtoggle]");
@@ -861,8 +803,7 @@ document.addEventListener("input",e=>{
   const sec=el.closest("[data-need]"); if(sec) clearErr(sec.dataset.need);
   syncAll();
 });
-function clearErr(k){ $$('[data-need="'+k+'"]').forEach(s=>s.classList.remove("err"));
-  if(S.opt==="c") wizMsg(""); }
+function clearErr(k){ $$('[data-need="'+k+'"]').forEach(s=>s.classList.remove("err")); }
 function renderMaps(){ $$("[data-mapslot]").forEach(el=>{ el.innerHTML=mapSVG(); }); wire(); }
 function renderWho(){ $$("[data-whoslot]").forEach(s=>s.innerHTML=whoHTML()); }
 function syncAll(){
@@ -1006,20 +947,6 @@ function needs(){
     label:phoneRequired()?"your name, email and phone":"your name and email"});
   return L;
 }
-const STEPKEY={where:"location",when:"date",who:"identity"};
-function wizMsg(t){ const m=$("#pane-c [data-msg]"); if(!m) return;
-  m.className="msg"+(t?" no":""); m.textContent=t||""; }
-function stepOK(){
-  const st=STEPS[S.step]; if(!st.req){ wizMsg(""); return true; }
-  const n=needs().find(x=>x.k===STEPKEY[st.k]);
-  if(n&&!n.ok){
-    const sec=$('#pane-c [data-need="'+n.k+'"]');   // scope to the wizard, not the first match on the page
-    if(sec){ sec.classList.add("err"); if(sec.scrollIntoView) sec.scrollIntoView({block:"center",behavior:"smooth"}); }
-    wizMsg("Please add "+n.label+" before moving on.");
-    return false;
-  }
-  wizMsg(""); return true;
-}
 document.addEventListener("submit",e=>{
   e.preventDefault();
   const pane=e.target.closest("[id^=pane-]"); if(!pane) return;
@@ -1036,11 +963,11 @@ document.addEventListener("submit",e=>{
 /* ---------- panes ---------- */
 function showPane(o){
   S.opt=o;
-  ["b","c","d","e","f"].forEach(k=>{ const p=$("#pane-"+k); if(p) p.hidden=(k!==o);
+  ["b","d","e","f"].forEach(k=>{ const p=$("#pane-"+k); if(p) p.hidden=(k!==o);
     const t=$("#t-"+k); if(t) t.setAttribute("aria-selected",k===o?"true":"false"); });
   window.scrollTo({top:0,behavior:"instant"});
 }
-["b","c","d","e","f"].forEach(k=>$("#t-"+k).addEventListener("click",()=>showPane(k)));
+["b","d","e","f"].forEach(k=>$("#t-"+k).addEventListener("click",()=>showPane(k)));
 const WHOLABEL={"caic-new":"first time","caic-ret":"returning","avcan":"signed in"};
 function pvNote(){ const el=$("#pvnote"); if(!el) return;
   const cost = S.who==="caic-new" ? (phoneRequired()?4:3)+" fields to type" : "nothing to type";
@@ -1070,7 +997,7 @@ $("#whosel").addEventListener("change",e=>{
   if(wasCA!==(S.who==="avcan")){          // different country, so the pin no longer means anything
     S.zone=""; S.lat=null; S.lng=null; renderMaps();
   }
-  if(S.opt==="c"){ S.step=WHOSTEP; renderStep(); } else { renderWho(); syncAll(); }
+  renderWho(); syncAll();
   flashWho();
 });
 
@@ -1227,13 +1154,11 @@ function resetMock(){
   Object.keys(INITIAL).forEach(k=>{ S[k]=(INITIAL[k]&&typeof INITIAL[k]==="object")?JSON.parse(JSON.stringify(INITIAL[k])):INITIAL[k]; });
   Object.assign(S,keep);
   S.observed_at=new Date().toISOString().slice(0,10);
-  S.step=0;
   $$("[data-need]").forEach(x=>x.classList.remove("err"));
   $$("[data-msg]").forEach(m=>{ m.className="msg"; m.textContent=""; });
   if($("#sheet").classList.contains("on")) closeSheet();
   if(!$(".dbg").hidden) $(".dbg").hidden=true;
   renderWho();
-  if(S.opt==="c") renderStep();
   syncAll();
   window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -1246,7 +1171,7 @@ $("#resetmock").addEventListener("click",()=>{
 });
 
 /* ---------- init ---------- */
-buildB(); buildC(); buildPatterns(); buildPriv();
+buildB(); buildPatterns(); buildPriv();
 renderWho(); wire(); syncAll(); showPane("b");
 })();
 </script>
