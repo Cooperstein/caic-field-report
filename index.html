@@ -80,8 +80,6 @@ button{font:inherit;color:inherit}
 .previewas{display:flex;align-items:center;gap:7px}
 .previewas label{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
 .chrome-in{flex-wrap:wrap}
-.pvnote{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap;background:none;border:1px solid var(--line);border-radius:6px;padding:5px 9px;cursor:pointer}
-.pvnote:hover{border-color:var(--accent);color:var(--accent)}
 .mockonly{padding-left:14px;border-left:1px solid var(--line)}
 .resetbtn{font-family:var(--disp);font-size:12px;font-weight:600;color:var(--ink-2);background:var(--surface);
   border:1.5px solid var(--line-2);border-radius:6px;padding:6px 12px;cursor:pointer;white-space:nowrap}
@@ -375,15 +373,6 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
 <div class="chrome"><div class="chrome-in">
   <div class="mark">CAIC <span>· field report concepts</span></div>
   <div class="ctrls">
-    <div class="previewas">
-      <label for="whosel">Preview as</label>
-      <select id="whosel">
-        <option value="caic-ret" selected>CAIC · returning</option>
-        <option value="caic-new">CAIC · first time</option>
-        <option value="avcan">AvCan · signed in</option>
-      </select>
-      <button type="button" class="pvnote" id="pvnote"></button>
-    </div>
     <div class="previewas" role="group" aria-label="Theme">
       <button type="button" class="thbtn" data-th="auto" aria-pressed="true">Auto</button>
       <button type="button" class="thbtn" data-th="light" aria-pressed="false">Light</button>
@@ -508,6 +497,8 @@ const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
 const has=v=>v!==undefined&&v!==null&&String(v).trim()!=="";
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
+// S.who is pinned to caic-ret. AvCan is always signed in, and the CAIC logged-out
+// view (caic-new) stays reachable in code so it can be wired into the CAIC form.
 const S={who:"caic-ret",opt:"h",
   firstname:"",lastname:"",email:"",phone:"",
   observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",mapMode:"idle",
@@ -926,11 +917,10 @@ function buildTrip(){
   if(other) other.innerHTML="";
   destroyPinMap();
   pane.innerHTML=
-    LEDE(avcan?"Trip report (AvCan)":"Trip report (CAIC)",
-      avcan?"Avalanche Canada’s branching trip report, in this form’s type. Required questions first. Observation last."
-           :"Avalanche Canada’s branching trip report, in this form’s type. Required questions first. Problem types if you saw an avalanche. Free text last.",
-      avcan?["AvCan","required branching","optional observation"]
-           :["CAIC","required branching","optional more details"])+
+    // AvCan keeps its lede exactly as it was; the CAIC form drops it.
+    (avcan?LEDE("Trip report (AvCan)",
+      "Avalanche Canada’s branching trip report, in this form’s type. Required questions first. Observation last.",
+      ["AvCan","required branching","optional observation"]):"")+
     `<div class="page"><form class="screen">
       <div class="intro"><h1>Submit a trip report</h1><p>Where you went, what you saw, and what you would tell the next party.</p></div>
       <div class="sec" data-need="title">${head("Trip",MUST)}
@@ -1362,7 +1352,6 @@ function syncAll(){
     const sm=$("small",btn); if(sm) sm.textContent=n?n+" technical fields filled in":"Crown, weak layer — optional";
     btn.classList.toggle("has",!!n);
   });
-  pvNote();
   $$("[data-outcome]").forEach(el=>{ el.className="outcome"+(S.visibility==="staff"?" locked":""); el.innerHTML=outcomeHTML(); });
   const dh=detailHTML();
   $$("[data-dslot]").forEach(el=>{ if(el.dataset.sig!==dh){ el.dataset.sig=dh; el.innerHTML=dh; } });
@@ -1544,18 +1533,6 @@ function showPane(o){
   if((o==="g"||o==="h")&&pinMap) setTimeout(()=>pinMap.invalidateSize(),80);
 }
 ["b","g","h","d","e","f"].forEach(k=>{ const t=$("#t-"+k); if(t) t.addEventListener("click",()=>showPane(k)); });
-const WHOLABEL={"caic-new":"first time","caic-ret":"returning","avcan":"signed in"};
-function pvNote(){ const el=$("#pvnote"); if(!el) return;
-  const cost = S.who==="caic-new" ? (phoneRequired()?4:3)+" fields to type" : "nothing to type";
-  el.textContent = WHOLABEL[S.who]+" \u00b7 "+cost;
-  el.title = "Highlight the contact block"; }
-function flashWho(){
-  const pane=$("#pane-"+S.opt); if(!pane||pane.hidden) return;
-  const sec=$('[data-need="identity"]',pane); if(!sec) return;
-  if(sec.scrollIntoView) sec.scrollIntoView({block:"center",behavior:"smooth"});
-  sec.classList.add("flash"); setTimeout(()=>sec.classList.remove("flash"),1400);
-}
-$("#pvnote").addEventListener("click",flashWho);
 document.addEventListener("click",e=>{ if(!e.target.closest("[data-privjump]")) return;
   const pane=$("#pane-"+S.opt); const row=$(".privrow",pane); if(!row) return;
   if(row.scrollIntoView) row.scrollIntoView({block:"center",behavior:"smooth"});
@@ -1566,17 +1543,6 @@ $$(".thbtn").forEach(b=>b.addEventListener("click",()=>{
   else document.documentElement.dataset.theme=t;
   $$(".thbtn").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));
 }));
-$("#whosel").addEventListener("change",e=>{
-  const wasCA=S.who==="avcan";
-  S.who=e.target.value;
-  if(S.who==="avcan") rollAvcan();
-  if(wasCA!==(S.who==="avcan")){          // different country, so the pin no longer means anything
-    S.zone=""; S.lat=null; S.lng=null; renderMaps(); resetPinMap();
-  }
-  renderWho(); syncAll();
-  flashWho();
-});
-
 /* ---------- reveal patterns (for the AvCan discussion) ---------- */
 const AVOPTS=[["none","No avalanches"],["saw","Saw one"],["triggered","We triggered one"],["caught","Someone was caught"]];
 const PATS=[
