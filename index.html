@@ -919,6 +919,11 @@ function buildTrip(){
   const avcan=isAvcanTrip();
   const pane=$(avcan?"#pane-h":"#pane-g");
   if(!pane) return;
+  // Both trip panes render the same ids (tr-map, tr-map-wrap, tr-map-cta ...), so once both
+  // have been built every $("#tr-map") lookup resolves to whichever pane sits first in the
+  // document and the other pane's map is orphaned. Only ever keep one of them populated.
+  const other=$(avcan?"#pane-g":"#pane-h");
+  if(other) other.innerHTML="";
   destroyPinMap();
   pane.innerHTML=
     LEDE(avcan?"Trip report (AvCan)":"Trip report (CAIC)",
