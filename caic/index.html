@@ -223,7 +223,8 @@ input[type=date]{max-width:220px}
 .mapnote{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);padding:7px 10px;border-top:1px solid var(--line);background:var(--surface)}
 .pinned{min-height:42px;display:flex;align-items:center;gap:9px;margin-top:9px;font-size:14px;color:var(--ink-2)}
 .pinned b{font-family:var(--disp);color:var(--ink)}
-.pinned .co{font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
+.pinned .co{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);flex:none}
+.pinned .zoneline{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pinned .tk{color:var(--ok);font-weight:700}
 .pinmap-wrap{position:relative;width:100%;height:220px;border-radius:var(--r);overflow:hidden;border:1.5px solid var(--line-2);background:var(--sunk)}
 .pinmap-wrap.picking{height:min(58vh,420px)}
@@ -376,7 +377,8 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
   border:1px solid var(--line-2);border-radius:6px;padding:6px 12px;cursor:pointer}
 .authbtn:hover{border-color:var(--accent);color:var(--accent)}
 .locnote{margin-top:6px}
-.locmask{flex-basis:100%;color:var(--flag);font-size:12.5px;line-height:1.4;margin-top:5px}
+.locmask{margin-left:auto;flex:none;color:var(--flag);font-size:11.5px;font-weight:600;letter-spacing:.02em;
+  border:1px solid currentColor;border-radius:999px;padding:3px 10px;white-space:nowrap}
 .locshare{margin:2px 0 12px}
 .saverow{display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
 .saverow small{color:var(--ink-3);font-size:12px}
@@ -1125,8 +1127,8 @@ function setPinZoneLine(){
   if(S.lat==null){ el.hidden=true; el.innerHTML=""; return; }
   el.hidden=false;
   const hidden = !isAvcanTrip() && S.locshare==="fuzz";
-  el.innerHTML=`<span class="tk" aria-hidden="true">✓</span><span>${isAvcanTrip()||S.who==="avcan"?"Forecast region":"Backcountry area"}: <b>${esc(S.zone)}</b></span><span class="co">${S.lat.toFixed(4)}, ${S.lng.toFixed(4)}</span>`
-    + (hidden?`<span class="locmask">Location hidden \u2014 the public map shows a random point within 2 miles. CAIC staff see this pin.</span>`:"");
+  el.innerHTML=`<span class="tk" aria-hidden="true">✓</span><span class="zoneline">${isAvcanTrip()||S.who==="avcan"?"Forecast region":"Backcountry area"}: <b>${esc(S.zone)}</b></span><span class="co">${S.lat.toFixed(2)}, ${S.lng.toFixed(2)}</span>`
+    + (hidden?`<span class="locmask">Location hidden</span>`:"");
 }
 function enterPickMode(){
   if(!pinMap) return;
