@@ -440,7 +440,7 @@ const CRACK=[["yes","Yes"],["no","No"]];
 const COLL=[["yes","Yes"],["no","No"]];
 const VIS=[["public","With my name"],["noname","Anonymously"],["noloc","Anonymous, no location"],["staff","CAIC staff only"]];
 const LOCSHARE=[["exact","Show my location"],["fuzz","Hide my location"]];
-const VIS_CAIC=[["public","Everyone, with my name"],["noname","Everyone, anonymously"],["staff","CAIC staff only"]];
+const VIS_CAIC=[["public","Everyone, with my name"],["noname","Everyone, without my name"],["staff","CAIC staff only"]];
 const VIS_AVCAN=[["public","Everyone, with my name"],["noname","Everyone, anonymously"]];
 function isTrip(){ return S.opt==="g"||S.opt==="h"; }
 function isAvcanTrip(){ return S.opt==="h"; }
@@ -751,7 +751,7 @@ function reporterName(){
 function outcomeHTML(){
   const z=S.zone||"your area", n=esc(reporterName());
   let t;
-  if(S.visibility==="noname") t=`Publishes <b>anonymously</b>, in ${esc(z)}.`;
+  if(S.visibility==="noname") t=`Publishes <b>without your name</b>, in ${esc(z)}.`;
   else if(S.visibility==="noloc") t=`Publishes <b>anonymously</b>, with your location hidden.`;
   else if(S.visibility==="staff") t=`<b>Only CAIC staff</b> will see this. Nothing appears publicly.`;
   else t=`Publishes as <b>${n}</b>, in ${esc(z)}.`;
@@ -851,7 +851,7 @@ function buildTrip(){
         <p class="bad" data-whobad>Please fill in your name, email and phone.</p></div>`}
       <div class="sec">${head("Who can see this",MAY)}
         <span class="q">Who can see this report?</span>
-        <p class="hint">Choose one. ${avcan?"The public MIN. Anonymous is completely normal and forecasters read it the same.":"Anonymous is completely normal. Forecasters read it the same."}</p>
+        <p class="hint">Choose one. ${avcan?"The public MIN. Anonymous is completely normal and forecasters read it the same.":"Leaving your name off is completely normal. Forecasters read it the same."}</p>
         ${chips("visibility",visOpts())}
       </div>
       ${B.when()}
