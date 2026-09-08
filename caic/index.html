@@ -960,11 +960,10 @@ function trIncident(){
   </div>`;
 }
 function trNotes(){
-  const inc=S.caught==="yes";
-  return `<div class="sec">${head("Your day",MAY)}
-    <label><span class="q">${inc?"What happened?":"Tell us about your day"}</span>
-    <p class="hint">${inc?"In your own words — how it started, what you did, how it ended. The parts that don’t fit a checkbox. No names, no blame.":"Anything you noticed is worth writing down. Avalanches, cracking, collapsing, wind, how the snow felt underfoot, or just where you went and how it was. There is no wrong thing to tell us."}</p>
-    <textarea data-bind="comments" style="min-height:120px" placeholder="${inc?"Where you were, how it started, what you did, and how it ended. Skip names and judgement.":"Where did you go, and what was the snow doing? It does not even have to be sentences — a few words or a list is genuinely useful."}"></textarea></label>
+  return `<div class="sec">${head("Trip summary",MAY)}
+    <label>
+    <p class="hint">Tell us anything. What’s the snow like, what you saw, what surprised you, what you talked about at the trailhead. Forecasters read every one of these. If someone was caught, tell us what happened.</p>
+    <textarea data-bind="comments" style="min-height:120px" placeholder="Deep and stable. Punchy and weird. Cracking everywhere. Bullet points and half sentences are perfect — no need to write it up nicely."></textarea></label>
     </div>`;
 }
 function avTechFilled(A){
