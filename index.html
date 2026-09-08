@@ -391,15 +391,6 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
   <div class="mark">CAIC <span>· field report concepts</span></div>
   <div class="ctrls">
     <div class="previewas">
-      <label for="revealsel">Reveal</label>
-      <select id="revealsel">
-        <option value="fixed">Link reveal</option>
-        <option value="appear">Link reveal (appears)</option>
-        <option value="inline">Progressive add</option>
-      <option value="short">Short inline reveal</option>
-      </select>
-    </div>
-    <div class="previewas">
       <label for="whosel">Preview as</label>
       <select id="whosel">
         <option value="caic-ret" selected>CAIC · returning</option>
@@ -545,7 +536,7 @@ const S={who:"caic-ret",opt:"h",step:0,
   sky:"",precip:"",wind:"",temp:"",wx_desc:"",
   g_total:"",g_caught:"",g_partial:"",g_full:"",g_breathing:"",g_involved:"",g_tsp:"",g_airbag:"",g_deployed:"",g_desc:"",
   g_rescue:"",g_injury:"",g_helmet:"",g_help:"",
-  reveal:"fixed"};
+  reveal:"fixed"};   // locked: the Reveal control is gone; all four paths below still work
 function avScope(el){
   const box=el.closest("[data-avi]");
   if(box) return S.avalanches[+box.dataset.avi]||{};
@@ -1152,8 +1143,8 @@ function problemHTML(){
 function buildB(){
   $("#pane-b").innerHTML=
     LEDE("The field report",
-      "Contact, where, when, photos, notes and red flags. Two of those are required; the rest are one tap each. Use the Reveal control at the top to switch between <b>link reveal</b> \u2014 one row that opens a separate detail page \u2014 and <b>progressive add</b>, which drops the relevant fields straight into the form underneath the red flags.",
-      ["2 required fields","core never changes","link reveal or progressive add"])+
+      "Contact, where, when, photos, notes and red flags. Two of those are required; the rest are one tap each. Everything beyond the core sits behind a single row that opens a separate detail page, so the form never changes height underneath the reporter.",
+      ["2 required fields","core never changes","link reveal"])+
     `<div class="page"><form class="screen">${INTRO}
       ${B.who()}${B.where()}${B.when()}${B.photos()}${B.notes()}${B.flags()}<div data-inline></div>${B.detail()}
       ${FOOT()}
@@ -1636,7 +1627,6 @@ document.addEventListener("click",e=>{ if(!e.target.closest("[data-privjump]")) 
   const pane=$("#pane-"+S.opt); const row=$(".privrow",pane); if(!row) return;
   if(row.scrollIntoView) row.scrollIntoView({block:"center",behavior:"smooth"});
   row.classList.add("flash"); setTimeout(()=>row.classList.remove("flash"),1400); });
-$("#revealsel").addEventListener("change",e=>{ S.reveal=e.target.value; syncAll(); });
 $$(".thbtn").forEach(b=>b.addEventListener("click",()=>{
   const t=b.dataset.th;
   if(t==="auto") delete document.documentElement.dataset.theme;
