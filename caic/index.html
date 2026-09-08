@@ -226,7 +226,7 @@ input[type=date]{max-width:220px}
 .pinned .co{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);flex:none}
 .pinned .zoneline{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pinned .tk{color:var(--ok);font-weight:700}
-.pinmap-wrap{position:relative;width:100%;height:220px;border-radius:var(--r);overflow:hidden;border:1.5px solid var(--line-2);background:var(--sunk)}
+.pinmap-wrap{position:relative;z-index:0;isolation:isolate;width:100%;height:220px;border-radius:var(--r);overflow:hidden;border:1.5px solid var(--line-2);background:var(--sunk)}
 .pinmap-wrap.picking{height:min(58vh,420px)}
 #tr-map{width:100%;height:100%}
 .pinmap-wrap:not(.picking) .leaflet-control-container{display:none}
@@ -316,7 +316,7 @@ input[type=date]{max-width:220px}
 .tagx{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--ink-2);background:var(--surface)}
 
 /* detail page (screen 2) */
-.dpage{position:fixed;inset:0;background:var(--ground);z-index:55;display:flex;flex-direction:column;
+.dpage{position:fixed;inset:0;background:var(--ground);z-index:2000;display:flex;flex-direction:column;
   transform:translateY(100%);visibility:hidden;transition:transform .28s cubic-bezier(.32,.72,0,1),visibility .28s}
 .dpage.on{transform:none;visibility:visible}
 .dpin{max-width:620px;margin:0 auto;width:100%;padding:0 22px}
@@ -334,7 +334,7 @@ input[type=date]{max-width:220px}
 .dpage-t button.req{border-color:var(--flag);color:var(--flag)}
 .dpage-b{flex:1;overflow-y:auto;padding:22px 0 30px}
 .dpage-f{background:var(--surface);border-top:1px solid var(--line);padding:13px 0;flex:none}
-.dpage-f .dpin{display:flex;gap:10px}
+.dpage-f .dpin{display:flex;flex-wrap:wrap;gap:10px}
 .dpage-f .btn{flex:1}
 .dstep{font-family:var(--mono);font-size:11px;color:var(--ink-3);padding:9px 0 0}
 .x{border:1px solid var(--line-2);background:var(--surface);width:40px;height:40px;border-radius:9px;cursor:pointer;
@@ -377,6 +377,31 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
   border:1px solid var(--line-2);border-radius:6px;padding:6px 12px;cursor:pointer}
 .authbtn:hover{border-color:var(--accent);color:var(--accent)}
 .locnote{margin-top:6px}
+.avcta-sec{padding-top:2px}
+.avtech{margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
+.backbtn{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line-2);
+  border-radius:999px;padding:8px 15px 8px 12px;font-family:var(--disp);font-size:14px;font-weight:600;
+  color:var(--ink);cursor:pointer;flex:none;min-height:40px}
+.backbtn:hover{border-color:var(--accent);color:var(--accent)}
+.backbtn span{font-size:19px;line-height:1}
+.skipcta{border-color:var(--line-2);background:var(--sunk)}
+.skipcta:hover{border-color:var(--accent);background:var(--wash)}
+.skipcta .avcta-i{font-size:19px}
+.dpage-t .dpin{padding-bottom:13px}
+.dpage-f .dpin>#sheet-clear,.dpage-f .dpin>#sheet-done{flex:1 1 45%}
+.avcta{width:100%;display:flex;align-items:center;gap:13px;text-align:left;cursor:pointer;
+  border:1.5px solid var(--accent);border-radius:var(--r);background:var(--wash);color:var(--ink);
+  padding:16px 18px;min-height:var(--touch)}
+.avcta:hover{background:var(--surface)}
+.avcta.has{border-color:var(--ok)}
+.avcta-i{width:32px;height:32px;border-radius:50%;background:transparent;color:var(--ink-2);flex:none;
+  border:1.5px solid var(--line-2);box-shadow:0 0 0 3px var(--sunk);
+  display:grid;place-items:center;font-family:var(--disp);font-weight:700;font-size:17px}
+.avcta.has .avcta-i{border-color:var(--ok);color:var(--ok)}
+.avcta-t{flex:1;min-width:0}
+.avcta-t strong{display:block;font-family:var(--disp);font-size:16px;font-weight:700}
+.avcta-t small{display:block;color:var(--ink-2);font-size:12.5px;margin-top:2px;line-height:1.4}
+.avcta-ar{color:var(--accent);font-size:22px;flex:none}
 .locmask{margin-left:auto;flex:none;color:var(--flag);font-size:11.5px;font-weight:600;letter-spacing:.02em;
   border:1px solid currentColor;border-radius:999px;padding:3px 10px;white-space:nowrap}
 .locshare{margin:2px 0 12px}
@@ -394,14 +419,13 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
 
 <div class="dpage" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
   <header class="dpage-h"><div class="dpin">
-    <button type="button" class="x" id="sheet-x" aria-label="Back to the report">&lsaquo;</button>
-    <div style="flex:1"><h3 id="sheet-title">Add more detail</h3><small id="sheet-sub">All optional</small></div>
+    <div style="flex:1;min-width:0"><h3 id="sheet-title">Add more detail</h3><small id="sheet-sub">All optional</small></div>
   </div></header>
   <nav class="dpage-t"><div class="dpin" id="sheet-tabs" role="tablist"></div></nav>
   <div class="dpage-b"><div class="dpin" id="sheet-body"></div></div>
   <footer class="dpage-f"><div class="dpin">
     <button type="button" class="btn btn-2" id="sheet-clear">Clear this section</button>
-    <button type="button" class="btn btn-go" id="sheet-done">Save and return</button>
+    <button type="button" class="btn btn-go" id="sheet-done">Save Avalanches</button>
   </div></footer>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -419,7 +443,7 @@ const S={who:"caic-ret",opt:"g",locshare:"exact",
   firstname:"",lastname:"",email:"",phone:"",
   observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",mapMode:"idle",
   comments:"",assets:[],av:"",cracking:"",collapsing:"",visibility:"public",
-  title:"",sawAvalanche:"",caught:"",whenOccurred:"",instability:[],incidentStory:"",
+  title:"",avType:"",sawAvalanche:"",caught:"",whenOccurred:"",instability:[],incidentStory:"",
   avalanches:[{}],avOpen:0,
   problemTypes:[],problems:{},
   hs:"",hn24:"",wl_grain:"",test:"",sp_desc:"",
@@ -442,21 +466,24 @@ const CRACK=[["yes","Yes"],["no","No"]];
 const COLL=[["yes","Yes"],["no","No"]];
 const VIS=[["public","With my name"],["noname","Anonymously"],["noloc","Anonymous, no location"],["staff","CAIC staff only"]];
 const LOCSHARE=[["exact","Show my location"],["fuzz","Hide my location"]];
+const AVTYPE=[["none","We didn\u2019t see an avalanche"],["saw","We saw an avalanche"],
+  ["triggered","Someone triggered an avalanche"],["caught","Someone was caught in an avalanche"]];
 const VIS_CAIC=[["public","Everyone, with my name"],["noname","Everyone, without my name"],["staff","CAIC staff only"]];
 const VIS_AVCAN=[["public","Everyone"],["noname","Only Forecasters"]];
 function isTrip(){ return S.opt==="g"||S.opt==="h"; }
 function isAvcanTrip(){ return S.opt==="h"; }
 function visOpts(){ return isAvcanTrip()?VIS_AVCAN:VIS_CAIC; }
-const ASPECT=[["N","N"],["NE","NE"],["E","E"],["SE","SE"],["S","S"],["SW","SW"],["W","W"],["NW","NW"],["U","I don't know"]];
-const TRIG=[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobiler","Snowmobiler"],["snowbiker","Snowbiker"],["climber","Ice climber"],["explosive","Explosive"],["unknown","I don't know"]];
+const ASPECT=[["N","N"],["NE","NE"],["E","E"],["SE","SE"],["S","S"],["SW","SW"],["W","W"],["NW","NW"],["U","Unsure"]];
+const TRIG=[["natural","Natural"],["skier","Skier"],["snowboarder","Snowboarder"],["snowmobiler","Snowmobiler"],["snowbiker","Snowbiker"],["climber","Ice climber"],["explosive","Explosive"],["unknown","Unsure"]];
 const TRIG_HOW=[
-  ["natural","It released on its own","Weather, a cornice, or the slope failing with nobody on it"],
-  ["intentional","Someone set it off on purpose",""],
-  ["unintentional","Someone set it off by accident",""],
-  ["remote","Someone set it off from a distance",""],
-  ["unknown","I don't know",""]
+  ["natural","It released on its own (Natural)","Weather, a cornice, or the slope failing with nobody on it"],
+  ["triggered","Someone triggered it",""],
+  ["remote","Someone triggered it from a distance",""],
+  ["unknown","Unsure",""]
 ];
-const TRIG_BY=[["person","A person"],["machine","A machine"],["other","Something else"]];
+const TRIG_BY=[["AS","Skier"],["AR","Snowboarder"],["AI","Snowshoer"],["AF","Foot"],
+  ["AM","Snowmobile"],["AN","Motorized snowbike"],["AK","Snowcat"],["AV","Vehicle"],
+  ["other","Something else"],["unsure","Unsure"]];
 const INSTAB=[
   ["newWx","30 cm or more of new snow, significant drifting, or rain in the last 48 hours",""],
   ["whumpf","Whumpfing or drum-like sounds",""],
@@ -469,7 +496,7 @@ const WEAK_INFO=[
   ["facets","Facets"],
   ["depth_hoar","Depth hoar"],
   ["new_snow","New snow"],
-  ["Unknown","Not sure"]
+  ["Unknown","Unsure"]
 ];
 const CO_ZONES=[
  {n:"Steamboat & Flat Tops",a:"Steamboat",b:"& Flat Tops",p:"120,40 300,32 314,150 200,170 110,140",x:208,y:98,lat:40.45,lng:-106.90},
@@ -603,13 +630,13 @@ const B={
  privacy:()=>`<div class="sec">${head("Who can see this",MAY)}${privacyRow()}</div>`
 };
 const AVKEYS=["whenOccurred","dsize","trigger","trigger_how","trigger_by","trigger_by_other","trigger_mode","aspect","elevation","problem","depth","width","runLength","startElev","incline","weakInfo","crust","av_desc"];
-const WHEN=[["whileThere","While there"],["todayFresh","Today"],["yesterday","Yesterday"],["fewDays","A few days"],["older","Older"],["unsure","Unsure"]];
+const WHEN=[["todayFresh","Today"],["yesterday","Yesterday"],["fewDays","A few days ago (3)"],["unsure","Unsure"],["setdate","Set date"]];
 const MOREKEYS=["depth","width","runLength","startElev","incline","weakInfo","crust"];
 const DSZ={D15:"D1.5",D25:"D2.5",D35:"D3.5",D45:"D4.5"};
 function sizeOpts(){
   return isAvcanTrip()
-    ?[["D1","1"],["D15","1.5"],["D2","2"],["D25","2.5"],["D3","3"],["D35","3.5"],["D4","4"],["D45","4.5"],["D5","5"],["U","I don't know"]]
-    :[["D1","D1"],["D15","D1.5"],["D2","D2"],["D25","D2.5"],["D3","D3"],["D35","D3.5"],["D4","D4"],["D45","D4.5"],["D5","D5"],["U","I don't know"]];
+    ?[["D1","1"],["D15","1.5"],["D2","2"],["D25","2.5"],["D3","3"],["D35","3.5"],["D4","4"],["D45","4.5"],["D5","5"],["U","Unsure"]]
+    :[["D1","D1"],["D15","D1.5"],["D2","D2"],["D25","D2.5"],["D3","D3"],["D35","D3.5"],["D4","D4"],["D45","D4.5"],["D5","D5"],["U","Unsure"]];
 }
 const ELEV={">TL":"Alpine",TL:"Treeline","<TL":"Below treeline"};
 const PROB={storm:"Storm slab",wind:"Wind slab",persistent:"Persistent slab",deep_persistent:"Deep persistent",
@@ -628,16 +655,29 @@ function avSummary(a){
   const f=AVKEYS.filter(k=>{const v=a[k];return Array.isArray(v)?v.length>0:has(v);}).length;
   return f?f+(f===1?" field filled in":" fields filled in"):"Nothing entered yet";
 }
+function todayLocal(){
+  const d=new Date();
+  return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+}
+const WHENDAYS={todayFresh:0,yesterday:1,fewDays:3};
+function daysAgoLocal(n){
+  const d=new Date(); d.setDate(d.getDate()-n);
+  return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+}
 function avCore(){
   return `<div class="incq">
         <span class="q">When do you think it happened?</span>
         <p class="hint" style="margin:0">Choose one.</p>
         ${chips("whenOccurred",WHEN,1)}
+        <label class="fld" data-whendate hidden style="margin-top:12px;max-width:240px">
+          <span>What date?</span>
+          <input type="date" data-bind="occurredOn" max="${todayLocal()}">
+        </label>
       </div>
       <div class="incq">
         <span class="q">How did this avalanche start?</span>
         <p class="hint" style="margin:0">Choose one. “On its own” means weather or the slope, not a person or machine.</p>
-        ${checksOne("trigger_how",TRIG_HOW)}
+        ${chips("trigger_how",TRIG_HOW)}
       </div>
       <div class="incq" data-triggerby hidden>
         <span class="q">Who or what set it off?</span>
@@ -656,7 +696,7 @@ function avCore(){
       <div class="incq">
         <span class="q">What elevation band?</span>
         <p class="hint" style="margin:0">Choose one.</p>
-        ${chips("elevation",[[">TL","Alpine"],["TL","Treeline"],["<TL","Below"],["U","I don't know"]],1)}
+        ${chips("elevation",[[">TL","Above treeline"],["TL","Near treeline"],["<TL","Below treeline"],["U","Unsure"]],1)}
       </div>
       <div class="incq">
         <span class="q">How big was it?</span>
@@ -666,7 +706,7 @@ function avCore(){
       <div class="incq">
         <span class="q">What avalanche problem was it?</span>
         <p class="hint" style="margin:0">Choose one.</p>
-        ${chips("problem",[["storm","Storm"],["wind","Wind"],["persistent","Persistent"],["deep_persistent","Deep persistent"],["wet_slab","Wet slab"],["loose_wet","Loose wet"],["loose_dry","Loose dry"],["cornice","Cornice"],["glide","Glide"],["Unknown","I don't know"]],1)}
+        ${chips("problem",[["storm","Storm"],["wind","Wind"],["persistent","Persistent"],["wet_slab","Wet slab"],["loose_wet","Loose wet"],["loose_dry","Loose dry"],["Unknown","Unsure"]],1)}
       </div>`;
 }
 function avRest(i,more,mfilled){
@@ -870,12 +910,18 @@ function buildTrip(){
   restorePinMap();
 }
 function instFilled(){ return (S.instability||[]).length>0; }
+function applyAvType(){
+  const t=S.avType;
+  if(!t){ S.sawAvalanche=""; S.caught=""; return; }
+  S.sawAvalanche = t==="none" ? "no" : "yes";
+  S.caught = t==="caught" ? "yes" : (t==="none" ? "" : "no");
+}
 function trFlowSig(){
-  return [S.sawAvalanche,S.caught,S.avalanches.length,S.avOpen].join("|");
+  return [S.avType,S.sawAvalanche,S.caught,S.avalanches.length,S.avOpen].join("|");
 }
 function trIncident(){
   return `<div class="sec">${head("Incident",MAY)}
-    <p class="hint" style="margin-top:-6px">Optional. Skip what you don’t know.</p>
+    <p class="hint" style="margin-top:-6px">Skip what you don’t know.</p>
     <div class="avblock">
       <div class="incq">
         <span class="q">How many people were in the group?</span>
@@ -896,17 +942,17 @@ function trIncident(){
       <div class="incq">
         <span class="q">Did the group have a transceiver, shovel and probe?</span>
         <p class="hint" style="margin:0">Choose one.</p>
-        ${chips("g_tsp",[["all","Everyone"],["some","Some"],["no","No"],["unknown","I don't know"]])}
+        ${chips("g_tsp",[["all","Everyone"],["some","Some"],["no","No"],["unknown","Unsure"]])}
       </div>
       <div class="incq">
         <span class="q">Did those caught have airbags?</span>
         <p class="hint" style="margin:0">Choose one.</p>
-        ${chips("g_airbag",[["yes","Yes"],["some","Some"],["no","No"],["unknown","I don't know"]])}
+        ${chips("g_airbag",[["yes","Yes"],["some","Some"],["no","No"],["unknown","Unsure"]])}
       </div>
       <div class="incq" data-deployed hidden>
         <span class="q">Were they deployed?</span>
         <p class="hint" style="margin:0">Choose one.</p>
-        ${chips("g_deployed",[["yes","Yes"],["no","No"],["unknown","I don't know"]])}
+        ${chips("g_deployed",[["yes","Yes"],["no","No"],["unknown","Unsure"]])}
       </div>
     </div>
   </div>`;
@@ -939,43 +985,50 @@ function trAvBlock(i,n){
   const A=S.avalanches[i]||{};
   const open=S.avOpen===i;
   const filled=avTechFilled(A);
-  const title=n>1?"Observation "+(i+1):"This avalanche";
+  const title=n>1?"Avalanche "+(i+1):"This avalanche";
   const head_=`<div class="avhead">
      <button type="button" class="avtoggle" data-avtoggle="${i}" aria-expanded="${open}">
        <span class="avcaret" aria-hidden="true">\u203a</span>
        <span class="avtitle">${title}</span>
        ${open?"":`<span class="avsum">${esc(avSummary(A)==="Nothing entered yet"?"Skipped — tap to add":avSummary(A))}</span>`}
      </button>
-     ${open&&n===1?`<button type="button" class="avskip" data-avtoggle="${i}">Skip</button>`:""}
      ${n>1?`<button type="button" class="rmav" data-rmav="${i}">Remove</button>`:""}</div>`;
   if(!open) return `<div class="avblock closed" data-avi="${i}">${head_}</div>`;
-  return `<div class="avblock" data-avi="${i}">${head_}${avCore()}
-    <div class="avmorewrap">${drow(filled?"has":"","tech","Add more details",
-      filled?filled+" technical fields filled in":"Crown, weak layer — optional")}</div>
-  </div>`;
+  return `<div class="avblock" data-avi="${i}">${head_}${avCore()}</div>`;
 }
 function trAvObs(){
   const n=S.avalanches.length;
   return `<div class="sec">${head("Avalanche observation",MAY)}
-    <p class="hint" style="margin-top:-6px">Optional. Skip or collapse if you have nothing to add.</p>
+    <p class="hint" style="margin-top:-6px">Skip or collapse if you have nothing to add.</p>
     ${S.avalanches.map((_,i)=>trAvBlock(i,n)).join("")}
-    <button type="button" class="addav" data-addav>+ Add another avalanche observation</button>
+    <button type="button" class="addav" data-addav>+ Add another avalanche</button>
   </div>`;
+}
+function avDetailCount(){
+  let n=0;
+  S.avalanches.forEach(A=>{ Object.keys(A||{}).forEach(k=>{
+    if(k[0]==="_") return; const v=A[k];
+    if(Array.isArray(v)?v.length>0:has(v)) n++; }); });
+  return n;
 }
 function trFlowHTML(){
   const saw=S.sawAvalanche, caught=S.caught;
-  let h=`<div class="sec" data-need="sawAvalanche">${head("Avalanches",MUST)}
+  let h=`<div class="sec">${head("Avalanches",MAY)}
     <span class="q">Did you see any recent avalanches or trigger an avalanche?</span>
     <p class="hint">Choose one.</p>
-    ${chips("sawAvalanche",[["yes","Yes"],["no","No"]])}
-    <p class="bad">Please answer this question.</p></div>`;
-  if(saw==="yes") h+=`<div class="sec" data-need="caught">
-    <span class="q">Was someone caught by the avalanche?</span>
-    <p class="hint">Choose one.</p>
-    ${chips("caught",[["yes","Yes"],["no","No"]])}
-    <p class="bad">Please answer this question.</p></div>`;
-  if(saw==="yes"&&caught==="yes") h+=trIncident();
-  if(saw==="yes") h+=trAvObs();
+    ${chips("avType",AVTYPE)}</div>`;
+  if(saw==="yes"){
+    const n=avDetailCount();
+    const label="Add avalanche details";
+    h+=`<div class="sec avcta-sec">
+      <button type="button" class="avcta${n?" has":""}" data-more="avdetails">
+        <span class="avcta-i" aria-hidden="true">${n?"\u2713":"+"}</span>
+        <span class="avcta-t"><strong>${label}</strong>
+          <small>${n?n+" field"+(n===1?"":"s")+" added \u2014 tap to review or add more"
+                   :"Size, trigger, aspect, elevation and more. All optional."}</small></span>
+        <span class="avcta-ar" aria-hidden="true">\u203a</span>
+      </button></div>`;
+  }
   h+=`<div class="sec">${head("Instability",MAY)}
     <span class="q">Did you notice any of these?</span>
     <p class="hint" style="margin-top:-2px">Select all that apply. Signs the snowpack is waking up.</p>
@@ -1086,6 +1139,7 @@ document.addEventListener("click",e=>{
     redrawAvalanches(); return; }
   const mo=e.target.closest("[data-more]"); if(mo){
     const box=mo.closest("[data-avi]"); if(box) S.avOpen=+box.dataset.avi;
+    if(isTrip()) tripSheet = mo.dataset.more==="avdetails" ? "avalanche" : "tech";
     openSheet(mo.dataset.more||"snowpack"); return; }
 });
 document.addEventListener("change",e=>{
@@ -1100,6 +1154,7 @@ document.addEventListener("change",e=>{
 });
 function onBind(e){
   const el=e.target.closest("[data-bind]"); if(!el) return;
+  if(el.type==="date"&&el.value&&el.value>todayLocal()) el.value=todayLocal();
   avScope(el)[el.dataset.bind]=el.value;
   const sec=el.closest("[data-need]"); if(sec) clearErr(sec.dataset.need);
   syncAll();
@@ -1249,6 +1304,7 @@ document.addEventListener("click",e=>{
   }
 });
 function syncAll(){
+  applyAvType();           // avType is the answer; sawAvalanche/caught are derived from it
   $$("[data-trflow]").forEach(el=>{ const k=trFlowSig();
     if(el.dataset.sig!==k){
       const ae=document.activeElement;
@@ -1265,6 +1321,18 @@ function syncAll(){
   $$(".chips[data-group], .checks[data-group]").forEach(g=>{ const v=avScope(g)[g.dataset.group];
     $$("[data-value]",g).forEach(c=>c.setAttribute("aria-pressed",
       (Array.isArray(v)?v.includes(c.dataset.value):v===c.dataset.value)?"true":"false")); });
+  $$("[data-whendate]").forEach(el=>{
+    const A=avScope(el), w=A.whenOccurred;
+    const rel=Object.prototype.hasOwnProperty.call(WHENDAYS,w);
+    const on=rel||w==="setdate";
+    el.hidden=!on;
+    if(!on){ A.occurredOn=""; A._whenrel=""; }
+    else if(rel && A._whenrel!==w){ A.occurredOn=daysAgoLocal(WHENDAYS[w]); A._whenrel=w; }
+    else if(w==="setdate" && A._whenrel){ A._whenrel=""; }
+    const lab=el.querySelector("span");
+    if(lab) lab.textContent = rel ? "Date recorded" : "What date?";
+    const i=el.querySelector("input"); if(i&&i.value!==(A.occurredOn||"")) i.value=A.occurredOn||"";
+  });
   $$("[data-triggerby]").forEach(el=>{
     const A=avScope(el), how=A.trigger_how;
     const show=!!how && how!=="natural" && how!=="unknown";
@@ -1372,8 +1440,10 @@ document.addEventListener("click",e=>{
 
 /* ---------- detail sheet ---------- */
 let sheetTab="avalanche";
+let tripSheet="avalanche";   // "avalanche" | "tech"
 function openSheet(k){ sheetTab=k||sheetTab; renderSheet(); $("#sheet").classList.add("on");
-  document.body.style.overflow="hidden"; $("#sheet-x").focus(); }
+  document.body.style.overflow="hidden";
+  const f=$("#sheet-skip")||$("#sheet-done"); if(f&&f.focus) f.focus(); }
 function closeSheet(){ $("#sheet").classList.remove("on"); document.body.style.overflow=""; syncAll();
   const b=$('#pane-'+S.opt+' [data-more="'+sheetTab+'"]')||$('#pane-'+S.opt+' [data-more="tech"]')||$('#pane-'+S.opt+' [data-more]'); if(b&&b.focus) b.focus(); }
 function sheetKeys(){
@@ -1387,11 +1457,27 @@ function renderSheet(){
   if(isTrip()){
     sheetTab="tech";
     const i=S.avOpen>=0?S.avOpen:0;
-    $("#sheet-tabs").innerHTML=`<button type="button" role="tab" aria-selected="true">Technical details</button>`;
-    $("#sheet-body").innerHTML=avTechHTML(i);
-    $("#sheet-title").textContent="Technical details";
-    $("#sheet-sub").textContent="All optional — add what you have and leave the rest.";
-    $("#sheet-done").textContent="Back";
+    if(tripSheet==="tech"){
+      $("#sheet-tabs").innerHTML=`<button type="button" class="avcta skipcta" id="sheet-skip">
+        <span class="avcta-i" aria-hidden="true">\u2190</span>
+        <span class="avcta-t"><strong>Skip this and go back to the report</strong>
+          <small>Avalanche details are optional. Your report is useful without them.</small></span>
+      </button>`;
+      $("#sheet-body").innerHTML=avTechHTML(i);
+      $("#sheet-title").textContent="Technical details";
+      $("#sheet-sub").textContent="Add what you have and leave the rest.";
+      $("#sheet-done").textContent="Back to avalanche details";
+    }else{
+      $("#sheet-tabs").innerHTML=`<button type="button" class="avcta skipcta" id="sheet-skip">
+        <span class="avcta-i" aria-hidden="true">\u2190</span>
+        <span class="avcta-t"><strong>Skip this and go back to the report</strong>
+          <small>Avalanche details are optional. Your report is useful without them.</small></span>
+      </button>`;
+      $("#sheet-body").innerHTML=trAvObs();
+      $("#sheet-title").textContent="Avalanche details";
+      $("#sheet-sub").textContent="Add what you have and leave the rest.";
+      $("#sheet-done").textContent="Save Avalanches";
+    }
     wire(); syncAll();
     return;
   }
@@ -1415,12 +1501,14 @@ function renderSheet(){
   wire(); syncAll();
 }
 $("#sheet-tabs").addEventListener("click",e=>{ const b=e.target.closest("[data-stab]"); if(!b) return; sheetTab=b.dataset.stab; renderSheet(); });
-$("#sheet-x").addEventListener("click",closeSheet);
 $("#sheet-done").addEventListener("click",()=>{
+  if(isTrip()&&tripSheet==="tech"){ tripSheet="avalanche"; renderSheet(); return; }
   if(S.av==="caught"&&sheetTab==="group"){ sheetTab="avalanche"; renderSheet(); return; }
   closeSheet();
 });
 
+document.addEventListener("click",e=>{ if(!e.target.closest("#sheet-skip")) return;
+  tripSheet="avalanche"; closeSheet(); });
 $("#sheet-clear").addEventListener("click",()=>{
   if(isTrip()&&sheetTab==="tech"){
     const A=S.avalanches[S.avOpen>=0?S.avOpen:0];
@@ -1441,11 +1529,7 @@ function tripNeeds(){
     ok:has(S.firstname)&&has(S.lastname)&&has(S.email)&&(!phoneRequired()||has(S.phone)),
     label:phoneRequired()?"your name, email and phone":"your name and email"});
   L.push({k:"location",ok:S.lat!=null,label:"where you were"},
-           {k:"date",ok:has(S.observed_at),label:"the date"},
-           {k:"sawAvalanche",ok:has(S.sawAvalanche),label:"whether you saw avalanches"});
-  if(S.sawAvalanche==="yes"){
-    L.push({k:"caught",ok:has(S.caught),label:"whether someone was caught"});
-  }
+           {k:"date",ok:has(S.observed_at),label:"the date"});
   return L;
 }
 function needs(){
