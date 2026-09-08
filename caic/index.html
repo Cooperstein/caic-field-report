@@ -485,10 +485,11 @@ const TRIG_BY=[["AS","Skier"],["AR","Snowboarder"],["AI","Snowshoer"],["AF","Foo
   ["AM","Snowmobile"],["AN","Motorized snowbike"],["AK","Snowcat"],["AV","Vehicle"],
   ["other","Something else"],["unsure","Unsure"]];
 const INSTAB=[
-  ["newWx","30 cm or more of new snow, significant drifting, or rain in the last 48 hours",""],
-  ["whumpf","Whumpfing or drum-like sounds",""],
-  ["cracks","Shooting cracks that ran a long way","Not just under your skis or sled — cracks that shot out across the slope"],
-  ["warming","Rapid warming to near or above 0°C, or wet snow on the surface",""],
+  ["newWx","10 inches or more of new snow",""],
+  ["drifting","Significant wind drifting",""],
+  ["whumpf","Whumpfing","Big booming collapses"],
+  ["cracks","Shooting cracks","Cracks that shoot out across the slope"],
+  ["warming","Rapid warming near or above freezing, or rain",""],
   ["none","None of these",""]
 ];
 const WEAK_INFO=[
@@ -1031,8 +1032,8 @@ function trFlowHTML(){
       </button></div>`;
   }
   h+=`<div class="sec">${head("Instability",MAY)}
-    <span class="q">Did you notice any of these?</span>
-    <p class="hint" style="margin-top:-2px">Select all that apply. Signs the snowpack is waking up.</p>
+    <span class="q">Did you notice any of these signs of danger?</span>
+    <p class="hint" style="margin-top:-2px">Select all that apply.</p>
     ${checks("instability",INSTAB,"none")}
     </div>`;
   return h;
