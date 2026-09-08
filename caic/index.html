@@ -443,7 +443,7 @@ const COLL=[["yes","Yes"],["no","No"]];
 const VIS=[["public","With my name"],["noname","Anonymously"],["noloc","Anonymous, no location"],["staff","CAIC staff only"]];
 const LOCSHARE=[["exact","Show my location"],["fuzz","Hide my location"]];
 const VIS_CAIC=[["public","Everyone, with my name"],["noname","Everyone, without my name"],["staff","CAIC staff only"]];
-const VIS_AVCAN=[["public","Everyone, with my name"],["noname","Everyone, anonymously"]];
+const VIS_AVCAN=[["public","Everyone"],["noname","Only Forecasters"]];
 function isTrip(){ return S.opt==="g"||S.opt==="h"; }
 function isAvcanTrip(){ return S.opt==="h"; }
 function visOpts(){ return isAvcanTrip()?VIS_AVCAN:VIS_CAIC; }
