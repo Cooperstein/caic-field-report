@@ -223,7 +223,8 @@ input[type=date]{max-width:220px}
 .mapnote{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);padding:7px 10px;border-top:1px solid var(--line);background:var(--surface)}
 .pinned{min-height:42px;display:flex;align-items:center;gap:9px;margin-top:9px;font-size:14px;color:var(--ink-2)}
 .pinned b{font-family:var(--disp);color:var(--ink)}
-.pinned .co{font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
+.pinned .co{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);flex:none}
+.pinned .zoneline{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pinned .tk{color:var(--ok);font-weight:700}
 .pinmap-wrap{position:relative;width:100%;height:220px;border-radius:var(--r);overflow:hidden;border:1.5px solid var(--line-2);background:var(--sunk)}
 .pinmap-wrap.picking{height:min(58vh,420px)}
@@ -369,7 +370,25 @@ table.aud{width:100%;border-collapse:collapse;font-size:13.5px;min-width:720px}
 .audit li b{color:var(--ink);font-weight:600}
 code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px 5px;border-radius:4px}
 .hid{display:none !important}
+.authbar{display:flex;align-items:center;gap:10px;font-size:13px}
+.authbar .whoami{color:var(--ink-2);white-space:nowrap}
+.authbar .whoami b{color:var(--ink);font-weight:600}
+.authbtn{font-family:var(--disp);font-size:12.5px;font-weight:600;color:var(--ink-2);background:var(--surface);
+  border:1px solid var(--line-2);border-radius:6px;padding:6px 12px;cursor:pointer}
+.authbtn:hover{border-color:var(--accent);color:var(--accent)}
+.locnote{margin-top:6px}
+.locmask{margin-left:auto;flex:none;color:var(--flag);font-size:11.5px;font-weight:600;letter-spacing:.02em;
+  border:1px solid currentColor;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.locshare{margin:2px 0 12px}
+.saverow{display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.saverow small{color:var(--ink-3);font-size:12px}
+.saverow .btn{min-height:44px;padding:11px 18px;font-size:14.5px}
 </style>
+<div class="chrome"><div class="chrome-in">
+  <div class="mark">CAIC <span>· trip report</span></div>
+  <div class="authbar" data-authslot></div>
+</div></div>
+
 <div id="pane-g"></div>
 
 
@@ -396,11 +415,11 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 
 // S.who is pinned to caic-ret. AvCan is always signed in, and the CAIC logged-out
 // view (caic-new) stays reachable in code so it can be wired into the CAIC form.
-const S={who:"caic-ret",opt:"g",
+const S={who:"caic-ret",opt:"g",locshare:"exact",
   firstname:"",lastname:"",email:"",phone:"",
   observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",mapMode:"idle",
   comments:"",assets:[],av:"",cracking:"",collapsing:"",visibility:"public",
-  title:"",activity:[],activityOther:"",sawAvalanche:"",caught:"",whenOccurred:"",instability:[],incidentStory:"",
+  title:"",sawAvalanche:"",caught:"",whenOccurred:"",instability:[],incidentStory:"",
   avalanches:[{}],avOpen:0,
   problemTypes:[],problems:{},
   hs:"",hn24:"",wl_grain:"",test:"",sp_desc:"",
@@ -422,7 +441,8 @@ const AV=[["none","No avalanches"],["saw","Saw avalanche(s)"],["triggered","We t
 const CRACK=[["yes","Yes"],["no","No"]];
 const COLL=[["yes","Yes"],["no","No"]];
 const VIS=[["public","With my name"],["noname","Anonymously"],["noloc","Anonymous, no location"],["staff","CAIC staff only"]];
-const VIS_CAIC=[["public","Everyone, with my name"],["noname","Everyone, anonymously"],["staff","CAIC staff only"]];
+const LOCSHARE=[["exact","Show my location"],["fuzz","Hide my location"]];
+const VIS_CAIC=[["public","Everyone, with my name"],["noname","Everyone, without my name"],["staff","CAIC staff only"]];
 const VIS_AVCAN=[["public","Everyone, with my name"],["noname","Everyone, anonymously"]];
 function isTrip(){ return S.opt==="g"||S.opt==="h"; }
 function isAvcanTrip(){ return S.opt==="h"; }
@@ -536,6 +556,8 @@ const B={
  trWhere:()=>`<div class="sec" data-need="location">${head("Where",MUST)}
    <span class="q">Where were you?</span>
    <p class="hint" id="tr-map-helper">Tap the map to set a location. Then drag and zoom \u2014 the pin stays in the centre.</p>
+   <p class="hint locnote">If you choose \u201cHide my location\u201d we will assign a random location within 2 miles of your pin click. CAIC staff will still see the original pin location.</p>
+   <div class="locshare">${chips("locshare",LOCSHARE)}</div>
    <div class="pinmap-wrap" id="tr-map-wrap" role="application" aria-label="Location map">
      <div id="tr-map"></div>
      <button type="button" class="pinmap-cta" id="tr-map-cta">
@@ -552,7 +574,6 @@ const B={
    <div class="pinmap-actions">
      <button type="button" class="btn btn-go" id="tr-btn-confirm">Confirm location</button>
    </div>
-   <p class="pinmap-coords" id="tr-map-coords" aria-live="polite"></p>
    <p class="pinned" id="tr-map-zone" hidden></p>
    <p class="bad">Please set a location on the map.</p></div>`,
  when:()=>`<div class="sec" data-need="date">${head("When",MUST)}
@@ -732,7 +753,7 @@ function reporterName(){
 function outcomeHTML(){
   const z=S.zone||"your area", n=esc(reporterName());
   let t;
-  if(S.visibility==="noname") t=`Publishes <b>anonymously</b>, in ${esc(z)}.`;
+  if(S.visibility==="noname") t=`Publishes <b>without your name</b>, in ${esc(z)}.`;
   else if(S.visibility==="noloc") t=`Publishes <b>anonymously</b>, with your location hidden.`;
   else if(S.visibility==="staff") t=`<b>Only CAIC staff</b> will see this. Nothing appears publicly.`;
   else t=`Publishes as <b>${n}</b>, in ${esc(z)}.`;
@@ -741,12 +762,20 @@ function outcomeHTML(){
 function phoneRequired(){ return true; }
 function whoHTML(){
   if(S.who==="avcan") return `<div class="who"><div class="av">${esc(initials(AVCAN.name))}</div><div class="m"><div class="n">${esc(AVCAN.name)}</div><div class="s">Signed in with Auth0 · ${esc(AVCAN.town)}</div></div><button type="button" class="lnk">Sign out</button></div>`;
-  if(S.who==="caic-ret") return `<div class="who"><div class="av">SO</div><div class="m"><div class="n">Sam Ortega</div><div class="s">sam.ortega@example.com · 970-555-0148</div></div><button type="button" class="lnk">Edit</button></div>`;
+  if(S.who==="caic-ret"){
+    // Falls back to the seeded reporter until someone saves their own details.
+    const nm=((S.firstname||"")+" "+(S.lastname||"")).trim()||"Sam Ortega";
+    const em=S.email||"sam.ortega@example.com";
+    const ph=S.phone||"970-555-0148";
+    return `<div class="who"><div class="av">${esc(initials(nm))}</div><div class="m"><div class="n">${esc(nm)}</div><div class="s">${esc(em)}${ph?" · "+esc(ph):""}</div></div><button type="button" class="lnk" data-editme>Edit</button></div>`;
+  }
   return `<p class="hint" style="margin-top:-4px">Saved on this device, so you only type it once. Forecasters use this to follow up on reports.</p>
    <div class="two"><label class="fld"><span>First name</span><input type="text" data-bind="firstname" autocomplete="given-name"></label>
    <label class="fld"><span>Last name</span><input type="text" data-bind="lastname" autocomplete="family-name"></label></div>
    <div class="two" style="margin-top:10px"><label class="fld"><span>Email</span><input type="email" data-bind="email" autocomplete="email"></label>
    <label class="fld"><span>Phone</span><input type="tel" data-bind="phone" autocomplete="tel" placeholder="3035551234"></label></div>
+   <div class="saverow"><button type="button" class="btn btn-2" data-saveme>Save my info</button>
+     <small>Kept on this device so you do not type it again.</small></div>
 `;
 }
 
@@ -820,28 +849,21 @@ function buildTrip(){
       ["AvCan","required branching","optional observation"]):"")+
     `<div class="page"><form class="screen">
       <div class="intro"><h1>Submit a trip report</h1><p>Tell us where you were and what you saw. Photos help more than anything else you can send.</p></div>
-      <div class="sec" data-need="title">${head("Trip",MUST)}
-        <label><span class="q">Trip title</span><input type="text" data-bind="title" placeholder="e.g. Spearhead Traverse"></label>
-        <p class="bad">Please enter a trip title.</p></div>
-      ${B.photos()}
+      ${avcan?"":`<div class="sec" data-need="identity">${head("You",MUST)}<div data-whoslot></div>
+        <p class="bad" data-whobad>Please fill in your name, email and phone.</p></div>`}
       <div class="sec">${head("Who can see this",MAY)}
         <span class="q">Who can see this report?</span>
-        <p class="hint">Choose one. ${avcan?"The public MIN. Anonymous is completely normal and forecasters read it the same.":"Anonymous is completely normal. Forecasters read it the same."}</p>
+        <p class="hint">Choose one. ${avcan?"The public MIN. Anonymous is completely normal and forecasters read it the same.":"Leaving your name off is completely normal. Forecasters read it the same."}</p>
         ${chips("visibility",visOpts())}
       </div>
-      ${B.when()}${B.trWhere()}
-      <div class="sec">${head("Activity",MAY)}
-        <span class="q">What activity were you doing?</span>
-        <p class="hint">Select all that apply.</p>
-        ${chipsM("activity",[["skiing","Skiing"],["crossCountrySkiing","Cross-country skiing"],["snowboarding","Snowboarding"],["iceClimbing","Ice climbing"],["mountaineering","Mountaineering"],["snowshoeing","Snowshoeing"],["snowmobiling","Snowmobiling"],["snowbiking","Snowbiking"],["hiking","Hiking"],["other","Other"]])}
-        <label class="fld" data-actother hidden style="margin-top:12px">
-          <span>What activity?</span>
-          <input type="text" data-bind="activityOther" placeholder="e.g. fat biking">
-        </label></div>
+      ${B.when()}
+      ${B.trWhere()}
+      ${B.photos()}
       <div data-trflow></div>
       <div data-trnotes></div>
       <div class="foot"><p class="outcome" data-outcome></p><button type="submit" class="btn btn-go">Submit trip report</button><p class="msg" data-msg></p></div>
       </form></div>`;
+  renderWho();
   initPinMap();
   restorePinMap();
 }
@@ -1104,7 +1126,9 @@ function setPinZoneLine(){
   const el=$("#tr-map-zone"); if(!el) return;
   if(S.lat==null){ el.hidden=true; el.innerHTML=""; return; }
   el.hidden=false;
-  el.innerHTML=`<span class="tk" aria-hidden="true">✓</span><span>${isAvcanTrip()||S.who==="avcan"?"Forecast region":"Backcountry area"}: <b>${esc(S.zone)}</b></span><span class="co">${S.lat.toFixed(4)}, ${S.lng.toFixed(4)}</span>`;
+  const hidden = !isAvcanTrip() && S.locshare==="fuzz";
+  el.innerHTML=`<span class="tk" aria-hidden="true">✓</span><span class="zoneline">${isAvcanTrip()||S.who==="avcan"?"Forecast region":"Backcountry area"}: <b>${esc(S.zone)}</b></span><span class="co">${S.lat.toFixed(2)}, ${S.lng.toFixed(2)}</span>`
+    + (hidden?`<span class="locmask">Location hidden</span>`:"");
 }
 function enterPickMode(){
   if(!pinMap) return;
@@ -1191,7 +1215,34 @@ function restorePinMap(){
   updatePinCoords({lat:S.lat,lng:S.lng});
   setPinZoneLine();
 }
-function renderWho(){ $$("[data-whoslot]").forEach(s=>s.innerHTML=whoHTML()); }
+function renderWho(){ $$("[data-whoslot]").forEach(s=>s.innerHTML=whoHTML()); renderAuth(); }
+function signedIn(){ return S.who!=="caic-new"; }
+function myName(){ return ((S.firstname||"")+" "+(S.lastname||"")).trim()||"Sam Ortega"; }
+function renderAuth(){
+  const el=$("[data-authslot]"); if(!el) return;
+  el.innerHTML = signedIn()
+    ? `<span class="whoami">Signed in as <b>${esc(myName())}</b></span><button type="button" class="authbtn" data-signout>Sign out</button>`
+    : `<button type="button" class="authbtn" data-signin>Sign in</button>`;
+}
+document.addEventListener("click",e=>{
+  if(e.target.closest("[data-saveme]")){          // save what they typed and show it back as a card
+    const n=needs().find(x=>x.k==="identity");
+    if(n&&!n.ok){ $$('[data-need="identity"]').forEach(x=>x.classList.add("err")); return; }
+    $$('[data-need="identity"]').forEach(x=>x.classList.remove("err"));
+    S.who="caic-ret"; renderWho(); syncAll(); return;
+  }
+  if(e.target.closest("[data-editme]")){          // back to the fields, keeping what was saved
+    S.who="caic-new"; renderWho(); syncAll(); return;
+  }
+  if(e.target.closest("[data-signout]")){
+    S.who="caic-new"; S.firstname=S.lastname=S.email=S.phone="";
+    renderWho(); syncAll(); return;
+  }
+  if(e.target.closest("[data-signin]")){          // the seeded reporter
+    S.who="caic-ret"; S.firstname=S.lastname=S.email=S.phone="";
+    renderWho(); syncAll(); return;
+  }
+});
 function syncAll(){
   $$("[data-trflow]").forEach(el=>{ const k=trFlowSig();
     if(el.dataset.sig!==k){
@@ -1209,10 +1260,6 @@ function syncAll(){
   $$(".chips[data-group], .checks[data-group]").forEach(g=>{ const v=avScope(g)[g.dataset.group];
     $$("[data-value]",g).forEach(c=>c.setAttribute("aria-pressed",
       (Array.isArray(v)?v.includes(c.dataset.value):v===c.dataset.value)?"true":"false")); });
-  $$("[data-actother]").forEach(el=>{
-    const on=(S.activity||[]).includes("other");
-    el.hidden=!on; if(!on) S.activityOther="";
-  });
   $$("[data-triggerby]").forEach(el=>{
     const A=avScope(el), how=A.trigger_how;
     const show=!!how && how!=="natural" && how!=="unknown";
@@ -1254,6 +1301,7 @@ function syncAll(){
   $$("[data-dslot]").forEach(el=>{ if(el.dataset.sig!==dh){ el.dataset.sig=dh; el.innerHTML=dh; } });
   $$("[data-probs]").forEach(el=>{ const k=problemSig();
     if(el.dataset.sig!==k){ el.dataset.sig=k; el.innerHTML=problemHTML(); } });
+  setPinZoneLine();          // the Show/Hide chips change what this line says
 }
 /* ---------- extra styles + defs modal ---------- */
 const ex=document.createElement("style");
@@ -1383,10 +1431,13 @@ document.addEventListener("keydown",e=>{ if(e.key!=="Escape") return;
 
 /* ---------- validation ---------- */
 function tripNeeds(){
-  const L=[{k:"title",ok:has(S.title),label:"a trip title"},
-           {k:"location",ok:S.lat!=null,label:"where you were"},
+  const L=[];
+  if(!isAvcanTrip()&&S.who==="caic-new") L.push({k:"identity",
+    ok:has(S.firstname)&&has(S.lastname)&&has(S.email)&&(!phoneRequired()||has(S.phone)),
+    label:phoneRequired()?"your name, email and phone":"your name and email"});
+  L.push({k:"location",ok:S.lat!=null,label:"where you were"},
            {k:"date",ok:has(S.observed_at),label:"the date"},
-           {k:"sawAvalanche",ok:has(S.sawAvalanche),label:"whether you saw avalanches"}];
+           {k:"sawAvalanche",ok:has(S.sawAvalanche),label:"whether you saw avalanches"});
   if(S.sawAvalanche==="yes"){
     L.push({k:"caught",ok:has(S.caught),label:"whether someone was caught"});
   }
@@ -1612,7 +1663,7 @@ const _reset=$("#resetmock"); if(_reset) _reset.addEventListener("click",()=>{
 });
 
 /* ---------- init ---------- */
-buildTrip(); wire(); syncAll();
+buildTrip(); renderWho(); wire(); syncAll();
 })();
 </script>
 
