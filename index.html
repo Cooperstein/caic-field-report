@@ -369,12 +369,15 @@ table.aud{width:100%;border-collapse:collapse;font-size:13.5px;min-width:720px}
 .audit li b{color:var(--ink);font-weight:600}
 code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px 5px;border-radius:4px}
 .hid{display:none !important}
-.forms{max-width:820px;margin:22px auto 4px;padding:0 18px;display:grid;gap:11px;grid-template-columns:1fr 1fr}
+.landing{max-width:820px;margin:0 auto;padding:38px 18px 46px}
+.landing h1{font-size:31px;margin-bottom:8px}
+.landing .sub{color:var(--ink-2);font-size:15.5px;line-height:1.55;margin:0 0 26px;max-width:52ch}
+.forms{display:grid;gap:13px;grid-template-columns:1fr 1fr}
 @media (max-width:640px){.forms{grid-template-columns:1fr}}
-.formcard{display:flex;align-items:center;gap:12px;padding:15px 17px;border:1px solid var(--line-2);border-radius:var(--r);
+.formcard{display:flex;align-items:center;gap:12px;padding:20px 21px;border:1px solid var(--line-2);border-radius:var(--r);
   background:var(--surface);text-decoration:none;color:var(--ink)}
 .formcard:hover{border-color:var(--accent)}
-.formcard strong{font-family:var(--disp);font-size:15px;font-weight:600;display:block}
+.formcard strong{font-family:var(--disp);font-size:16.5px;font-weight:600;display:block}
 .formcard small{display:block;color:var(--ink-3);font-size:12.5px;line-height:1.4;margin-top:2px}
 .formcard>span.go{margin-left:auto;color:var(--ink-3);font-size:20px;flex:none}
 .formcard div{min-width:0}
@@ -391,27 +394,34 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
   </div>
 </div></div>
 
-<div class="forms">
-  <a class="formcard" href="avcan/">
-    <div><strong>Trip report — Avalanche Canada</strong>
-      <small>The AvCan form, as agreed. Frozen for their testing.</small></div>
-    <span class="go" aria-hidden="true">&rsaquo;</span>
-  </a>
-  <a class="formcard" href="caic/">
-    <div><strong>Trip report — CAIC</strong>
-      <small>The Colorado version. Where the current work happens.</small></div>
-    <span class="go" aria-hidden="true">&rsaquo;</span>
-  </a>
-</div>
-
 <div class="tabs"><div class="tabs-in" role="tablist">
-  <button class="tab" role="tab" id="t-b" aria-selected="true">The form</button>
+  <button class="tab" role="tab" id="t-l" aria-selected="true">Start</button>
+  <button class="tab" role="tab" id="t-b" aria-selected="false">The form</button>
   <button class="tab" role="tab" id="t-e" aria-selected="false">Reveal patterns</button>
   <button class="tab" role="tab" id="t-f" aria-selected="false">Privacy patterns</button>
   <button class="tab" role="tab" id="t-d" aria-selected="false">Field audit</button>
 </div></div>
 
-<div id="pane-b"></div>
+<div id="pane-l">
+  <div class="landing">
+    <h1>Field report concepts</h1>
+    <p class="sub">Two trip report forms, one for each organisation. The tabs above hold the design rationale behind them.</p>
+    <div class="forms">
+      <a class="formcard" href="avcan/">
+        <div><strong>Trip report — Avalanche Canada</strong>
+          <small>The AvCan form, as agreed. Frozen for their testing.</small></div>
+        <span class="go" aria-hidden="true">&rsaquo;</span>
+      </a>
+      <a class="formcard" href="caic/">
+        <div><strong>Trip report — CAIC</strong>
+          <small>The Colorado version. Where the current work happens.</small></div>
+        <span class="go" aria-hidden="true">&rsaquo;</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div id="pane-b" hidden></div>
 
 <div id="pane-e" class="audit" hidden></div>
 
@@ -1539,12 +1549,12 @@ document.addEventListener("submit",e=>{
 function showPane(o){
   const prev=S.opt;
   S.opt=o;
-  ["b","d","e","f"].forEach(k=>{ const p=$("#pane-"+k); if(p) p.hidden=(k!==o);
+  ["l","b","d","e","f"].forEach(k=>{ const p=$("#pane-"+k); if(p) p.hidden=(k!==o);
     const t=$("#t-"+k); if(t) t.setAttribute("aria-selected",k===o?"true":"false"); });
   window.scrollTo({top:0,behavior:"instant"});
   syncAll();
 }
-["b","d","e","f"].forEach(k=>{ const t=$("#t-"+k); if(t) t.addEventListener("click",()=>showPane(k)); });
+["l","b","d","e","f"].forEach(k=>{ const t=$("#t-"+k); if(t) t.addEventListener("click",()=>showPane(k)); });
 document.addEventListener("click",e=>{ if(!e.target.closest("[data-privjump]")) return;
   const pane=$("#pane-"+S.opt); const row=$(".privrow",pane); if(!row) return;
   if(row.scrollIntoView) row.scrollIntoView({block:"center",behavior:"smooth"});
@@ -1728,7 +1738,7 @@ $("#resetmock").addEventListener("click",()=>{
 
 /* ---------- init ---------- */
 buildB(); buildPatterns(); buildPriv();
-renderWho(); wire(); syncAll(); showPane("b");
+renderWho(); wire(); syncAll(); showPane("l");
 })();
 </script>
 
