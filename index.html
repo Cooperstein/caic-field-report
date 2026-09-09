@@ -384,14 +384,6 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
 </style>
 <div class="chrome"><div class="chrome-in">
   <div class="mark">CAIC/AvCan <span>· field report concepts</span></div>
-  <div class="ctrls">
-    <div class="previewas" role="group" aria-label="Theme">
-      <button type="button" class="thbtn" data-th="auto" aria-pressed="true">Auto</button>
-      <button type="button" class="thbtn" data-th="light" aria-pressed="false">Light</button>
-      <button type="button" class="thbtn" data-th="dark" aria-pressed="false">Dark</button>
-    </div>
-    <div class="previewas mockonly"><button type="button" class="resetbtn" id="resetmock">Clear form</button></div>
-  </div>
 </div></div>
 
 <div class="tabs"><div class="tabs-in" role="tablist">
@@ -1735,7 +1727,7 @@ function resetMock(){
   syncAll();
   window.scrollTo({top:0,behavior:"smooth"});
 }
-$("#resetmock").addEventListener("click",()=>{
+const _reset=$("#resetmock"); if(_reset) _reset.addEventListener("click",()=>{
   const b=$("#resetmock");
   resetMock();
   clearTimeout(armed);
