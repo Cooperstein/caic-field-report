@@ -227,7 +227,7 @@ input[type=date]{max-width:220px}
 .pinned b{font-family:var(--disp);color:var(--ink)}
 .pinned .co{font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
 .pinned .tk{color:var(--ok);font-weight:700}
-.pinmap-wrap{position:relative;width:100%;height:220px;border-radius:var(--r);overflow:hidden;border:1.5px solid var(--line-2);background:var(--sunk)}
+.pinmap-wrap{position:relative;z-index:0;isolation:isolate;width:100%;height:220px;border-radius:var(--r);overflow:hidden;border:1.5px solid var(--line-2);background:var(--sunk)}
 .pinmap-wrap.picking{height:min(58vh,420px)}
 #tr-map{width:100%;height:100%}
 .pinmap-wrap:not(.picking) .leaflet-control-container{display:none}
@@ -317,7 +317,7 @@ input[type=date]{max-width:220px}
 .tagx{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--ink-2);background:var(--surface)}
 
 /* detail page (screen 2) */
-.dpage{position:fixed;inset:0;background:var(--ground);z-index:55;display:flex;flex-direction:column;
+.dpage{position:fixed;inset:0;background:var(--ground);z-index:2000;display:flex;flex-direction:column;
   transform:translateY(100%);visibility:hidden;transition:transform .28s cubic-bezier(.32,.72,0,1),visibility .28s}
 .dpage.on{transform:none;visibility:visible}
 .dpin{max-width:620px;margin:0 auto;width:100%;padding:0 22px}
