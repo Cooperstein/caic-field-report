@@ -83,6 +83,8 @@ button{font:inherit;color:inherit}
 .mockonly{padding-left:14px;border-left:1px solid var(--line)}
 .resetbtn{font-family:var(--disp);font-size:12px;font-weight:600;color:var(--ink-2);background:var(--surface);
   border:1.5px solid var(--line-2);border-radius:6px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+a.resetbtn{text-decoration:none}
+a.resetbtn:hover{border-color:var(--accent);color:var(--accent)}
 .resetbtn:hover{border-color:var(--crit);color:var(--crit)}
 .resetbtn.arm{border-color:var(--crit);color:var(--crit);background:var(--crit-wash)}
 .resetbtn.done{border-color:var(--ok);color:var(--ok);background:var(--ok-wash)}
@@ -454,7 +456,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:1px
       <button type="button" class="thbtn" data-th="light" aria-pressed="false">Light</button>
       <button type="button" class="thbtn" data-th="dark" aria-pressed="false">Dark</button>
     </div>
-    <div class="previewas mockonly"><button type="button" class="resetbtn" id="resetmock">Clear form</button></div>
+    <div class="previewas mockonly"><a class="resetbtn" href="api-field-map.html">API field map</a><button type="button" class="resetbtn" id="resetmock">Clear form</button></div>
     <div class="authbar" data-authslot></div>
   </div>
 </div></div>
