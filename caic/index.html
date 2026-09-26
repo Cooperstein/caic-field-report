@@ -503,7 +503,7 @@ const S={who:"caic-ret",opt:"g",locshare:"exact",
   firstname:"",lastname:"",email:"",phone:"",
   observed_at:new Date().toISOString().slice(0,10),lat:null,lng:null,zone:"",mapMode:"idle",
   comments:"",assets:[],av:"",cracking:"",collapsing:"",visibility:"public",
-  title:"",avType:"",sawAvalanche:"",caught:"",whenOccurred:"",instability:[],incidentStory:"",
+  title:"",avType:"",sawAvalanche:"",caught:"",whenOccurred:"",tr_cracking:"",tr_collapsing:"",incidentStory:"",
   avalanches:[{}],avOpen:0,
   problemTypes:[],problems:{},
   hs:"",hn24:"",wl_grain:"",test:"",sp_desc:"",
@@ -544,14 +544,8 @@ const TRIG_HOW=[
 const TRIG_BY=[["AS","Skier"],["AR","Snowboarder"],["AI","Snowshoer"],["AF","Foot"],
   ["AM","Snowmobile"],["AN","Motorized snowbike"],["AK","Snowcat"],["AV","Vehicle"],
   ["other","Something else"],["unsure","Unsure"]];
-const INSTAB=[
-  ["newWx","10 inches or more of new snow",""],
-  ["drifting","Significant wind drifting",""],
-  ["whumpf","Whumpfing","Big booming collapses"],
-  ["cracks","Shooting cracks","Cracks that shoot out across the slope"],
-  ["warming","Rapid warming near or above freezing, or rain",""],
-  ["none","None of these",""]
-];
+const TR_CRACK=[["none","None"],["minor","Minor"],["moderate","Moderate"],["shooting","Shooting"],["unknown","Unknown"]];
+const TR_COLL=[["none","None"],["minor","Minor"],["moderate","Moderate"],["rumbling","Rumbling"],["unknown","Unknown"]];
 const WEAK_INFO=[
   ["surface_hoar","Surface hoar"],
   ["facets","Facets"],
@@ -973,7 +967,6 @@ function buildTrip(){
   initPinMap();
   restorePinMap();
 }
-function instFilled(){ return (S.instability||[]).length>0; }
 function applyAvType(){
   const t=S.avType;
   if(!t){ S.sawAvalanche=""; S.caught=""; return; }
@@ -1094,9 +1087,11 @@ function trFlowHTML(){
       </button></div>`;
   }
   h+=`<div class="sec">${head("Instability",MAY)}
-    <span class="q">Did you notice any of these signs of danger?</span>
-    <p class="hint" style="margin-top:-2px">Select all that apply.</p>
-    ${checks("instability",INSTAB,"none")}
+    <span class="q">Did you see signs of instability?</span>
+    <span class="q" style="font-size:15px;margin-top:14px">Cracking</span>
+    ${chips("tr_cracking",TR_CRACK)}
+    <span class="q" style="font-size:15px;margin-top:18px">Collapsing</span>
+    ${chips("tr_collapsing",TR_COLL)}
     </div>`;
   return h;
 }
