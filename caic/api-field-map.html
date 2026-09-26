@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="description" content="How each question on the CAIC trip report maps to the CAIC Data API v2, and how to upload photos and video.">
+<title>Trip report API field map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{color-scheme:light dark;
+  --ground:#F6F7F9; --surface:#FFFFFF; --sunk:#F0F2F6;
+  --ink:#16181D; --ink-2:#4A5260; --ink-3:#6B7380;
+  --line:#E2E5EA; --line-2:#C7CDD6;
+  --accent:#1F5FA8; --wash:#EAF1FA;
+  --ok:#2C7A52; --ok-wash:#E4F1EA;
+  --flag:#8F5A0B; --flag-wash:#FBEED6;
+  --crit:#B0301C; --crit-wash:#FAE5E1;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --disp:"Archivo","IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#101318; --surface:#171B21; --sunk:#1D222A;
+  --ink:#E8EBF0; --ink-2:#A5AEBB; --ink-3:#8A93A0;
+  --line:#262C34; --line-2:#39414B;
+  --accent:#6FA8E8; --wash:#152234;
+  --ok:#5EAE81; --ok-wash:#152A1F;
+  --flag:#E0A54E; --flag-wash:#332714;
+  --crit:#DE7460; --crit-wash:#331915;
+}}
+:root[data-theme="dark"]{
+  --ground:#101318; --surface:#171B21; --sunk:#1D222A;
+  --ink:#E8EBF0; --ink-2:#A5AEBB; --ink-3:#8A93A0;
+  --line:#262C34; --line-2:#39414B;
+  --accent:#6FA8E8; --wash:#152234;
+  --ok:#5EAE81; --ok-wash:#152A1F;
+  --flag:#E0A54E; --flag-wash:#332714;
+  --crit:#DE7460; --crit-wash:#331915;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--disp);letter-spacing:-.02em;line-height:1.25;text-wrap:balance}
+h1{font-size:30px;margin:0 0 10px}
+h2{font-size:22px;margin:0 0 12px;padding-top:8px}
+h3{font-size:16.5px;margin:26px 0 8px}
+p{margin:0 0 12px}
+a{color:var(--accent)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;border-radius:4px}
+code{font-family:var(--mono);font-size:.86em;background:var(--sunk);border:1px solid var(--line);border-radius:4px;padding:1px 5px;overflow-wrap:anywhere}
+.chrome{border-bottom:1px solid var(--line);background:var(--surface)}
+.chrome-in{max-width:980px;margin:0 auto;padding:11px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mark{font-family:var(--disp);font-weight:700;font-size:13.5px;flex:1 1 100%;min-width:0}
+@media (min-width:601px){.mark{flex:1 1 auto}}
+.mark span{color:var(--ink-3);font-weight:500}
+.back{font-family:var(--disp);font-size:12.5px;font-weight:600;text-decoration:none;border:1.5px solid var(--line-2);border-radius:6px;padding:6px 12px;color:var(--ink-2);white-space:nowrap}
+.back:hover{border-color:var(--accent);color:var(--accent)}
+.th{display:flex}
+.th button{font-family:var(--disp);font-size:11.5px;font-weight:600;color:var(--ink-3);background:var(--surface);border:1px solid var(--line-2);padding:5px 10px;cursor:pointer;margin-left:-1px}
+.th button:first-child{border-radius:6px 0 0 6px;margin-left:0}.th button:last-child{border-radius:0 6px 6px 0}
+.th button[aria-pressed="true"]{background:var(--wash);color:var(--accent);border-color:var(--accent);position:relative}
+main{max-width:980px;margin:0 auto;padding:32px 16px 80px}
+.lede{color:var(--ink-2);font-size:16.5px;max-width:70ch}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 8px;padding:0;list-style:none}
+.toc a{display:inline-block;font-size:13.5px;font-weight:500;text-decoration:none;border:1px solid var(--line-2);border-radius:999px;padding:5px 12px;background:var(--surface)}
+.toc a:hover{border-color:var(--accent)}
+section{margin-top:44px;scroll-margin-top:16px}
+.note{border-left:3px solid var(--accent);background:var(--wash);padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+.note.warn{border-color:var(--flag);background:var(--flag-wash)}
+.note p:last-child{margin:0}
+.steps{counter-reset:s;list-style:none;padding:0;margin:16px 0}
+.steps>li{counter-increment:s;position:relative;padding:12px 14px 12px 52px;background:var(--surface);border:1px solid var(--line);border-radius:9px;margin-bottom:8px}
+.steps>li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--surface);font:700 13px/26px var(--disp);text-align:center}
+.steps small{display:block;color:var(--ink-2);font-size:13.5px;margin-top:2px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:9px;background:var(--surface);margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+thead th{font-family:var(--disp);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-2);background:var(--sunk);white-space:nowrap}
+td small{display:block;color:var(--ink-3);font-size:12.5px}
+td code{white-space:nowrap}
+.fixed{color:var(--ink-3)}
+table.trig tr.grp td{border-top:2px solid var(--line-2)}
+.tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;border-radius:4px;padding:1px 6px;margin-left:4px;vertical-align:1px}
+.tag.req{color:var(--crit);background:var(--crit-wash)}
+.tag.gotcha{color:var(--flag);background:var(--flag-wash)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.grid2>*{min-width:0}
+.grid2 .tw{margin:0}
+.codewrap{position:relative;margin:12px 0}
+pre{margin:0;background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:14px 16px;overflow-x:auto;font:13px/1.55 var(--mono);color:var(--ink);tab-size:2}
+.copy{position:absolute;top:8px;right:8px;font-family:var(--disp);font-size:11.5px;font-weight:600;border:1px solid var(--line-2);border-radius:6px;background:var(--surface);color:var(--ink-2);padding:4px 10px;cursor:pointer}
+.copy:hover{border-color:var(--accent);color:var(--accent)}
+.check{list-style:none;padding:0;margin:12px 0}
+.check li{position:relative;padding:8px 0 8px 30px;border-bottom:1px solid var(--line)}
+.check li::before{content:"";position:absolute;left:4px;top:13px;width:14px;height:14px;border:2px solid var(--ok);border-radius:3px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:600}
+footer{max-width:980px;margin:0 auto;padding:0 16px 40px;color:var(--ink-3);font-size:13px}
+@media (max-width:600px){h1{font-size:25px} td,th{padding:8px 10px} .steps>li{padding-left:46px}}
+</style>
+</head>
+<body>
+<div class="chrome"><div class="chrome-in">
+  <div class="mark">CAIC <span>· trip report API field map</span></div>
+  <div class="th" role="group" aria-label="Theme">
+    <button type="button" data-th="auto" aria-pressed="true">Auto</button>
+    <button type="button" data-th="light" aria-pressed="false">Light</button>
+    <button type="button" data-th="dark" aria-pressed="false">Dark</button>
+  </div>
+  <a class="back" href="./">&larr; Back to the form</a>
+</div></div>
+
+<main>
+<h1>Trip report &rarr; CAIC Data API v2</h1>
+<p class="lede">Every question on the <a href="./">CAIC trip report</a>, the API field it lands in, and the conversion in between. Written for the Avalanche Canada developers wiring the form to CAIC. Copy the reference code at the bottom rather than re-deriving the tables. It was checked against the published spec.</p>
+<p class="fixed" style="font-size:13.5px">Spec: <a href="https://forecasts-origin.avalanche.state.co.us/api/documentation/v2/public.html">CAIC Data API v2</a>, version 2.55. Value lists confirmed against live production data on 26 September 2026.</p>
+
+<ul class="toc">
+  <li><a href="#order">Call order</a></li>
+  <li><a href="#report">Report</a></li>
+  <li><a href="#avalanche">Avalanches</a></li>
+  <li><a href="#snowpack">Instability</a></li>
+  <li><a href="#assets">Photos and video</a></li>
+  <li><a href="#external">External links</a></li>
+  <li><a href="#code">Reference code</a></li>
+  <li><a href="#checklist">Bug checklist</a></li>
+  <li><a href="#gaps">Not collected yet</a></li>
+</ul>
+
+<section id="order">
+<h2>Call order</h2>
+<p>None of these endpoints need an auth token. Everything after step 1 hangs off the report's <code>id</code>, so the report has to exist first.</p>
+<ol class="steps">
+  <li><code>POST /api/v2/observation_reports</code><small>Contact, privacy, pin, date, the avalanche answer and the trip summary. Returns the report with its <code>id</code>.</small></li>
+  <li><code>POST /api/v2/observation_reports/{id}/avalanche_observations</code><small>Once per avalanche the reporter filled in. Zero calls if they did not.</small></li>
+  <li><code>POST /api/v2/observation_reports/{id}/snowpack_observations</code><small>Once, only if Cracking or Collapsing was answered.</small></li>
+  <li>For each photo or video: register &rarr; PUT to S3 &rarr; attach<small>See <a href="#assets">Photos and video</a>. Caption and order go in the attach call.</small></li>
+</ol>
+<div class="grid2">
+  <div class="tw"><table><thead><tr><th>Server</th><th>Base URL</th></tr></thead><tbody>
+    <tr><td>Development</td><td><code>https://lb-octonaut.avalanche.dev/api/v2</code></td></tr>
+    <tr><td>Production</td><td><code>https://api.avalanche.state.co.us/api/v2</code></td></tr>
+  </tbody></table></div>
+  <div class="note warn" style="margin:0"><p><b>Build and test against development.</b> Every test post to production is a real public report that a forecaster has to find and delete.</p></div>
+</div>
+</section>
+
+<section id="report">
+<h2>1. Observation report</h2>
+<p><code>POST /api/v2/observation_reports</code>. One per submission.</p>
+<div class="tw"><table>
+<thead><tr><th>Form question</th><th>Form state</th><th>API field</th><th>Conversion</th></tr></thead>
+<tbody>
+<tr><td>You: first name, last name, email, phone</td><td><code>firstname</code> <code>lastname</code> <code>email</code> <code>phone</code></td><td>same names</td><td>Trim whitespace. The form requires all four.</td></tr>
+<tr><td>Who can see this report?</td><td><code>visibility</code></td><td><code>is_anonymous</code><br><code>is_locked</code></td><td>See <a href="#privacy">privacy table</a></td></tr>
+<tr><td>Where: Show / Hide my location</td><td><code>locshare</code></td><td><code>is_anonymous_location</code></td><td><code>fuzz</code> &rarr; <code>true</code>, <code>exact</code> &rarr; <code>false</code></td></tr>
+<tr><td>Where: map pin</td><td><code>lat</code> <code>lng</code></td><td><code>latitude</code><br><code>longitude</code></td><td>Always the <b>real</b> pin, rounded to 6 decimals. The server moves the public location when <code>is_anonymous_location</code> is true. Never fuzz on the client.</td></tr>
+<tr><td>Where: backcountry area line</td><td><code>zone</code></td><td><em>omit</em></td><td>Display only. The server derives <code>backcountry_zone_id</code> from the pin.</td></tr>
+<tr><td>What day were you out?</td><td><code>observed_at</code></td><td><code>observed_at</code><br><code>date_known</code><br><code>time_known</code></td><td>Send the date alone, <code>"YYYY-MM-DD"</code>, in the reporter's local day. Do not add a time or convert to UTC. <code>date_known: "Known"</code>, <code>time_known: "Unknown"</code>.</td></tr>
+<tr><td>Did you see any recent avalanches or trigger an avalanche?</td><td><code>avType</code></td><td><code>saw_avalanche</code><br><code>triggered_avalanche</code><br><code>caught_in_avalanche</code></td><td>Exactly one is true. See <a href="#avtype">avalanche answer table</a>.</td></tr>
+<tr><td>Trip summary</td><td><code>comments</code></td><td><code>description</code></td><td>Trim. Send <code>null</code> when empty.</td></tr>
+<tr><td class="fixed">(fixed)</td><td></td><td><code>hw_op_bc</code></td><td><code>"bc"</code> (backcountry)</td></tr>
+<tr><td class="fixed">(fixed)</td><td></td><td><code>report_source</code></td><td><code>"Mobile App"</code></td></tr>
+</tbody></table></div>
+<p style="font-size:14px;color:var(--ink-2)">Do not send <code>status</code>, <code>investigation_status</code>, <code>comments_caic</code>, <code>fuzzed_latitude</code> or <code>fuzzed_longitude</code>. They are staff-only or server-set.</p>
+
+<div class="grid2">
+<div>
+<h3 id="privacy">Who can see this report?</h3>
+<div class="tw"><table><thead><tr><th>Choice</th><th><code>visibility</code></th><th>is_anonymous</th><th>is_locked</th></tr></thead><tbody>
+<tr><td>Everyone, with my name</td><td><code>public</code></td><td>false</td><td>false</td></tr>
+<tr><td>Everyone, without my name</td><td><code>noname</code></td><td><b>true</b></td><td>false</td></tr>
+<tr><td>CAIC staff only</td><td><code>staff</code></td><td><b>true</b></td><td><b>true</b></td></tr>
+</tbody></table></div>
+<p style="font-size:13.5px;color:var(--ink-2)">CAIC staff only also sets <code>is_anonymous_location: true</code>, whatever the location choice.</p>
+</div>
+<div>
+<h3 id="avtype">Avalanche answer</h3>
+<div class="tw"><table><thead><tr><th><code>avType</code></th><th>saw_</th><th>triggered_</th><th>caught_in_</th></tr></thead><tbody>
+<tr><td><code>none</code> or unanswered</td><td>false</td><td>false</td><td>false</td></tr>
+<tr><td><code>saw</code></td><td><b>true</b></td><td>false</td><td>false</td></tr>
+<tr><td><code>triggered</code></td><td>false</td><td><b>true</b></td><td>false</td></tr>
+<tr><td><code>caught</code></td><td>false</td><td>false</td><td><b>true</b></td></tr>
+</tbody></table></div>
+<p style="font-size:13.5px;color:var(--ink-2)">The choices are exclusive, so only one flag is ever true. Do not infer the others.</p>
+</div>
+</div>
+</section>
+
+<section id="avalanche">
+<h2>2. Avalanche observations</h2>
+<p><code>POST /api/v2/observation_reports/{id}/avalanche_observations</code>, once per entry in <code>avalanches[]</code>.</p>
+<div class="note warn"><p><b>Skip empty entries.</b> The form always holds one blank avalanche, and a reporter can add more and leave them blank. Only send an entry with at least one answered question. Send none at all if <code>avType</code> is <code>none</code> or unanswered, even if an entry has data left over from before the reporter changed their answer.</p></div>
+<div class="tw"><table>
+<thead><tr><th>Form question</th><th>Form state</th><th>API field</th><th>Conversion</th></tr></thead>
+<tbody>
+<tr><td class="fixed">(from the report)</td><td><code>lat</code> <code>lng</code></td><td><code>latitude</code> <code>longitude</code> <span class="tag req">required</span></td><td>Same real pin as the report</td></tr>
+<tr><td>When do you think it happened?</td><td><code>whenOccurred</code><br><code>occurredOn</code></td><td><code>observed_at</code> <span class="tag req">required</span><br><code>date_known</code><br><code>time_known</code></td><td><code>occurredOn</code> if set, otherwise the report date. The form already turns Today, Yesterday and A few days ago into a date. See <a href="#when">when table</a>. <code>time_known: "Unknown"</code>.</td></tr>
+<tr><td>How did this avalanche start?<br>Who or what set it off?</td><td><code>trigger_how</code><br><code>trigger_by</code></td><td><code>primary_trigger</code><br><code>secondary_trigger</code></td><td>Natural &rarr; <code>N</code>. Triggered &rarr; <code>A</code> + who (<code>AS</code>, <code>AR</code>…). From a distance adds <code>r</code>. See <a href="#trigger">every combination</a>.</td></tr>
+<tr><td>What set it off? (free text)</td><td><code>trigger_by_other</code></td><td><code>comments</code></td><td><code>"Triggered by: " + text</code></td></tr>
+<tr><td>Which way did the slope face?</td><td><code>aspect</code></td><td><code>aspect</code></td><td>Unchanged: <code>N NE E SE S SW W NW U</code></td></tr>
+<tr><td>What elevation band? <span class="tag gotcha">gotcha</span></td><td><code>elevation</code></td><td><code>elevation</code></td><td>See <a href="#elev">elevation table</a>. The API stores HTML-escaped text.</td></tr>
+<tr><td>How big was it?</td><td><code>dsize</code></td><td><code>destructive_size</code></td><td>See <a href="#size">size table</a></td></tr>
+<tr><td>What avalanche problem was it?</td><td><code>problem</code></td><td><code>problem_type</code></td><td>Unchanged: <code>storm wind persistent wet_slab loose_wet loose_dry Unknown</code> (capital U)</td></tr>
+</tbody></table></div>
+
+<h3 id="trigger">Trigger: every combination</h3>
+<p>Two questions build one code. <b>How did this avalanche start?</b> picks the family: Natural is <code>N</code>, and a person or machine is <code>A</code> (artificial). <b>Who or what set it off?</b> adds the second letter: <code>A</code>+<code>S</code> = <code>AS</code> for Skier. <b>From a distance</b> uses the same primary code and adds <code>r</code> (remote) as the secondary trigger. Nothing else sets a secondary trigger.</p>
+<div class="tw"><table class="trig"><thead><tr><th>How did this avalanche start? <code>trigger_how</code></th><th>Who or what set it off? <code>trigger_by</code></th><th>primary_trigger</th><th>secondary_trigger</th></tr></thead><tbody>
+<tr><td>It released on its own (Natural) <code>natural</code></td><td class="fixed">(not asked)</td><td><code>N</code></td><td><code>null</code></td></tr>
+<tr class="grp"><td rowspan="10">Someone triggered it <code>triggered</code></td><td>Skier <code>AS</code></td><td><b><code>AS</code></b></td><td><code>null</code></td></tr>
+<tr><td>Snowboarder <code>AR</code></td><td><b><code>AR</code></b></td><td><code>null</code></td></tr>
+<tr><td>Snowshoer <code>AI</code></td><td><b><code>AI</code></b></td><td><code>null</code></td></tr>
+<tr><td>Foot <code>AF</code></td><td><b><code>AF</code></b></td><td><code>null</code></td></tr>
+<tr><td>Snowmobile <code>AM</code></td><td><b><code>AM</code></b></td><td><code>null</code></td></tr>
+<tr><td>Motorized snowbike <code>AN</code></td><td><b><code>AN</code></b></td><td><code>null</code></td></tr>
+<tr><td>Snowcat <code>AK</code></td><td><b><code>AK</code></b></td><td><code>null</code></td></tr>
+<tr><td>Vehicle <code>AV</code></td><td><b><code>AV</code></b></td><td><code>null</code></td></tr>
+<tr><td>Something else <code>other</code></td><td><b><code>AO</code></b><small>free text goes to <code>comments</code></small></td><td><code>null</code></td></tr>
+<tr><td>Unsure <code>unsure</code></td><td><b><code>AU</code></b><small>also used if this question is skipped</small></td><td><code>null</code></td></tr>
+<tr class="grp"><td rowspan="10">Someone triggered it from a distance <code>remote</code></td><td>Skier <code>AS</code></td><td><b><code>AS</code></b></td><td><b><code>r</code></b></td></tr>
+<tr><td>Snowboarder <code>AR</code></td><td><b><code>AR</code></b></td><td><b><code>r</code></b></td></tr>
+<tr><td>Snowshoer <code>AI</code></td><td><b><code>AI</code></b></td><td><b><code>r</code></b></td></tr>
+<tr><td>Foot <code>AF</code></td><td><b><code>AF</code></b></td><td><b><code>r</code></b></td></tr>
+<tr><td>Snowmobile <code>AM</code></td><td><b><code>AM</code></b></td><td><b><code>r</code></b></td></tr>
+<tr><td>Motorized snowbike <code>AN</code></td><td><b><code>AN</code></b></td><td><b><code>r</code></b></td></tr>
+<tr><td>Snowcat <code>AK</code></td><td><b><code>AK</code></b></td><td><b><code>r</code></b></td></tr>
+<tr><td>Vehicle <code>AV</code></td><td><b><code>AV</code></b></td><td><b><code>r</code></b></td></tr>
+<tr><td>Something else <code>other</code></td><td><b><code>AO</code></b><small>free text goes to <code>comments</code></small></td><td><b><code>r</code></b></td></tr>
+<tr><td>Unsure <code>unsure</code></td><td><b><code>AU</code></b><small>also used if this question is skipped</small></td><td><b><code>r</code></b></td></tr>
+<tr class="grp"><td>Unsure <code>unknown</code></td><td class="fixed">(not asked)</td><td><code>U</code></td><td><code>null</code></td></tr>
+<tr><td class="fixed">(question skipped)</td><td class="fixed">—</td><td class="fixed">omit</td><td class="fixed">omit</td></tr>
+</tbody></table></div>
+<p style="font-size:13.5px;color:var(--ink-2)">The form never produces <code>AC AA AE AL AB AX AH AP AW A</code> or the secondary codes <code>u c y U</code>. They are for professional and explosive work, or need detail the form does not ask for. A forecaster can recode a free-text “Something else” answer later. Do not try to guess <code>AC</code> or <code>AW</code> from the text.</p>
+
+<div class="grid2">
+<div>
+<h3 id="elev">Elevation</h3>
+<div class="tw"><table><thead><tr><th>Form</th><th>Label</th><th>Send exactly</th></tr></thead><tbody>
+<tr><td><code>&gt;TL</code></td><td>Above treeline</td><td><code>&amp;#62;TL</code></td></tr>
+<tr><td><code>TL</code></td><td>Near treeline</td><td><code>TL</code></td></tr>
+<tr><td><code>&lt;TL</code></td><td>Below treeline</td><td><code>&amp;#60;TL</code></td></tr>
+<tr><td><code>U</code></td><td>Unsure</td><td><code>U</code></td></tr>
+</tbody></table></div>
+<p style="font-size:13.5px;color:var(--ink-2)">These are the literal strings the spec lists and production stores. The value is the eight characters <code>&amp;#62;TL</code>, not <code>&gt;TL</code>. Do not decode it, and do not let a JSON or HTML layer re-escape it.</p>
+</div>
+<div>
+<h3 id="size">Size</h3>
+<div class="tw"><table><thead><tr><th>Form <code>dsize</code></th><th>destructive_size</th></tr></thead><tbody>
+<tr><td><code>D1 D2 D3 D4 D5</code></td><td>unchanged</td></tr>
+<tr><td><code>D15 D25 D35 D45</code></td><td><code>D1.5 D2.5 D3.5 D4.5</code></td></tr>
+<tr><td><code>U</code> (Unsure)</td><td><code>U</code></td></tr>
+</tbody></table></div>
+<h3 id="when">When</h3>
+<div class="tw"><table><thead><tr><th>Form <code>whenOccurred</code></th><th>date_known</th></tr></thead><tbody>
+<tr><td><code>setdate</code> (they picked a date)</td><td><code>Known</code></td></tr>
+<tr><td><code>todayFresh</code> <code>yesterday</code> <code>fewDays</code> <code>unsure</code> or unanswered</td><td><code>Estimated</code></td></tr>
+</tbody></table></div>
+</div>
+</div>
+</section>
+
+<section id="snowpack">
+<h2>3. Instability (snowpack observation)</h2>
+<p><code>POST /api/v2/observation_reports/{id}/snowpack_observations</code>. Send one only when Cracking or Collapsing was answered.</p>
+<div class="tw"><table>
+<thead><tr><th>Form question</th><th>Form state</th><th>API field</th><th>Conversion</th></tr></thead>
+<tbody>
+<tr><td class="fixed">(from the report)</td><td><code>lat</code> <code>lng</code> <code>observed_at</code></td><td><code>latitude</code> <code>longitude</code> <code>observed_at</code> <span class="tag req">required</span></td><td>Same as the report</td></tr>
+<tr><td>Cracking</td><td><code>tr_cracking</code></td><td><code>cracking</code></td><td>Capitalise: <code>none minor moderate shooting unknown</code> &rarr; <code>None Minor Moderate Shooting Unknown</code></td></tr>
+<tr><td>Collapsing</td><td><code>tr_collapsing</code></td><td><code>collapsing</code></td><td>Capitalise: <code>none minor moderate rumbling unknown</code> &rarr; <code>None Minor Moderate Rumbling Unknown</code></td></tr>
+</tbody></table></div>
+<div class="note"><p>“None” is an answer, not a blank. Send <code>"None"</code> when the reporter picked it. Omit the field only when they skipped the question. Forecasters filter on reports that say “no cracking.”</p></div>
+</section>
+
+<section id="assets">
+<h2>4. Photos and video</h2>
+<p>Files go straight from the device to CAIC's S3 bucket. The API only hands out a short-lived upload URL and then links the stored file to the report. Each file takes three calls, run after the report exists.</p>
+<ol class="steps">
+  <li><code>POST /api/v2/assets/registrations</code><small>Body: <code>byte_size</code>, <code>checksum</code>, <code>content_type</code>, <code>filename</code>. Returns <code>key</code>, <code>signed_id</code> and <code>direct_upload.url</code> + <code>direct_upload.headers</code>.</small></li>
+  <li><code>PUT</code> the raw bytes to <code>direct_upload.url</code><small>Send exactly the headers the registration returned and nothing else. PUT, not POST: a POST fails the checksum.</small></li>
+  <li><code>POST /api/v2/observation_reports/{id}/attachments</code><small>Body: <code>key</code>, <code>signed_id</code>, plus the photo's <code>caption</code> and its <code>position</code> (1, 2, 3… in the order shown on the form). Leave out the deprecated <code>type</code> field.</small></li>
+</ol>
+<div class="tw"><table><thead><tr><th>Form</th><th>Where it goes</th></tr></thead><tbody>
+<tr><td>The file (<code>assets[i].file</code>)</td><td>Registration: <code>byte_size</code> = file size in bytes, <code>filename</code> = base name only (no folders), <code>content_type</code> = MIME type</td></tr>
+<tr><td>Caption (<code>assets[i].caption</code>)</td><td>Attach: <code>caption</code>. Trim, and omit if empty.</td></tr>
+<tr><td>Order in the photo strip</td><td>Attach: <code>position</code>, starting at 1</td></tr>
+</tbody></table></div>
+<div class="note warn">
+<p><b>The checksum is the one that trips people up.</b> It is the <b>base64 of the raw 16-byte MD5 digest</b>: <code>bymH1431LAiMufALW2h2zw==</code>, 24 characters. It is not the 32-character hex string <code>md5sum</code> prints, and not base64 of that hex string. S3 rejects the PUT if it is wrong.</p>
+<p>Browsers have no built-in MD5 (Web Crypto has no MD5), so the example uses <a href="https://www.npmjs.com/package/spark-md5">spark-md5</a>. Native apps can use the platform's MD5 (CommonCrypto on iOS, <code>MessageDigest</code> on Android) and base64 the bytes.</p>
+</div>
+<ul class="check">
+  <li>Register each file immediately before its PUT. The signed URL expires after about five minutes, so registering everything up front breaks on slow connections. If a PUT fails, register again for a fresh URL.</li>
+  <li>Hash in slices, not with the whole file in memory. Phone video runs to hundreds of MB.</li>
+  <li>Upload one file at a time. Trailhead signal is poor, and parallel uploads mostly make every file slower.</li>
+  <li>Some browsers leave <code>file.type</code> empty (HEIC, some .MOV). Fall back to the file extension, and send the same value in the registration and the PUT.</li>
+  <li>Tags are optional and limited to what the user may set. Leave them out.</li>
+</ul>
+</section>
+
+<section id="external">
+<h2>5. External links</h2>
+<p><code>POST /api/v2/observation_reports/{id}/external_attachments</code> links media that lives elsewhere, typically a YouTube video, without uploading it. Body: <code>external_url</code> and <code>content_type</code> (both required), plus optional <code>caption</code> and <code>position</code>.</p>
+<p>The trip report does not ask for links today, so nothing on the form maps here. If one is added, the server only accepts some domains and returns <code>400 bad url domain</code> for the rest. Get the allowed list from CAIC rather than guessing, and show the reporter a plain message on a 400.</p>
+</section>
+
+<section id="code">
+<h2>Reference code</h2>
+<p><code>buildPayloads(S)</code> turns the form state into the request bodies above. <code>submitTrip(S)</code> sends them in order and uploads the files. Both are plain JavaScript with no framework. Before this page was published, they were run against six test reports: every body matched the spec's field names, types and allowed values, and the retry paths were checked against a mock server.</p>
+<details open><summary>buildPayloads.js: form state &rarr; request bodies</summary>
+<div class="codewrap"><button type="button" class="copy" data-copy="c-map">Copy</button><pre id="c-map"><code>// CAIC trip report -&gt; CAIC Data API v2 request bodies.
+// Input: the form state (see "Form state" on this page). Output: one body per request.
+const AV_FLAGS = {            // avType -&gt; report booleans; exactly one is ever true
+  none:      { saw_avalanche: false, triggered_avalanche: false, caught_in_avalanche: false },
+  saw:       { saw_avalanche: true,  triggered_avalanche: false, caught_in_avalanche: false },
+  triggered: { saw_avalanche: false, triggered_avalanche: true,  caught_in_avalanche: false },
+  caught:    { saw_avalanche: false, triggered_avalanche: false, caught_in_avalanche: true  },
+};
+const ELEVATION = { "&gt;TL": "&amp;#62;TL", "TL": "TL", "&lt;TL": "&amp;#60;TL", "U": "U" };  // API stores the escaped text
+const SIZE = { D1: "D1", D15: "D1.5", D2: "D2", D25: "D2.5", D3: "D3", D35: "D3.5",
+               D4: "D4", D45: "D4.5", D5: "D5", U: "U" };
+const TRIGGER_BY = { AS: "AS", AR: "AR", AI: "AI", AF: "AF", AM: "AM", AN: "AN", AK: "AK", AV: "AV",
+                     other: "AO", unsure: "AU" };
+const CRACKING   = { none: "None", minor: "Minor", moderate: "Moderate", shooting: "Shooting", unknown: "Unknown" };
+const COLLAPSING = { none: "None", minor: "Minor", moderate: "Moderate", rumbling: "Rumbling", unknown: "Unknown" };
+const AV_KEYS = ["whenOccurred", "trigger_how", "trigger_by", "aspect", "elevation", "dsize", "problem"];
+
+const filled = v =&gt; v !== undefined &amp;&amp; v !== null &amp;&amp; String(v).trim() !== "";
+const round6 = n =&gt; Math.round(n * 1e6) / 1e6;
+
+// "How did this avalanche start?" picks the family; "Who or what set it off?" picks the letter after A.
+// Only "from a distance" sets a secondary trigger (r). Who/what = Unsure or unanswered -&gt; AU.
+function triggers(a) {
+  switch (a.trigger_how) {
+    case "natural":   return { primary_trigger: "N", secondary_trigger: null };
+    case "triggered": return { primary_trigger: TRIGGER_BY[a.trigger_by] || "AU", secondary_trigger: null };
+    case "remote":    return { primary_trigger: TRIGGER_BY[a.trigger_by] || "AU", secondary_trigger: "r" };
+    case "unknown":   return { primary_trigger: "U", secondary_trigger: null };
+    default:          return {};                       // not answered: omit both
+  }
+}
+
+function buildPayloads(S) {
+  const lat = round6(S.lat), lng = round6(S.lng), date = S.observed_at;   // date is "YYYY-MM-DD"
+  const staff = S.visibility === "staff";
+
+  const report = {
+    firstname: S.firstname.trim(), lastname: S.lastname.trim(),
+    email: S.email.trim(), phone: S.phone.trim(),
+    observed_at: date, date_known: "Known", time_known: "Unknown",
+    latitude: lat, longitude: lng,                     // always the real pin; the server fuzzes
+    is_anonymous: S.visibility !== "public",
+    is_anonymous_location: S.locshare === "fuzz" || staff,
+    is_locked: staff,
+    ...(AV_FLAGS[S.avType] || AV_FLAGS.none),
+    description: filled(S.comments) ? S.comments.trim() : null,
+    hw_op_bc: "bc",
+    report_source: "Mobile App",
+  };
+
+  const reported = S.avType &amp;&amp; S.avType !== "none";   // details are ignored if the answer went back to "none"
+  const avalanches = !reported ? [] : S.avalanches
+    .filter(a =&gt; AV_KEYS.some(k =&gt; filled(a[k])))      // the form always holds one empty entry
+    .map(a =&gt; ({
+      latitude: lat, longitude: lng,
+      observed_at: filled(a.occurredOn) ? a.occurredOn : date,
+      date_known: a.whenOccurred === "setdate" &amp;&amp; filled(a.occurredOn) ? "Known" : "Estimated",
+      time_known: "Unknown",
+      ...(filled(a.aspect)    &amp;&amp; { aspect: a.aspect }),
+      ...(filled(a.elevation) &amp;&amp; { elevation: ELEVATION[a.elevation] }),
+      ...(filled(a.dsize)     &amp;&amp; { destructive_size: SIZE[a.dsize] }),
+      ...(filled(a.problem)   &amp;&amp; { problem_type: a.problem }),
+      ...triggers(a),
+      ...(filled(a.trigger_by_other) &amp;&amp; { comments: "Triggered by: " + a.trigger_by_other.trim() }),
+    }));
+
+  const snowpack = (filled(S.tr_cracking) || filled(S.tr_collapsing)) ? {
+    latitude: lat, longitude: lng, observed_at: date,
+    ...(filled(S.tr_cracking)   &amp;&amp; { cracking: CRACKING[S.tr_cracking] }),
+    ...(filled(S.tr_collapsing) &amp;&amp; { collapsing: COLLAPSING[S.tr_collapsing] }),
+  } : null;
+
+  const attachments = S.assets.map((f, i) =&gt; ({       // file is uploaded first; see "Photos and video"
+    file: f.file, caption: filled(f.caption) ? f.caption.trim() : undefined, position: i + 1,
+  }));
+
+  return { report, avalanches, snowpack, attachments };
+}
+
+</code></pre></div>
+</details>
+<details><summary>submitTrip.js: send the report, observations and files</summary>
+<div class="codewrap"><button type="button" class="copy" data-copy="c-sub">Copy</button><pre id="c-sub"><code>// Submit a trip report: create the report, then hang everything else off its id.
+// Needs spark-md5 for the upload checksum (browsers have no built-in MD5):
+//   &lt;script src="https://cdn.jsdelivr.net/npm/spark-md5@3.0.2/spark-md5.min.js"&gt;&lt;/script&gt;
+const API = "https://lb-octonaut.avalanche.dev/api/v2";   // dev. Production: https://api.avalanche.state.co.us/api/v2
+
+async function post(url, body, { timeout = 30000 } = {}) {
+  const ctl = new AbortController(), t = setTimeout(() =&gt; ctl.abort(), timeout);
+  try {
+    const res = await fetch(url, { method: "POST", signal: ctl.signal,
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(body) });
+    if (!res.ok) throw Object.assign(new Error(`${res.status} on ${url}: ${await res.text()}`), { status: res.status });
+    return res.json();
+  } finally { clearTimeout(t); }
+}
+
+// Retry only steps that are safe to repeat: network errors, 429 and 5xx. Never a 4xx.
+async function retry(fn, tries = 3) {
+  for (let i = 1; ; i++) {
+    try { return await fn(); }
+    catch (e) {
+      const transient = !e.status || e.status === 429 || e.status &gt;= 500;
+      if (!transient || i &gt;= tries) throw e;
+      await new Promise(r =&gt; setTimeout(r, 1000 * 2 ** i));
+    }
+  }
+}
+
+// Base64 of the raw MD5 digest -- NOT the hex string md5sum prints. Read in 2 MB slices so video fits in memory.
+async function md5Base64(file) {
+  const spark = new SparkMD5.ArrayBuffer(), step = 2 * 1024 * 1024;
+  for (let at = 0; at &lt; file.size; at += step)
+    spark.append(await file.slice(at, at + step).arrayBuffer());
+  return btoa(spark.end(true));
+}
+
+const TYPES = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", heic: "image/heic",
+                mp4: "video/mp4", mov: "video/quicktime", webm: "video/webm" };
+const contentType = f =&gt; f.type || TYPES[f.name.split(".").pop().toLowerCase()] || "application/octet-stream";
+
+async function uploadAsset(reportId, { file, caption, position }) {
+  const checksum = await md5Base64(file);
+  return retry(async () =&gt; {
+    // 1. Register. The signed URL lives about 5 minutes, so register right before each PUT.
+    const reg = await post(`${API}/assets/registrations`, {
+      byte_size: file.size, checksum, content_type: contentType(file), filename: file.name });
+    // 2. PUT (not POST) the bytes to S3 with exactly the headers the registration returned.
+    const put = await fetch(reg.direct_upload.url,
+      { method: "PUT", headers: reg.direct_upload.headers, body: file });
+    if (!put.ok) throw Object.assign(new Error(`S3 ${put.status}: ${await put.text()}`), { status: put.status &gt;= 500 ? put.status : undefined });
+    // 3. Attach to the report, caption and order included.
+    return post(`${API}/observation_reports/${reportId}/attachments`,
+      { key: reg.key, signed_id: reg.signed_id, caption, position });
+  });
+}
+
+async function submitTrip(S) {
+  const p = buildPayloads(S);
+  // The report has no idempotency key: a blind retry can create a duplicate. Post it once.
+  const report = await post(`${API}/observation_reports`, p.report);
+  const id = report.id, failed = [];
+  const run = async (label, fn) =&gt; { try { await retry(fn); } catch (e) { failed.push({ label, error: e.message }); } };
+
+  for (const [i, a] of p.avalanches.entries())
+    await run(`avalanche ${i + 1}`, () =&gt; post(`${API}/observation_reports/${id}/avalanche_observations`, a));
+  if (p.snowpack)
+    await run("snowpack", () =&gt; post(`${API}/observation_reports/${id}/snowpack_observations`, p.snowpack));
+  for (const att of p.attachments)                      // one at a time: phones on trailhead signal
+    await run(att.file.name, () =&gt; uploadAsset(id, att));
+
+  return { id, failed };   // keep id + failed locally and offer "Retry uploads" rather than resubmitting
+}
+</code></pre></div>
+</details>
+<details><summary>Example: what one report produces</summary>
+<p style="margin-top:10px;font-size:14px;color:var(--ink-2)">Anonymous, location hidden, saw two avalanches (one natural wind slab yesterday, one snowmobile-triggered remote on a set date), a third avalanche entry left blank, shooting cracks, two photos. Note the blank avalanche is gone, and <code>&amp;#62;TL</code> / <code>D1.5</code> are converted.</p>
+<div class="codewrap"><button type="button" class="copy" data-copy="c-ex">Copy</button><pre id="c-ex"><code>{
+  "report": {
+    "firstname": "Sam",
+    "lastname": "Ortega",
+    "email": "sam@example.com",
+    "phone": "9705550148",
+    "observed_at": "2026-02-14",
+    "date_known": "Known",
+    "time_known": "Unknown",
+    "latitude": 39.601235,
+    "longitude": -106.050123,
+    "is_anonymous": true,
+    "is_anonymous_location": true,
+    "is_locked": false,
+    "saw_avalanche": true,
+    "triggered_avalanche": false,
+    "caught_in_avalanche": false,
+    "description": null,
+    "hw_op_bc": "bc",
+    "report_source": "Mobile App"
+  },
+  "avalanches": [
+    {
+      "latitude": 39.601235,
+      "longitude": -106.050123,
+      "observed_at": "2026-02-13",
+      "date_known": "Estimated",
+      "time_known": "Unknown",
+      "aspect": "NE",
+      "elevation": "&amp;#62;TL",
+      "destructive_size": "D1.5",
+      "problem_type": "wind",
+      "primary_trigger": "N",
+      "secondary_trigger": null
+    },
+    {
+      "latitude": 39.601235,
+      "longitude": -106.050123,
+      "observed_at": "2026-02-10",
+      "date_known": "Known",
+      "time_known": "Unknown",
+      "elevation": "&amp;#60;TL",
+      "destructive_size": "D2.5",
+      "primary_trigger": "AM",
+      "secondary_trigger": "r"
+    }
+  ],
+  "snowpack": {
+    "latitude": 39.601235,
+    "longitude": -106.050123,
+    "observed_at": "2026-02-14",
+    "cracking": "Shooting"
+  },
+  "attachments": [
+    {
+      "file": "a.jpg",
+      "caption": "Crown",
+      "position": 1
+    },
+    {
+      "file": "b.mp4",
+      "position": 2
+    }
+  ]
+}</code></pre></div>
+</details>
+<details><summary>Form state: the object these functions read</summary>
+<div class="codewrap"><pre><code>{
+  firstname: "", lastname: "", email: "", phone: "",
+  visibility: "public",        // public | noname | staff
+  locshare: "exact",           // exact | fuzz
+  observed_at: "2026-02-14",   // local date, YYYY-MM-DD
+  lat: 39.60123, lng: -106.05012,
+  avType: "",                  // "" | none | saw | triggered | caught
+  avalanches: [{               // always at least one entry; may be blank
+    whenOccurred: "",          // todayFresh | yesterday | fewDays | unsure | setdate
+    occurredOn: "",            // YYYY-MM-DD, filled by the form from whenOccurred
+    trigger_how: "",           // natural | triggered | remote | unknown
+    trigger_by: "",            // AS AR AI AF AM AN AK AV | other | unsure
+    trigger_by_other: "",
+    aspect: "",                // N NE E SE S SW W NW U
+    elevation: "",             // &gt;TL | TL | &lt;TL | U
+    dsize: "",                 // D1 D15 D2 D25 D3 D35 D4 D45 D5 U
+    problem: ""                // storm wind persistent wet_slab loose_wet loose_dry Unknown
+  }],
+  tr_cracking: "",             // none minor moderate shooting unknown
+  tr_collapsing: "",           // none minor moderate rumbling unknown
+  comments: "",                // Trip summary
+  assets: [{ file: File, caption: "" }]
+}</code></pre></div>
+</details>
+</section>
+
+<section id="checklist">
+<h2>Bug checklist</h2>
+<p>Each of these is an easy mistake that the API will either reject or, worse, accept and store wrong.</p>
+<ul class="check">
+  <li><b>Post the report once.</b> The API has no idempotency key. A blind retry after a timeout can create a duplicate public report. Keep the returned <code>id</code> on the device, and retry only the steps after it.</li>
+  <li><b>Never retry a 4xx.</b> It will fail the same way. Retry network errors, 429 and 5xx with backoff.</li>
+  <li><b>Partial success is normal.</b> A report can post while one photo fails. Tell the reporter what went through, and offer “Retry uploads,” not “Resubmit.”</li>
+  <li><b>Elevation is <code>&amp;#62;TL</code> / <code>&amp;#60;TL</code></b>, literally.</li>
+  <li><b>Sizes need the dot:</b> <code>D15</code> &rarr; <code>D1.5</code>.</li>
+  <li><b>Cracking and collapsing are capitalised</b>, and <code>"None"</code> is a real answer.</li>
+  <li><b>Case matters everywhere:</b> <code>Unknown</code> for problem type, <code>U</code> for aspect/elevation/size/trigger, <code>r</code> and <code>U</code> for secondary trigger.</li>
+  <li><b>Dates are local calendar dates</b>, <code>"YYYY-MM-DD"</code>. Converting to UTC can move a late-afternoon report to the next day.</li>
+  <li><b>Send the real pin.</b> The server does the obfuscation. A client-side fuzz means staff lose the true location.</li>
+  <li><b>Exactly one avalanche flag is true</b>, or none.</li>
+  <li><b>Skip blank avalanche entries</b>, and ignore avalanche entries when the answer is back to “didn't see.”</li>
+  <li><b>Omit, don't guess.</b> An unanswered question is left out (or <code>null</code>), never filled with a default like <code>U</code>. The server treats “unknown” and “not asked” differently.</li>
+  <li><b>Checksum is base64 of raw MD5 bytes</b>, 24 characters ending in <code>==</code>.</li>
+  <li><b>S3 upload is a PUT with the returned headers</b>, sent within about five minutes of registering.</li>
+  <li><b>Browser builds:</b> the API allows cross-origin calls from <code>www.avalanche.ca</code>. Confirm the S3 PUT works from the browser on the development server before relying on it.</li>
+</ul>
+</section>
+
+<section id="gaps">
+<h2>Not collected yet</h2>
+<p>The API can take more than the trip report asks for. These exist in the spec, or elsewhere in this prototype, but are not on the CAIC trip form, so there is nothing to send:</p>
+<ul>
+  <li>Group and incident details (group size, number caught or buried, rescue gear, airbags)</li>
+  <li>Avalanche dimensions, weak layer, bed surface and crust</li>
+  <li>Weather observations (<code>POST …/weather_observations</code>)</li>
+  <li>Report title, activity, route and objective (<code>report_title</code>, <code>report_activity</code>, <code>route</code>, <code>objective</code>)</li>
+  <li>External video links</li>
+</ul>
+<p>If any of these are added to the form, this page gets a new row, not a new process.</p>
+</section>
+</main>
+<footer>Draft for CAIC and Avalanche Canada. Built from the published OpenAPI spec, version 2.55. If the spec and this page disagree, the spec wins. Tell CAIC so this page can be fixed.</footer>
+<script>
+(function(){
+  "use strict";
+  const root=document.documentElement;
+  document.querySelectorAll("[data-th]").forEach(b=>b.addEventListener("click",()=>{
+    const t=b.dataset.th;
+    if(t==="auto") delete root.dataset.theme; else root.dataset.theme=t;
+    document.querySelectorAll("[data-th]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+    try{ localStorage.setItem("caic-theme",t); }catch(e){}
+  }));
+  try{ const t=localStorage.getItem("caic-theme"); const b=t&&document.querySelector('[data-th="'+t+'"]'); if(b) b.click(); }catch(e){}
+  document.querySelectorAll("[data-copy]").forEach(b=>b.addEventListener("click",async()=>{
+    const txt=document.getElementById(b.dataset.copy).textContent;
+    try{ await navigator.clipboard.writeText(txt); b.textContent="Copied"; }
+    catch(e){ b.textContent="Select and copy"; }
+    setTimeout(()=>{ b.textContent="Copy"; },1600);
+  }));
+})();
+</script>
+</body>
+</html>
